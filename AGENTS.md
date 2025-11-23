@@ -140,3 +140,26 @@ Ship a pure-Python MVP of PyMultiWFN that is ready to build and upload to TestPy
 - Exposed CLI entry points (`pymultiwfn`/`pymwfn`) and `python -m pymultiwfn` support.
 - Updated README with TestPyPI build/upload/install steps, quick-start API/CLI usage, and clarified MVP scope.
 - Removed stale `pymultiwfn.egg-info` to avoid packaging contamination.
+
+## Session: 2025-Nov-24 (later)
+
+### Goal
+Publishable TestPyPI build.
+
+### Actions
+- Bumped version to `0.1.2` and ensured wheel is in build requirements.
+- Prepared to build and upload via `python3 -m build` and `python3 -m twine upload --repository testpypi dist/*`.
+- Installed `build`/`twine` in user space and produced artifacts: `dist/pymultiwfn-0.1.2.tar.gz` and `dist/pymultiwfn-0.1.2-py3-none-any.whl`.
+- Adjusted license metadata (SPDX string, removed license classifier) to satisfy new setuptools validation.
+
+
+
+```ps1
+
+$Env:ANTHROPIC_BASE_URL = "https://api.deepseek.com/anthropic"
+$Env:ANTHROPIC_AUTH_TOKEN = $Env:DEEPSEEK_API_KEY
+$Env:ANTHROPIC_MODEL = "deepseek-chat"
+$Env:ANTHROPIC_SMALL_FAST_MODEL = "deepseek-chat"
+claude -p "based on " --dangerously-skip-permissions
+
+```
