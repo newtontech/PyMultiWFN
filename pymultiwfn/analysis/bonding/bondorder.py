@@ -1,11 +1,16 @@
 """
-Bond order analysis module.
-Implements various bond order calculations including Mayer, Mulliken, and Wiberg bond orders.
+Bond order analysis module for PyMultiWFN.
+
+This module implements various bond order analysis methods including:
+- Mayer bond order analysis
+- Mulliken bond order analysis
+- Orbital decomposition of bond orders
+- Orbital occupancy-perturbed Mayer bond order
 """
 
 import numpy as np
 from typing import Dict, List, Tuple, Optional, Union
-from pymultiwfn.core.data import Wavefunction
+from ...core.data import Wavefunction
 
 
 def calculate_mayer_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:

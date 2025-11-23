@@ -3,6 +3,7 @@
 
 docs show be a github pages folder that use ant design to build a website for promoting the package.
 尽可能做到不需要编译任何文件就可以使用pip安装这个包
+如果需要测试文件，例如test.py文件，请在提交git前删除这个文件，不要保留。
 ### 阶段一：项目侦察与架构规划 (Reconnaissance & Architecture)
 
 **目标**：让 AI 理解现有的文件结构，并提出合理的 Python 目录结构。
