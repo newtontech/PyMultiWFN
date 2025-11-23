@@ -8,6 +8,21 @@ from typing import Optional, Tuple
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.math.basis import evaluate_basis
 
+# Import composition analysis
+from .composition import (
+    MullikenAnalyzer,
+    SCPAAnalyzer,
+    HirshfeldAnalyzer,
+    BeckeAnalyzer,
+    FragmentAnalyzer
+)
+
+# Import localization methods
+from .localization import (
+    PipekMezeyLocalizer,
+    FosterBoysLocalizer
+)
+
 class OrbitalAnalyzer:
     def __init__(self, wavefunction: Wavefunction):
         if wavefunction.coefficients is None:
