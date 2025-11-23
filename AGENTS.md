@@ -2,6 +2,7 @@
 请注意项目的标准写法是PyMultiWFN，并且需要作为一个可以在pip上安装的包，拥有与multiwfn相同的功能a @consistency_verifier  can be used to validate that @pymultiwfn and @Multiwfn_3.8_dev_src_Linux_2025-Nov-23 can generate exactly same output.
 
 docs show be a github pages folder that use ant design to build a website for promoting the package.
+尽可能做到不需要编译任何文件就可以使用pip安装这个包
 ### 阶段一：项目侦察与架构规划 (Reconnaissance & Architecture)
 
 **目标**：让 AI 理解现有的文件结构，并提出合理的 Python 目录结构。
