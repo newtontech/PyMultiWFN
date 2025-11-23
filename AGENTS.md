@@ -101,3 +101,12 @@
 1.  Create the physical directory structure.
 2.  Implement `pymultiwfn/core/data.py` to mirror `define.f90`'s data structures.
 3.  Implement a basic parser in `pymultiwfn/io/` to load data.
+
+### Phase 2: Foundation Setup (Update)
+**Actions Taken**:
+1.  **Package Configuration**: Created `pyproject.toml` to make `pymultiwfn` a pip-installable package, ensuring standard Python packaging practices.
+2.  **Core Implementation**: Implemented `pymultiwfn/core/constants.py` (physical constants), `pymultiwfn/core/data.py` (Wavefunction data structures), and `pymultiwfn/config.py` (configuration).
+3.  **IO Implementation**: Implemented `pymultiwfn/io/parsers/fchk.py` for parsing Gaussian FCHK files.
+
+**Note on Validation**:
+A `consistency_verifier` tool (located at `consistency_verifier/`) will be used to validate that `pymultiwfn` and the original `Multiwfn` source code (`Multiwfn_3.8_dev_src_Linux_2025-Nov-23`) generate exactly the same output. This ensures the refactoring maintains functional parity.
