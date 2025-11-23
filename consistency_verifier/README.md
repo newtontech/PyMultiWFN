@@ -184,3 +184,32 @@ Key parameters can be adjusted in the code:
 - `timeout`: Process timeout in seconds (default: 60)
 - `max_workers`: Parallel execution workers
 - `skip_patterns`: Output lines to ignore during comparison
+
+
+
+
+  "Building upon the existing consistency_verifier/README.md, the first step is to establish the basic execution  
+  of both the original Multiwfn program and the pymultiwfn library on a single test file.                         
+
+
+
+
+1. Create a placeholder `verifier.py` in C:\Users\yanha\Downloads\PyMultiWFN\consistency_verifier\ if it       
+   doesn't already exist.
+2. Implement a function within `verifier.py` (e.g., run_multiwfn_and_pymultiwfn) that takes a file path to an  
+   example input file (e.g., from C:\Users\yanha\Downloads\PyMultiWFN\Multiwfn_3.8_dev_bin_Win64\examples\) as 
+   an argument.
+3. Within this function, execute `Multiwfn.exe`:(or corresponding file in linux or mac OS)
+      * Determine the correct command-line arguments to run Multiwfn.exe non-interactively on the input file to  
+      generate a specific output (e.g., Function 0: Molecular data). You may need to consult Multiwfn
+      documentation or experiment.
+      * Capture its standard output and standard error.
+4. Execute `pymultiwfn`:
+      * Identify the equivalent pymultiwfn function or module that processes the same input file and performs the
+      same analysis as Multiwfn in the previous step.
+      * Capture its output (e.g., returned data structure or printed output).
+5. For initial verification, print both raw outputs (Multiwfn and pymultiwfn) to the console for a selected    
+   example file.
+
+Goal: To confirm that both programs can be invoked programmatically and their raw outputs can be captured for a
+simple case.

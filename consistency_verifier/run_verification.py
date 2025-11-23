@@ -1,6 +1,6 @@
 import os
 import sys
-from consistency_verifier import ConsistencyVerifier
+from verifier import ConsistencyVerifier
 
 def main():
     # Configuration

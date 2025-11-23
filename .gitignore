@@ -81,16 +81,17 @@ test_reports/
 .gemini/
 gha-creds-*.json
 
-# Ignore specific binary files in Multiwfn_3.8_dev_bin_Win64/examples
-Multiwfn_3.8_dev_bin_Win64/examples/*.xyz
-Multiwfn_3.8_dev_bin_Win64/examples/*.fch
-Multiwfn_3.8_dev_bin_Win64/examples/*.gjf
-Multiwfn_3.8_dev_bin_Win64/examples/*.pdb
-Multiwfn_3.8_dev_bin_Win64/examples/*.mwfn
-Multiwfn_3.8_dev_bin_Win64/examples/*.opj
-Multiwfn_3.8_dev_bin_Win64/examples/*.mol
-Multiwfn_3.8_dev_bin_Win64/examples/*.vmd
-Multiwfn_3.8_dev_bin_Win64/examples/*.47
-Multiwfn_3.8_dev_bin_Win64/examples/*.txt
-Multiwfn_3.8_dev_bin_Win64/examples/*.png
-Multiwfn_3.8_dev_bin_Win64/examples/*.pdf
+# Ignore specific binary files in consistency_verifier/examples
+consistency_verifier/examples/*.xyz
+consistency_verifier/examples/*.fch
+consistency_verifier/examples/*.gjf
+consistency_verifier/examples/*.pdb
+consistency_verifier/examples/*.mwfn
+consistency_verifier/examples/*.opj
+consistency_verifier/examples/*.mol
+consistency_verifier/examples/*.vmd
+consistency_verifier/examples/*.47
+consistency_verifier/examples/*.txt
+consistency_verifier/examples/*.png
+consistency_verifier/examples/*.pdf
+consistency_verifier/examples/*.exe
