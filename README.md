@@ -1,62 +1,62 @@
 # PyMultiWFN
 
-**PyMultiWFN** is a modernization project aiming to refactor the renowned wavefunction analysis program **Multiwfn** from Fortran to Python. This project seeks to maintain the powerful analytical capabilities of the original software while leveraging Python's ecosystem for better modularity, readability, and extensibility.
+**PyMultiWFN** is a modernization of the Multiwfn wavefunction analysis program, rewritten in Python for easier extension and packaging. The MVP keeps the core data structures, FCHK parsing, and density evaluation while avoiding any compilation step so it can ship as a pure-Python wheel to TestPyPI.
 
-## Project Goal
+## What’s in the MVP
+- Pure-Python package, `pip install`-able without compilation.
+- `FchkLoader` to read Gaussian `.fchk` files into a `Wavefunction` object.
+- Vectorized Gaussian basis evaluation and electron-density calculator.
+- Minimal CLI (`pymultiwfn path/to/file.fchk`) for quick inspection.
+- Optional Fortran wrappers documented in `pymultiwfn/math/fortran` (not required for install).
 
-To create a high-performance, modular, and user-friendly Python package for wavefunction analysis, serving as a modern alternative or companion to the original Multiwfn.
+## Install (TestPyPI)
+Publish a build to TestPyPI, then install:
 
-## Architecture
+```bash
+python -m pip install --upgrade pip build twine
+python -m build
+python -m twine upload --repository testpypi dist/*
 
-The project follows a modular architecture designed to separate data, logic, and visualization.
-
-### Directory Structure
-
-```text
-pymultiwfn/
-├── core/           # Core data structures (Wavefunction, Atom, BasisSet)
-├── io/             # File I/O (Parsers for .fch, .wfn, .molden, etc.)
-├── math/           # Mathematical engines (Grid generation, Integration, GTF evaluation)
-├── analysis/       # Analysis modules (Topology, Population, Bonding, etc.)
-├── vis/            # Visualization (Matplotlib/PyQt plotting)
-├── utils/          # Utilities (Logging, Config)
-└── config.py       # Configuration management
+# install from TestPyPI (replace VERSION)
+python -m pip install -U --extra-index-url https://test.pypi.org/simple pymultiwfn==0.1.1
 ```
 
-## Technology Stack
+## Quick start
+```python
+import numpy as np
+from pymultiwfn.io.loader import load_wavefunction
+from pymultiwfn.math.density import calc_density
 
-*   **Language**: Python 3.10+
-*   **Core Computation**: NumPy (Vectorization), Numba (JIT Compilation for performance-critical loops)
-*   **Visualization**: Matplotlib (Static), PyQt/Side (Interactive GUI - Future)
-*   **Quantum Chemistry Interop**: PySCF (Optional, for complex integrals)
+wfn = load_wavefunction("molecule.fchk")
+points = np.array([[0.0, 0.0, 0.0]])  # Bohr
+density = calc_density(wfn, points)
+print("ρ(0,0,0) =", density[0])
+```
 
-## Development Status
+Command line:
+```bash
+pymultiwfn molecule.fchk   # prints header info and a density sanity check
+```
 
-### Phase 1: Reconnaissance & Architecture (Completed)
-- Analyzed original Fortran source code structure.
-- Designed Python package structure.
-- Established strategies for handling global variables and performance bottlenecks.
+## Package layout
+```text
+pymultiwfn/
+├── core/         # Wavefunction, Atom/Shell containers, definitions & constants
+├── io/           # Parsers (currently .fchk)
+├── math/         # Basis and density evaluation; optional f2py stubs
+├── analysis/     # Stubs for bonding/density/orbital analyses (extensible)
+├── vis/          # GUI/plotting placeholders
+├── utils/        # Helpers
+└── config.py     # Runtime configuration singleton
+```
 
-### Phase 2: Foundation (In Progress)
-- Setting up project skeleton.
-- Implementing Core Data Structures (`Wavefunction`).
-- Implementing basic File I/O (`.fch` parser).
+## Development tips
+- Keep changes additive; use NumPy vectorization for heavy math.
+- Use `pymultiwfn/math/fortran/lebedev.pyf` if you need compiled grids, but it is optional for wheels.
+- `consistency_verifier/` can be used to compare outputs with the original Multiwfn Fortran code.
 
-## License
-
-[License Information to be added]
-Original citing:
-LICENSE INFORMATION: To download and use Multiwfn, you are required to read and agree the following terms:
-(a) Currently Multiwfn is free of charge and open-source for both academic and commerical usages, anyone is allowed to freely distribute the original or their modified Multiwfn codes to others.
-(b) Multiwfn can be distributed as a free component of commercial code. Selling modified version of Multiwfn may also be granted, however, obtaining prior consent from the original author of Multiwfn (Tian Lu) is needed.
-(c) If Multiwfn is utilized in your work, or your own code incorporated any part of Multiwfn code, at least the following original papers of Multiwfn MUST BE cited in main text of your paper or code:
-Tian Lu, Feiwu Chen, J. Comput. Chem., 33, 580-592 (2012)
-Tian Lu, J. Chem. Phys., 161, 082503 (2024)
-(d) There is no warranty of correctness of the results produced by Multiwfn, the author of Multiwfn does not hold responsibility in any way for any consequences arising from the use of the Multiwfn.
-
-Whenever possible, please mention and cite Multiwfn in main text rather than in supplemental information, otherwise not only Multiwfn will be difficult for readers to notice, but also the paper will not be included in citation statistics.
-
-郑重提示：在研究文章里恰当引用研究中使用的所有学术程序是最基本的学术规范和道德。最合理的引用Multiwfn的方法见Multiwfn可执行文件包里的How to cite Multiwfn.pdf文档。如果使用了Multiwfn（包括其中任何功能）的文章中甚至连上面红字提到的这篇Multiwfn原文都没在文章正文里引用的话，一经发现，作者会被列入黑名单，并禁止在未来使用Multiwfn。给实验组做代算时也必须明确告知对方需要在文章中对Multiwfn进行正确引用。
-
-PyMultiWFN citing: 
-PyMultiWFN is a modernization project aiming to refactor the renowned wavefunction analysis program Multiwfn from Fortran to Python. This project seeks to maintain the powerful analytical capabilities of the original software while leveraging Python's ecosystem for better modularity, readability, and extensibility.
+## License & citation
+- Code: MIT License (see `LICENSE`).
+- Please cite the original Multiwfn papers when results rely on its algorithms:  
+  Tian Lu, Feiwu Chen, *J. Comput. Chem.* **33**, 580–592 (2012)  
+  Tian Lu, *J. Chem. Phys.* **161**, 082503 (2024)

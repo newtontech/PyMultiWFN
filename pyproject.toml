@@ -4,25 +4,48 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pymultiwfn"
-version = "0.1.0"
-description = "A Python refactoring of the Multiwfn wavefunction analysis program"
-readme = "README.md"
+version = "0.1.1"
+description = "Python-first refactor of the Multiwfn wavefunction analysis program"
+readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
   {name = "PyMultiWFN Team"}
 ]
+keywords = ["quantum-chemistry", "wavefunction", "analysis", "multiwfn", "computational-chemistry"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "Topic :: Scientific/Engineering :: Physics",
+]
 dependencies = [
-  "numpy>=1.20",
+  "numpy>=1.21",
   "scipy>=1.7",
   "matplotlib>=3.5",
   "numba>=0.55"
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/yourusername/pymultiwfn"
-"Bug Tracker" = "https://github.com/yourusername/pymultiwfn/issues"
+"Homepage" = "https://github.com/pymultiwfn/pymultiwfn"
+"Bug Tracker" = "https://github.com/pymultiwfn/pymultiwfn/issues"
+"Documentation" = "https://pymultiwfn.github.io/docs"
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["pymultiwfn*"]
+
+[tool.setuptools.package-data]
+pymultiwfn = [
+  "math/fortran/*"
+]
+
+[project.scripts]
+pymultiwfn = "pymultiwfn.main:main"
+pymwfn = "pymultiwfn.main:main"

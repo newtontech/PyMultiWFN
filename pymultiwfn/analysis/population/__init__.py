@@ -1,2 +1,2 @@
 # pymultiwfn/analysis/population/__init__.py
-# Placeholder for population analysis module
+from .mulliken import calculate_mulliken_population_and_charges

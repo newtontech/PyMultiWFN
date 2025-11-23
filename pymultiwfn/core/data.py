@@ -56,9 +56,6 @@ class Wavefunction:
     energies: Optional[np.ndarray] = None # Orbital energies
     occupations: Optional[np.ndarray] = None # Orbital occupations
     
-    # Overlap matrix
-    overlap_matrix: Optional[np.ndarray] = None
-    
     # Unrestricted / Open Shell
     is_unrestricted: bool = False
     coefficients_beta: Optional[np.ndarray] = None

@@ -126,3 +126,17 @@ A `consistency_verifier` tool (located at `consistency_verifier/`) will be used 
 
 **Current Status**:
 The project foundation is laid. Core data structures, I/O (FCHK), and basic compute engines (Density) are implemented. The hybrid programming path is established for complex components.
+
+---
+
+## Session: 2025-Nov-24
+
+### Goal
+Ship a pure-Python MVP of PyMultiWFN that is ready to build and upload to TestPyPI.
+
+### Actions
+- Cleaned the package tree for distribution (removed cached bytecode, added missing `__init__` for parsers).
+- Added MIT `LICENSE`, refreshed `pyproject.toml` metadata (classifiers, keywords, package data, scripts, URLs), and bumped version to `0.1.1`.
+- Exposed CLI entry points (`pymultiwfn`/`pymwfn`) and `python -m pymultiwfn` support.
+- Updated README with TestPyPI build/upload/install steps, quick-start API/CLI usage, and clarified MVP scope.
+- Removed stale `pymultiwfn.egg-info` to avoid packaging contamination.

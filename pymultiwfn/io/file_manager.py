@@ -9,7 +9,8 @@ class FileManager:
     """
     def __init__(self):
         self.parsers = {
-            '.fchk': FchkLoader
+            '.fchk': FchkLoader,
+            '.fch': FchkLoader,
         }
         # Add other parsers here as they are implemented
 

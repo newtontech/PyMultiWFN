@@ -1,90 +1,106 @@
-
 import numpy as np
+from pymultiwfn.core.data import Wavefunction
 from typing import Tuple, Optional
 
-from pymultiwfn.core.data import Wavefunction
-
-def calculate_mulliken_bond_order(wavefunction: Wavefunction) -> Tuple[np.ndarray, Optional[np.ndarray], Optional[np.ndarray]]:
+def calculate_mulliken_bond_order(
+    wavefunction: Wavefunction, 
+    overlap_matrix: np.ndarray
+) -> Tuple[np.ndarray, Optional[np.ndarray], Optional[np.ndarray]]:
     """
-    Calculates the Mulliken bond order matrix for a given wavefunction.
+    Calculates the Mulliken bond order (Mulliken overlap population) matrix.
 
     Args:
-        wavefunction: A Wavefunction object containing density matrices and overlap matrix.
+        wavefunction: The Wavefunction object containing MO coefficients, occupations, etc.
+        overlap_matrix: The overlap matrix (S_uv).
 
     Returns:
-        A tuple:
-        - A numpy array representing the total Mulliken bond order matrix.
-        - A numpy array representing the alpha Mulliken bond order matrix (if unrestricted), else None.
-        - A numpy array representing the beta Mulliken bond order matrix (if unrestricted), else None.
+        A tuple (bnd_mattot, bnd_mata, bnd_matb)
+        bnd_mattot: Total Mulliken bond order matrix.
+        bnd_mata: Alpha Mulliken bond order matrix (None if restricted).
+        bnd_matb: Beta Mulliken bond order matrix (None if restricted).
     """
+    if wavefunction.Ptot is None or wavefunction.Palpha is None or wavefunction.Pbeta is None:
+        wavefunction.calculate_density_matrices()
+
     num_atoms = wavefunction.num_atoms
-    num_basis = wavefunction.num_basis
-
-    if wavefunction.overlap_matrix is None:
-        raise ValueError("Overlap matrix (Sbas) is not available in the Wavefunction object.")
-    if wavefunction.Ptot is None:
-        wavefunction.calculate_density_matrices() # Ensure density matrices are calculated
-    if wavefunction.Ptot is None: # Check again in case calculate_density_matrices failed
-        raise ValueError("Total density matrix (Ptot) could not be calculated.")
-
-    atomic_basis_indices = wavefunction.get_atomic_basis_indices()
-
-    bond_order_matrix_total = np.zeros((num_atoms, num_atoms))
-    bond_order_matrix_alpha = None
-    bond_order_matrix_beta = None
-
-    # Calculate Mulliken bond order for total density
-    # The Fortran code calculates only for upper triangle (j = i+1 to ncenter), then makes it symmetric and multiplies by 2.
-    for i in range(num_atoms):
-        basis_fns_i = atomic_basis_indices[i]
-        for j in range(i + 1, num_atoms):
-            basis_fns_j = atomic_basis_indices[j]
-            
-            # Extract relevant submatrices
-            ptot_ij = wavefunction.Ptot[np.ix_(basis_fns_i, basis_fns_j)]
-            sbas_ij = wavefunction.overlap_matrix[np.ix_(basis_fns_i, basis_fns_j)]
-
-            # Perform the sum for Mulliken bond order
-            accum_total = np.sum(ptot_ij * sbas_ij)
-            bond_order_matrix_total[i, j] = accum_total
     
-    # Make symmetric and multiply by 2
-    bond_order_matrix_total = 2 * (bond_order_matrix_total + bond_order_matrix_total.T)
+    # Get mapping from atom index to its basis function indices
+    atom_to_bfs_map = wavefunction.get_atomic_basis_indices()
 
-    # Fill diagonal elements: Sum of corresponding row elements
+    bnd_mattot = np.zeros((num_atoms, num_atoms))
+    bnd_mata = None
+    bnd_matb = None
+
+    # --- Calculate total Mulliken bond order ---
+    # In Fortran, this is PSmata = Sbas * Ptot (element-wise product)
+    PS_tot_element_wise = wavefunction.Ptot * overlap_matrix
+
     for i in range(num_atoms):
-        bond_order_matrix_total[i, i] = np.sum(bond_order_matrix_total[i, :])
+        bfs_i = atom_to_bfs_map.get(i, []) # Get list of bfs for atom i
+        if not bfs_i: # Skip if atom has no basis functions assigned
+            continue
 
-    # Handle unrestricted case
+        for j in range(i + 1, num_atoms):
+            bfs_j = atom_to_bfs_map.get(j, []) # Get list of bfs for atom j
+            if not bfs_j: # Skip if atom has no basis functions assigned
+                continue
+
+            # Sum up elements of the population matrix belonging to basis functions
+            # on atom i and atom j.
+            bond_order_val = np.sum(PS_tot_element_wise[np.ix_(bfs_i, bfs_j)])
+            
+            bnd_mattot[i, j] = bond_order_val
+            bnd_mattot[j, i] = bond_order_val # Symmetric matrix
+
+    # Fortran code applies factor of 2 and then sums diagonals
+    # bndmattot=2*(bndmattot+transpose(bndmattot))
+    # forall (i=1:ncenter) bndmattot(i,i)=sum(bndmattot(i,:))
+    # It seems to apply 2* to off-diagonals, and then sum for diagonals.
+    # We can do this in two steps to be explicit.
+    bnd_mattot_off_diag = bnd_mattot + bnd_mattot.T # Already symmetric from above loop, just make explicit
+    bnd_mattot = 2 * bnd_mattot_off_diag
+    for i in range(num_atoms):
+        bnd_mattot[i, i] = np.sum(bnd_mattot[i, :])
+
+
+    # --- Calculate Alpha and Beta Mulliken Bond Orders for Unrestricted Wavefunctions ---
     if wavefunction.is_unrestricted:
-        if wavefunction.Palpha is None or wavefunction.Pbeta is None:
-             raise ValueError("Alpha and Beta density matrices are not available for unrestricted calculation.")
+        bnd_mata = np.zeros((num_atoms, num_atoms))
+        bnd_matb = np.zeros((num_atoms, num_atoms))
 
-        bond_order_matrix_alpha = np.zeros((num_atoms, num_atoms))
-        bond_order_matrix_beta = np.zeros((num_atoms, num_atoms))
+        PS_alpha_element_wise = wavefunction.Palpha * overlap_matrix
+        PS_beta_element_wise = wavefunction.Pbeta * overlap_matrix
 
         for i in range(num_atoms):
-            basis_fns_i = atomic_basis_indices[i]
+            bfs_i = atom_to_bfs_map.get(i, [])
+            if not bfs_i:
+                continue
+
             for j in range(i + 1, num_atoms):
-                basis_fns_j = atomic_basis_indices[j]
+                bfs_j = atom_to_bfs_map.get(j, [])
+                if not bfs_j:
+                    continue
 
-                ptot_alpha_ij = wavefunction.Palpha[np.ix_(basis_fns_i, basis_fns_j)]
-                ptot_beta_ij = wavefunction.Pbeta[np.ix_(basis_fns_i, basis_fns_j)]
-                sbas_ij = wavefunction.overlap_matrix[np.ix_(basis_fns_i, basis_fns_j)]
-
-                accum_alpha = np.sum(ptot_alpha_ij * sbas_ij)
-                bond_order_matrix_alpha[i, j] = accum_alpha
-
-                accum_beta = np.sum(ptot_beta_ij * sbas_ij)
-                bond_order_matrix_beta[i, j] = accum_beta
+                bond_order_alpha = np.sum(PS_alpha_element_wise[np.ix_(bfs_i, bfs_j)])
+                bond_order_beta = np.sum(PS_beta_element_wise[np.ix_(bfs_i, bfs_j)])
+                
+                bnd_mata[i, j] = bond_order_alpha
+                bnd_mata[j, i] = bond_order_alpha
+                bnd_matb[i, j] = bond_order_beta
+                bnd_matb[j, i] = bond_order_beta
         
-        # Make symmetric and multiply by 2 for alpha and beta
-        bond_order_matrix_alpha = 2 * (bond_order_matrix_alpha + bond_order_matrix_alpha.T)
-        bond_order_matrix_beta = 2 * (bond_order_matrix_beta + bond_order_matrix_beta.T)
+        bnd_mata_off_diag = bnd_mata + bnd_mata.T
+        bnd_mata = 2 * bnd_mata_off_diag
+        bnd_matb_off_diag = bnd_matb + bnd_matb.T
+        bnd_matb = 2 * bnd_matb_off_diag
 
-        # Fill diagonal elements for alpha and beta
+        # Set diagonal elements
         for i in range(num_atoms):
-            bond_order_matrix_alpha[i, i] = np.sum(bond_order_matrix_alpha[i, :])
-            bond_order_matrix_beta[i, i] = np.sum(bond_order_matrix_beta[i, :])
+            bnd_mata[i, i] = np.sum(bnd_mata[i, :])
+            bnd_matb[i, i] = np.sum(bnd_matb[i, :])
+        
+        # Total Mulliken bond order for unrestricted case is sum of alpha and beta
+        bnd_mattot = bnd_mata + bnd_matb
 
-    return bond_order_matrix_total, bond_order_matrix_alpha, bond_order_matrix_beta
+
+    return bnd_mattot, bnd_mata, bnd_matb
