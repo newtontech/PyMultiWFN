@@ -211,5 +211,4 @@ Key parameters can be adjusted in the code:
 5. For initial verification, print both raw outputs (Multiwfn and pymultiwfn) to the console for a selected    
    example file.
 
-Goal: To confirm that both programs can be invoked programmatically and their raw outputs can be captured for a
-simple case.
+Goal: To confirm that both programs can be invoked programmatically and their raw outputs can be captured for a simple case.

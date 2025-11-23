@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyMultiWFN - Simple Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #28a745;
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 PyMultiWFN Website Test</h1>
+        <p>This page tests the basic functionality of the PyMultiWFN website.</p>
+
+        <div class="test-item">
+            <h3>1. Basic HTML Structure</h3>
+            <div id="html-test">Testing...</div>
+        </div>
+
+        <div class="test-item">
+            <h3>2. CSS Loading</h3>
+            <div id="css-test">Testing...</div>
+        </div>
+
+        <div class="test-item">
+            <h3>3. JavaScript Functionality</h3>
+            <div id="js-test">Testing...</div>
+        </div>
+
+        <div class="test-item">
+            <h3>4. Font Awesome Icons</h3>
+            <div id="icons-test">Testing...</div>
+        </div>
+
+        <div class="test-item">
+            <h3>5. Network Connectivity</h3>
+            <div id="network-test">Testing...</div>
+        </div>
+
+        <div class="test-item">
+            <h3>6. Browser Information</h3>
+            <div id="browser-test">Testing...</div>
+        </div>
+
+        <div class="test-item">
+            <h3>Manual Tests</h3>
+            <button onclick="testMainSite()">Test Main Site</button>
+            <button onclick="testNavigation()">Test Navigation</button>
+            <button onclick="testResponsive()">Test Responsive</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let tests = [];
+
+        // Test 1: HTML Structure
+        function testHTML() {
+            try {
+                const hasTitle = document.title && document.title.length > 0;
+                const hasBody = document.body && document.body.children.length > 0;
+                const hasContainer = document.querySelector('.container');
+
+                const result = hasTitle && hasBody && hasContainer;
+                tests.push(`HTML Structure: ${result ? '✅ PASS' : '❌ FAIL'}`);
+                document.getElementById('html-test').innerHTML = result ?
+                    '<span class="success">✅ HTML Structure loaded correctly</span>' :
+                    '<span class="error">❌ HTML Structure issues detected</span>';
+            } catch (error) {
+                tests.push(`HTML Structure: ❌ ERROR - ${error.message}`);
+                document.getElementById('html-test').innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+
+        // Test 2: CSS Loading
+        function testCSS() {
+            try {
+                const container = document.querySelector('.container');
+                const styles = window.getComputedStyle(container);
+                const hasStyles = styles.backgroundColor !== 'rgba(0, 0, 0, 0)' &&
+                                 styles.padding !== '0px';
+
+                tests.push(`CSS Loading: ${hasStyles ? '✅ PASS' : '❌ FAIL'}`);
+                document.getElementById('css-test').innerHTML = hasStyles ?
+                    '<span class="success">✅ CSS loaded and applied correctly</span>' :
+                    '<span class="error">❌ CSS not loaded properly</span>';
+            } catch (error) {
+                tests.push(`CSS Loading: ❌ ERROR - ${error.message}`);
+                document.getElementById('css-test').innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+
+        // Test 3: JavaScript
+        function testJavaScript() {
+            try {
+                const canRunJS = typeof testJavaScript === 'function';
+                const hasConsole = typeof console !== 'undefined' && console.log;
+                const hasAlert = typeof alert === 'function';
+
+                tests.push(`JavaScript: ${canRunJS ? '✅ PASS' : '❌ FAIL'}`);
+                document.getElementById('js-test').innerHTML = canRunJS ?
+                    '<span class="success">✅ JavaScript is working correctly</span>' :
+                    '<span class="error">❌ JavaScript not working</span>';
+            } catch (error) {
+                tests.push(`JavaScript: ❌ ERROR - ${error.message}`);
+                document.getElementById('js-test').innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+
+        // Test 4: Font Awesome (icons)
+        function testIcons() {
+            setTimeout(() => {
+                try {
+                    // Try to load Font Awesome CSS
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css';
+
+                    link.onload = () => {
+                        tests.push('Font Awesome: ✅ PASS');
+                        document.getElementById('icons-test').innerHTML =
+                            '<span class="success">✅ Font Awesome loaded successfully <i class="fas fa-check"></i></span>';
+                    };
+
+                    link.onerror = () => {
+                        tests.push('Font Awesome: ⚠️ WARNING - CDN unavailable');
+                        document.getElementById('icons-test').innerHTML =
+                            '<span class="error">⚠️ Font Awesome CDN not available (icons may not show)</span>';
+                    };
+
+                    document.head.appendChild(link);
+                } catch (error) {
+                    tests.push(`Font Awesome: ❌ ERROR - ${error.message}`);
+                    document.getElementById('icons-test').innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+                }
+            }, 500);
+        }
+
+        // Test 5: Network Connectivity
+        function testNetwork() {
+            fetch('https://api.github.com/repos/ant-design/ant-design')
+                .then(() => {
+                    tests.push('Network: ✅ PASS');
+                    document.getElementById('network-test').innerHTML =
+                        '<span class="success">✅ Network connectivity working</span>';
+                })
+                .catch(() => {
+                    tests.push('Network: ⚠️ WARNING - Limited');
+                    document.getElementById('network-test').innerHTML =
+                        '<span class="error">⚠️ Limited network connectivity</span>';
+                });
+        }
+
+        // Test 6: Browser Information
+        function testBrowser() {
+            try {
+                const userAgent = navigator.userAgent;
+                const language = navigator.language;
+                const platform = navigator.platform;
+                const cookieEnabled = navigator.cookieEnabled;
+
+                tests.push(`Browser: ✅ ${userAgent.split(' ').slice(-2).join(' ')}`);
+                document.getElementById('browser-test').innerHTML = `
+                    <span class="success">✅ Browser: ${userAgent.split(' ').slice(-2).join(' ')}</span><br>
+                    <small>Language: ${language}, Platform: ${platform}, Cookies: ${cookieEnabled ? 'Enabled' : 'Disabled'}</small>
+                `;
+            } catch (error) {
+                tests.push(`Browser: ❌ ERROR - ${error.message}`);
+                document.getElementById('browser-test').innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+
+        // Manual test functions
+        function testMainSite() {
+            window.open('index.html', '_blank');
+        }
+
+        function testNavigation() {
+            alert('Navigation test: Click the menu items in the main site to test navigation');
+        }
+
+        function testResponsive() {
+            alert('Responsive test: Resize the browser window to test responsive design');
+        }
+
+        // Run all tests
+        function runAllTests() {
+            console.log('Running website tests...');
+            testHTML();
+            testCSS();
+            testJavaScript();
+            testIcons();
+            testNetwork();
+            testBrowser();
+
+            setTimeout(() => {
+                showResults();
+            }, 3000);
+        }
+
+        function showResults() {
+            const resultsDiv = document.getElementById('results');
+            const passCount = tests.filter(t => t.includes('✅ PASS')).length;
+            const failCount = tests.filter(t => t.includes('❌ FAIL')).length;
+            const warningCount = tests.filter(t => t.includes('⚠️ WARNING')).length;
+
+            resultsDiv.innerHTML = `
+                <div class="test-item" style="margin-top: 30px;">
+                    <h3>📊 Test Results Summary</h3>
+                    <p><strong>Tests Completed:</strong> ${tests.length}</p>
+                    <p><strong>✅ Passed:</strong> ${passCount}</p>
+                    <p><strong>❌ Failed:</strong> ${failCount}</p>
+                    <p><strong>⚠️ Warnings:</strong> ${warningCount}</p>
+                    <div style="margin-top: 15px;">
+                        <strong>All Tests:</strong><br>
+                        ${tests.map(test => `<div>${test}</div>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', function() {
+            runAllTests();
+        });
+    </script>
+</body>
+</html>

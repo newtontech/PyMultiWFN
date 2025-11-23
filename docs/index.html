@@ -4,2229 +4,756 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PyMultiWFN - Advanced Wavefunction Analysis for Quantum Chemistry</title>
-    <meta name="description" content="PyMultiWFN: Modern Python implementation of Multiwfn for advanced wavefunction analysis, electron density calculations, and quantum chemical topology">
-    <meta name="keywords" content="quantum chemistry, wavefunction analysis, electron density, Multiwfn, Python, computational chemistry">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/antd/5.12.8/antd.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/5.12.8/reset.min.css">
-    <!-- Additional libraries for advanced features -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="PyMultiWFN: Modern Python implementation of Multiwfn for advanced wavefunction analysis">
+    <meta name="keywords" content="quantum chemistry, wavefunction analysis, Multiwfn, Python">
+
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <!-- Base Styles -->
+    <style>
+        /* Critical CSS for immediate rendering */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        /* Loading State */
+        .loading-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            color: white;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .error-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 48px;
+            color: #ff4d4f;
+            margin-bottom: 20px;
+        }
+
+        /* Main App Styles */
+        .app-container {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .app-container.loaded {
+            opacity: 1;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero h2 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #1890ff;
+        }
+
+        .btn-primary:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #1890ff;
+        }
+
+        /* Content Sections */
+        .content-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #1890ff;
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #1890ff;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            color: #1890ff;
+            margin-bottom: 1rem;
+        }
+
+        /* Status Cards */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .status-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .status-card h3 {
+            color: #1890ff;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .timeline {
+            list-style: none;
+        }
+
+        .timeline li {
+            padding: 1rem 0;
+            border-left: 3px solid #f0f0f0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .timeline li::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 1.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #52c41a;
+        }
+
+        .timeline li.incomplete::before {
+            background: #1890ff;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .badge-processing {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+
+        /* License Section */
+        .license-alert {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .license-alert h3 {
+            color: #1890ff;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: #001529;
+            color: rgba(255, 255, 255, 0.65);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero h2 {
+                font-size: 1.2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .features-grid,
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mb-2 { margin-bottom: 2rem; }
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
+    <!-- Loading Screen -->
+    <div class="loading-container" id="loading">
+        <div class="loading-spinner"></div>
+        <h2>Loading PyMultiWFN...</h2>
+        <p>Initializing quantum chemistry analysis platform</p>
+    </div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef, useCallback, useMemo } = React;
-        const { Layout, Menu, Typography, Button, Card, Row, Col, Space, Timeline, Badge, Alert, Anchor, Divider, Tabs, Table, Progress, Statistic, Switch, Tooltip, Modal, Input, Select, Tag, Dropdown, FloatButton, BackTop, Collapse } = antd;
-        const { Header, Content, Footer } = Layout;
-        const { Title, Paragraph, Text, Link } = Typography;
-        const { TabPane } = Tabs;
+    <!-- Error Screen -->
+    <div class="error-container" id="error">
+        <div class="error-card">
+            <div class="error-icon">⚠️</div>
+            <h2>Loading Failed</h2>
+            <p>Unable to load the website. Please try:</p>
+            <ul style="text-align: left; display: inline-block;">
+                <li>Refreshing the page</li>
+                <li>Checking your internet connection</li>
+                <li>Using a modern browser (Chrome, Firefox, Safari, Edge)</li>
+                <li>Disabling ad blockers temporarily</li>
+            </ul>
+            <button class="btn btn-primary" onclick="window.location.reload()" style="margin-top: 1rem;">
+                Try Again
+            </button>
+        </div>
+    </div>
 
-        // Theme Context
-        const ThemeContext = React.createContext('light');
+    <!-- Main Application -->
+    <div class="app-container" id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-atom"></i>
+                    <span>PyMultiWFN</span>
+                </div>
+                <nav>
+                    <ul class="nav-menu">
+                        <li><a href="#home" onclick="showSection('home')">Home</a></li>
+                        <li><a href="#installation" onclick="showSection('installation')">Installation</a></li>
+                        <li><a href="#api" onclick="showSection('api')">API</a></li>
+                        <li><a href="#docs" onclick="showSection('docs')">Documentation</a></li>
+                        <li><a href="https://github.com/yourusername/PyMultiWFN" target="_blank">GitHub</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
 
-        // Advanced Components
-        const OrbitalVisualization = () => {
-            const canvasRef = useRef(null);
-            useEffect(() => {
-                if (!canvasRef.current) return;
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h1>PyMultiWFN</h1>
+                <h2>Advanced Wavefunction Analysis for Quantum Chemistry</h2>
+                <p>
+                    A modern Python implementation of Multiwfn featuring cutting-edge computational methods,
+                    real-time visualization, and seamless integration with modern scientific computing ecosystems.
+                </p>
+                <div class="cta-buttons">
+                    <a href="#installation" class="btn btn-primary" onclick="showSection('installation')">
+                        <i class="fas fa-book"></i> Get Started
+                    </a>
+                    <a href="https://github.com/yourusername/PyMultiWFN" target="_blank" class="btn btn-secondary">
+                        <i class="fab fa-github"></i> View on GitHub
+                    </a>
+                    <a href="#installation" class="btn btn-secondary" onclick="showSection('installation')">
+                        <i class="fas fa-download"></i> pip install pymultiwfn
+                    </a>
+                </div>
+            </div>
+        </section>
 
-                const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(75, 400 / 300, 0.1, 1000);
-                const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, alpha: true });
-                renderer.setSize(400, 300);
+        <!-- Features Section -->
+        <section class="content-section">
+            <h2 class="section-title">Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>Modern Architecture</h3>
+                    <p>Modular design with clear separation of data, logic, and visualization components.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h3>High Performance</h3>
+                    <p>NumPy vectorization and Numba JIT compilation for computationally intensive tasks.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h3>Extensible</h3>
+                    <p>Leverages Python's rich ecosystem of scientific computing libraries.</p>
+                </div>
+            </div>
+        </section>
 
-                // Create orbital visualization
-                const geometry = new THREE.SphereGeometry(1, 32, 32);
-                const material = new THREE.MeshBasicMaterial({
-                    color: 0x1890ff,
-                    wireframe: true,
-                    transparent: true,
-                    opacity: 0.6
-                });
-                const sphere = new THREE.Mesh(geometry, material);
-                scene.add(sphere);
+        <!-- Development Status -->
+        <section class="content-section">
+            <h2 class="section-title">Development Status</h2>
+            <div class="status-grid">
+                <div class="status-card">
+                    <h3>
+                        Phase 1: Reconnaissance & Architecture
+                        <span class="badge badge-success">Completed</span>
+                    </h3>
+                    <ul class="timeline">
+                        <li>Analyzed original Fortran source code</li>
+                        <li>Designed Python package structure</li>
+                        <li>Established performance strategies</li>
+                    </ul>
+                </div>
+                <div class="status-card">
+                    <h3>
+                        Phase 2: Foundation
+                        <span class="badge badge-processing">In Progress</span>
+                    </h3>
+                    <ul class="timeline">
+                        <li>Project skeleton setup</li>
+                        <li>Core data structures</li>
+                        <li class="incomplete">Basic file I/O implementation</li>
+                        <li class="incomplete">Advanced analysis modules</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
-                // Add electron cloud particles
-                const particlesGeometry = new THREE.BufferGeometry();
-                const particlesCount = 1000;
-                const posArray = new Float32Array(particlesCount * 3);
-
-                for(let i = 0; i < particlesCount * 3; i++) {
-                    posArray[i] = (Math.random() - 0.5) * 4;
-                }
-
-                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-                const particlesMaterial = new THREE.PointsMaterial({
-                    size: 0.01,
-                    color: 0x40a9ff,
-                    transparent: true,
-                    opacity: 0.8
-                });
-
-                const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-                scene.add(particlesMesh);
-
-                camera.position.z = 3;
-
-                const animate = () => {
-                    requestAnimationFrame(animate);
-                    sphere.rotation.x += 0.01;
-                    sphere.rotation.y += 0.01;
-                    particlesMesh.rotation.y += 0.002;
-                    renderer.render(scene, camera);
-                };
-
-                animate();
-            }, []);
-
-            return <canvas ref={canvasRef} style={{ width: '100%', height: '300px', borderRadius: '8px' }} />;
-        };
-
-        const PerformanceBenchmark = () => {
-            const chartRef = useRef(null);
-            useEffect(() => {
-                if (!chartRef.current) return;
-
-                const ctx = chartRef.current.getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Grid Generation', 'Density Calculation', 'Gradient Computation', 'Integration'],
-                        datasets: [{
-                            label: 'Multiwfn (Fortran)',
-                            data: [100, 100, 100, 100],
-                            backgroundColor: 'rgba(24, 144, 255, 0.3)',
-                            borderColor: 'rgba(24, 144, 255, 1)',
-                            borderWidth: 2
-                        }, {
-                            label: 'PyMultiWFN (Python + NumPy)',
-                            data: [95, 92, 88, 96],
-                            backgroundColor: 'rgba(82, 196, 26, 0.3)',
-                            borderColor: 'rgba(82, 196, 26, 1)',
-                            borderWidth: 2
-                        }, {
-                            label: 'PyMultiWFN (Python + Numba)',
-                            data: [98, 105, 102, 108],
-                            backgroundColor: 'rgba(250, 173, 20, 0.3)',
-                            borderColor: 'rgba(250, 173, 20, 1)',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Relative Performance (%)'
-                                }
-                            }
-                        },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Computational Performance Comparison'
-                            }
-                        }
-                    }
-                });
-            }, []);
-
-            return <canvas ref={chartRef} style={{ width: '100%', height: '400px' }} />;
-        };
-
-        const CodeExample = ({ title, code, language = 'python' }) => {
-            const [copied, setCopied] = useState(false);
-
-            const copyCode = () => {
-                navigator.clipboard.writeText(code);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-            };
-
-            return (
-                <Card
-                    title={title}
-                    extra={
-                        <Button
-                            type={copied ? "primary" : "default"}
-                            size="small"
-                            icon={<i className={`fas ${copied ? 'fa-check' : 'fa-copy'}`}></i>}
-                            onClick={copyCode}
-                        >
-                            {copied ? 'Copied!' : 'Copy'}
-                        </Button>
-                    }
-                    className="code-example-card"
-                >
-                    <pre>
-                        <code className={`language-${language}`}>
-                            {code}
-                        </code>
-                    </pre>
-                </Card>
-            );
-        };
-
-        const FeatureComparison = () => {
-            const columns = [
-                {
-                    title: 'Feature',
-                    dataIndex: 'feature',
-                    key: 'feature',
-                },
-                {
-                    title: 'Multiwfn',
-                    dataIndex: 'multiwfn',
-                    key: 'multiwfn',
-                    render: (value) => <Tag color={value ? 'green' : 'red'}>{value ? '✓' : '✗'}</Tag>
-                },
-                {
-                    title: 'PyMultiWFN',
-                    dataIndex: 'pymultiwfn',
-                    key: 'pymultiwfn',
-                    render: (value) => <Tag color={value ? 'blue' : 'red'}>{value ? '✓' : '✗'}</Tag>
-                },
-                {
-                    title: 'Performance',
-                    dataIndex: 'performance',
-                    key: 'performance',
-                    render: (value) => <Progress percent={value} size="small" status={value >= 90 ? 'success' : 'active'} />
-                }
-            ];
-
-            const data = [
-                { key: '1', feature: 'Electron Density Analysis', multiwfn: true, pymultiwfn: true, performance: 95 },
-                { key: '2', feature: 'AIM (Atoms in Molecules)', multiwfn: true, pymultiwfn: true, performance: 92 },
-                { key: '3', feature: 'NCI (Non-covalent Interaction)', multiwfn: true, pymultiwfn: true, performance: 88 },
-                { key: '4', feature: 'ELF (Electron Localization Function)', multiwfn: true, pymultiwfn: true, performance: 90 },
-                { key: '5', feature: 'LOL (Localized Orbital Locator)', multiwfn: true, pymultiwfn: true, performance: 87 },
-                { key: '6', feature: 'RDG (Reduced Density Gradient)', multiwfn: true, pymultiwfn: true, performance: 91 },
-                { key: '7', feature: 'Molecular Surface Analysis', multiwfn: true, pymultiwfn: false, performance: 0 },
-                { key: '8', feature: 'Bond Critical Points', multiwfn: true, pymultiwfn: true, performance: 89 },
-                { key: '9', feature: 'Visualization Integration', multiwfn: true, pymultiwfn: true, performance: 105 },
-                { key: '10', feature: 'Python API', multiwfn: false, pymultiwfn: true, performance: 120 }
-            ];
-
-            return <Table columns={columns} dataSource={data} pagination={false} />;
-        };
-
-        const InteractiveDemo = () => {
-            const [calculationType, setCalculationType] = useState('density');
-            const [isCalculating, setIsCalculating] = useState(false);
-            const [result, setResult] = useState(null);
-
-            const runCalculation = () => {
-                setIsCalculating(true);
-                setTimeout(() => {
-                    const results = {
-                        density: { value: '0.142', unit: 'e/bohr³', description: 'Electron density at BCP' },
-                        gradient: { value: '0.089', unit: 'e/bohr⁴', description: 'Density gradient magnitude' },
-                        laplacian: { value: '-0.234', unit: 'e/bohr⁵', description: 'Laplacian of electron density' },
-                        elf: { value: '0.756', unit: 'dimensionless', description: 'Electron localization function' }
-                    };
-                    setResult(results[calculationType]);
-                    setIsCalculating(false);
-                }, 2000);
-            };
-
-            return (
-                <Card title="Interactive Quantum Chemical Calculator">
-                    <Space direction="vertical" style={{ width: '100%' }} size="large">
-                        <div>
-                            <Text strong>Calculation Type: </Text>
-                            <Select
-                                value={calculationType}
-                                onChange={setCalculationType}
-                                style={{ width: 200, marginLeft: 8 }}
-                            >
-                                <Select.Option value="density">Electron Density</Select.Option>
-                                <Select.Option value="gradient">Density Gradient</Select.Option>
-                                <Select.Option value="laplacian">Laplacian</Select.Option>
-                                <Select.Option value="elf">ELF</Select.Option>
-                            </Select>
-                        </div>
-
-                        <Button
-                            type="primary"
-                            size="large"
-                            loading={isCalculating}
-                            onClick={runCalculation}
-                            icon={<i className="fas fa-calculator"></i>}
-                        >
-                            {isCalculating ? 'Computing...' : 'Run Calculation'}
-                        </Button>
-
-                        {result && (
-                            <Card size="small" className="result-card">
-                                <Row gutter={16}>
-                                    <Col span={8}>
-                                        <Statistic title="Value" value={result.value} suffix={result.unit} />
-                                    </Col>
-                                    <Col span={16}>
-                                        <Text type="secondary">{result.description}</Text>
-                                    </Col>
-                                </Row>
-                            </Card>
-                        )}
-                    </Space>
-                </Card>
-            );
-        };
-
-        // Installation Page Component
-        const InstallationPage = () => (
-            <div className="content-wrapper">
-                <Title level={1} className="page-title">
-                    <i className="fas fa-download"></i> Installation Guide
-                </Title>
-                <Paragraph className="page-description">
-                    Get PyMultiWFN up and running on your system with our comprehensive installation guide.
-                </Paragraph>
-
-                <Row gutter={[24, 24]}>
-                    <Col xs={24} lg={16}>
-                        <Card title="Quick Installation" className="installation-card">
-                            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                                <div>
-                                    <Title level={4}>
-                                        <i className="fab fa-python"></i> Using pip (Recommended)
-                                    </Title>
-                                    <CodeExample
-                                        title="Install from PyPI"
-                                        code={`# Install the latest stable version
+        <!-- Installation Section -->
+        <section class="content-section hidden" id="installation-section">
+            <h2 class="section-title">Installation Guide</h2>
+            <div class="status-card">
+                <h3>Quick Installation</h3>
+                <p>Get PyMultiWFN up and running on your system with pip:</p>
+                <pre style="
+                    background: #f6f8fa;
+                    padding: 1rem;
+                    border-radius: 8px;
+                    overflow: auto;
+                    margin: 1rem 0;
+                "># Install the latest stable version
 pip install pymultiwfn
 
 # Install with optional dependencies for GPU support
 pip install pymultiwfn[gpu]
 
 # Install development version
-pip install pymultiwfn[dev]`}
-                                    />
-                                </div>
+pip install pymultiwfn[dev]</pre>
 
-                                <div>
-                                    <Title level={4}>
-                                        <i className="fab fa-github"></i> Install from Source
-                                    </Title>
-                                    <CodeExample
-                                        title="Clone and install from GitHub"
-                                        code={`git clone https://github.com/yourusername/PyMultiWFN.git
-cd PyMultiWFN
-pip install -e .
+                <h4>System Requirements</h4>
+                <ul>
+                    <li>Python 3.8+</li>
+                    <li>NumPy 1.20+</li>
+                    <li>SciPy 1.7+</li>
+                    <li>4GB RAM minimum (8GB+ recommended)</li>
+                </ul>
 
-# For development installation
-pip install -e ".[dev,test]"`}
-                                    />
-                                </div>
-
-                                <div>
-                                    <Title level={4}>
-                                        <i className="fab fa-docker"></i> Using Docker
-                                    </Title>
-                                    <CodeExample
-                                        title="Docker installation"
-                                        code={`# Pull the pre-built Docker image
-docker pull pymultiwfn/pymultiwfn:latest
-
-# Run in a container
-docker run -it pymultiwfn/pymultiwfn:latest
-
-# Build from source
-docker build -t pymultiwfn .`}
-                                    />
-                                </div>
-                            </Space>
-                        </Card>
-                    </Col>
-
-                    <Col xs={24} lg={8}>
-                        <Card title="System Requirements" className="requirements-card">
-                            <Space direction="vertical" style={{ width: '100%' }}>
-                                <div>
-                                    <Title level={5}>
-                                        <i className="fas fa-desktop"></i> Operating System
-                                    </Title>
-                                    <ul>
-                                        <li>Linux (Ubuntu 18.04+, CentOS 7+)</li>
-                                        <li>macOS 10.15+</li>
-                                        <li>Windows 10+</li>
-                                        <li>WSL2 on Windows</li>
-                                    </ul>
-                                </div>
-
-                                <div>
-                                    <Title level={5}>
-                                        <i className="fas fa-memory"></i> Hardware
-                                    </Title>
-                                    <ul>
-                                        <li>Minimum: 4GB RAM</li>
-                                        <li>Recommended: 8GB+ RAM</li>
-                                        <li>GPU: NVIDIA CUDA 11.0+ (optional)</li>
-                                        <li>Storage: 2GB free space</li>
-                                    </ul>
-                                </div>
-
-                                <div>
-                                    <Title level={5}>
-                                        <i className="fas fa-code"></i> Software Dependencies
-                                    </Title>
-                                    <ul>
-                                        <li>Python 3.8+</li>
-                                        <li>NumPy 1.20+</li>
-                                        <li>SciPy 1.7+</li>
-                                        <li>Matplotlib 3.3+</li>
-                                    </ul>
-                                </div>
-                            </Space>
-                        </Card>
-                    </Col>
-                </Row>
-
-                <Card title="Verification" style={{ marginTop: 24 }}>
-                    <Title level={4}>
-                        <i className="fas fa-check-circle"></i> Verify Installation
-                    </Title>
-                    <Paragraph>
-                        After installation, verify that PyMultiWFN is working correctly:
-                    </Paragraph>
-                    <CodeExample
-                        title="Test installation"
-                        code={`# Test the installation
-python -c "import pymultiwfn as pw; print(pw.__version__)"
-
-# Run a quick test
-pymultiwfn-test
-
-# Check available modules
-python -c "import pymultiwfn; print(dir(pymultiwfn))"`}
-                    />
-                </Card>
+                <h4>Verification</h4>
+                <p>After installation, verify PyMultiWFN is working:</p>
+                <pre style="
+                    background: #f6f8fa;
+                    padding: 1rem;
+                    border-radius: 8px;
+                    overflow: auto;
+                ">python -c "import pymultiwfn as pw; print(pw.__version__)"</pre>
             </div>
-        );
+        </section>
 
-        // API Reference Page
-        const APIPage = () => (
-            <div className="content-wrapper">
-                <Title level={1} className="page-title">
-                    <i className="fas fa-code"></i> API Reference
-                </Title>
-                <Paragraph className="page-description">
-                    Complete API documentation for PyMultiWFN with examples and detailed descriptions.
-                </Paragraph>
-
-                <Card title="Core Modules" style={{ marginBottom: 24 }}>
-                    <Tabs defaultActiveKey="core" type="card">
-                        <Tabs.TabPane tab="Core Classes" key="core">
-                            <Space direction="vertical" style={{ width: '100%' }} size="large">
-                                <Card size="small" title="Wavefunction Class">
-                                    <Title level={5}>Description</Title>
-                                    <Paragraph>
-                                        The main class for representing quantum chemical wavefunctions and performing analyses.
-                                    </Paragraph>
-
-                                    <Title level={5}>Constructor</Title>
-                                    <CodeExample
-                                        title="Wavefunction initialization"
-                                        code={`import pymultiwfn as pw
+        <!-- API Section -->
+        <section class="content-section hidden" id="api-section">
+            <h2 class="section-title">API Reference</h2>
+            <div class="status-card">
+                <h3>Core Classes</h3>
+                <h4>Wavefunction Class</h4>
+                <p>The main class for representing quantum chemical wavefunctions:</p>
+                <pre style="
+                    background: #f6f8fa;
+                    padding: 1rem;
+                    border-radius: 8px;
+                    overflow: auto;
+                ">import pymultiwfn as pw
 
 # Load from file
 wf = pw.Wavefunction.from_file('molecule.fchk')
 
-# Or create from scratch
-wf = pw.Wavefunction(
-    molecules=mol_data,
-    basis_set=basis_data,
-    density_matrix=density_matrix
-)`}
-                                    />
+# Calculate electron density
+density = wf.calculate_density(grid)</pre>
 
-                                    <Title level={5}>Key Methods</Title>
-                                    <ul>
-                                        <li><code>calculate_density(grid)</code> - Compute electron density</li>
-                                        <li><code>find_critical_points()</code> - Locate critical points</li>
-                                        <li><code>calculate_gradient()</code> - Compute density gradient</li>
-                                        <li><code>calculate_laplacian()</code> - Compute Laplacian of density</li>
-                                        <li><code>perform_aim_analysis()</code> - Run AIM analysis</li>
-                                    </ul>
-                                </Card>
-
-                                <Card size="small" title="Grid Class">
-                                    <Title level={5}>Description</Title>
-                                    <Paragraph>
-                                        Handles spatial grid generation and management for quantum chemical calculations.
-                                    </Paragraph>
-
-                                    <CodeExample
-                                        title="Grid creation and usage"
-                                        code={`# Generate uniform grid
+                <h4>Grid Class</h4>
+                <p>Handles spatial grid generation:</p>
+                <pre style="
+                    background: #f6f8fa;
+                    padding: 1rem;
+                    border-radius: 8px;
+                    overflow: auto;
+                "># Generate uniform grid
 grid = pw.Grid.uniform(
     center=[0, 0, 0],
     size=[10, 10, 10],
     spacing=0.1
-)
-
-# Generate adaptive grid
-grid = pw.Grid.adaptive(
-    molecule=mol,
-    density=density,
-    threshold=0.001
-)`}
-                                    />
-                                </Card>
-                            </Space>
-                        </Tabs.TabPane>
-
-                        <Tabs.TabPane tab="Analysis Modules" key="analysis">
-                            <Space direction="vertical" style={{ width: '100%' }} size="large">
-                                <Card size="small" title="AIM Analysis">
-                                    <Title level={5}>Atoms in Molecules Analysis</Title>
-                                    <CodeExample
-                                        title="AIM analysis workflow"
-                                        code={`# Perform AIM analysis
-aim = pw.AIMAnalysis(wavefunction)
-
-# Find bond critical points
-bcps = aim.find_bond_critical_points()
-
-# Calculate bond paths
-bond_paths = aim.trace_bond_paths(bcps)
-
-# Get atomic basins
-basins = aim.get_atomic_basins()
-
-# Calculate atomic properties
-properties = aim.calculate_atomic_properties()`}
-                                    />
-                                </Card>
-
-                                <Card size="small" title="ELF Analysis">
-                                    <Title level={5}>Electron Localization Function</Title>
-                                    <CodeExample
-                                        title="ELF calculation and analysis"
-                                        code={`# Calculate ELF
-elf = pw.calculate_elf(wavefunction, grid)
-
-# Find basins
-basins = pw.identify_elf_basins(elf, threshold=0.8)
-
-# Calculate basin populations
-populations = pw.calculate_basin_populations(basins, density)`}
-                                    />
-                                </Card>
-                            </Space>
-                        </Tabs.TabPane>
-
-                        <Tabs.TabPane tab="Visualization" key="visualization">
-                            <Space direction="vertical" style={{ width: '100%' }} size="large">
-                                <Card size="small" title="3D Visualization">
-                                    <CodeExample
-                                        title="Creating 3D visualizations"
-                                        code={`import pymultiwfn.visualization as vis
-
-# Plot density isosurfaces
-vis.plot_isosurface(
-    density, grid,
-            levels=[0.002, 0.01],
-    colors=['blue', 'red'],
-    opacity=0.7
-)
-
-# Create molecular orbital plot
-vis.plot_molecular_orbital(
-    wavefunction,
-    orbital_index=0,
-    isovalue=0.05
-)`}
-                                    />
-                                </Card>
-
-                                <Card size="small" title="2D Plots">
-                                    <CodeExample
-                                        title="Creating 2D plots"
-                                        code={`# Generate contour plot
-vis.plot_contour(
-    density, grid,
-    plane='xy',
-    levels=20,
-    cmap='viridis'
-)
-
-# Create line plot
-vis.plot_line_profile(
-    density, grid,
-    start=[0, 0, -5],
-    end=[0, 0, 5],
-    npoints=500
-)`}
-                                    />
-                                </Card>
-                            </Space>
-                        </Tabs.TabPane>
-                    </Tabs>
-                </Card>
+)</pre>
             </div>
-        );
+        </section>
 
-        // Tutorials Page Component
-        const TutorialsPage = () => (
-            <div className="content-wrapper">
-                <Title level={1} className="page-title">
-                    <i className="fas fa-graduation-cap"></i> Interactive Tutorials
-                </Title>
-                <Paragraph className="page-description">
-                    Step-by-step guides to master PyMultiWFN for quantum chemical analysis.
-                </Paragraph>
-
-                <Row gutter={[24, 24]}>
-                    <Col xs={24} lg={8}>
-                        <Card
-                            hoverable
-                            className="tutorial-card"
-                            cover={<div className="tutorial-cover beginner"><i className="fas fa-play-circle"></i></div>}
-                        >
-                            <Card.Meta
-                                title="Getting Started"
-                                description="Learn the basics of PyMultiWFN and perform your first electron density analysis."
-                            />
-                            <div style={{ marginTop: 16 }}>
-                                <Tag color="green">Beginner</Tag>
-                                <Tag color="blue">15 min</Tag>
-                            </div>
-                        </Card>
-                    </Col>
-                    <Col xs={24} lg={8}>
-                        <Card
-                            hoverable
-                            className="tutorial-card"
-                            cover={<div className="tutorial-cover intermediate"><i className="fas fa-atom"></i></div>}
-                        >
-                            <Card.Meta
-                                title="AIM Analysis"
-                                description="Master atoms-in-molecules theory and critical point analysis."
-                            />
-                            <div style={{ marginTop: 16 }}>
-                                <Tag color="orange">Intermediate</Tag>
-                                <Tag color="blue">30 min</Tag>
-                            </div>
-                        </Card>
-                    </Col>
-                    <Col xs={24} lg={8}>
-                        <Card
-                            hoverable
-                            className="tutorial-card"
-                            cover={<div className="tutorial-cover advanced"><i className="fas fa-brain"></i></div>}
-                        >
-                            <Card.Meta
-                                title="Advanced Topics"
-                                description="Explore NCI analysis, ELF basins, and machine learning integration."
-                            />
-                            <div style={{ marginTop: 16 }}>
-                                <Tag color="red">Advanced</Tag>
-                                <Tag color="blue">45 min</Tag>
-                            </div>
-                        </Card>
-                    </Col>
-                </Row>
-
-                <Card title="Featured Tutorial: Density Analysis Workflow" style={{ marginTop: 24 }}>
-                    <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                        <div>
-                            <Title level={4}>Step 1: Load Your Wavefunction</Title>
-                            <CodeExample
-                                title="Loading quantum chemical data"
-                                code={`import pymultiwfn as pw
-import numpy as np
-
-# Load from Gaussian fchk file
-wf = pw.Wavefunction.from_file('water.fchk')
-
-# Inspect the wavefunction
-print(f"Number of electrons: {wf.n_electrons}")
-print(f"Number of basis functions: {wf.n_basis}")
-print(f"Molecule: {wf.molecule.formula}")`}
-                            />
-                        </div>
-
-                        <div>
-                            <Title level={4}>Step 2: Generate Calculation Grid</Title>
-                            <CodeExample
-                                title="Creating spatial grids"
-                                code={`# Generate uniform grid around the molecule
-grid = pw.Grid.uniform(
-    center=wf.molecule.center_of_mass,
-    size=[8, 8, 8],  # 8 Å box
-    spacing=0.1      # 0.1 Å resolution
-)
-
-print(f"Grid points: {len(grid.points)}")`}
-                            />
-                        </div>
-
-                        <div>
-                            <Title level={4}>Step 3: Calculate Electron Density</Title>
-                            <CodeExample
-                                title="Density calculation"
-                                code={`# Calculate electron density on grid
-density = wf.calculate_density(grid)
-
-# Find maximum density point
-max_idx = np.argmax(density)
-max_density = density[max_idx]
-max_position = grid.points[max_idx]
-
-print(f"Maximum density: {max_density:.6f} at {max_position}")`}
-                            />
-                        </div>
-
-                        <div>
-                            <Title level={4}>Step 4: Find Critical Points</Title>
-                            <CodeExample
-                                title="Critical point analysis"
-                                code={`# Automatically find critical points
-cps = wf.find_critical_points(grid, density)
-
-print(f"Found {len(cps)} critical points:")
-for cp in cps:
-    print(f"  Type: {cp.type}, Position: {cp.position}, Value: {cp.value:.6f}")`}
-                            />
-                        </div>
-
-                        <div>
-                            <Title level={4}>Step 5: Visualize Results</Title>
-                            <CodeExample
-                                title="Creating visualizations"
-                                code={`import pymultiwfn.visualization as vis
-
-# Plot density isosurface
-vis.plot_isosurface(density, grid, levels=[0.002], colors=['blue'])
-
-# Create 2D contour plot
-vis.plot_contour(density, grid, plane='xy', levels=20)
-
-# Plot critical points
-vis.plot_critical_points(cps, grid)`}
-                            />
-                        </div>
-                    </Space>
-                </Card>
+        <!-- License Section -->
+        <section class="content-section">
+            <div class="license-alert">
+                <h3>License Information</h3>
+                <p>
+                    PyMultiWFN is based on the original Multiwfn program. When using this software,
+                    please cite the original Multiwfn papers:
+                </p>
+                <ul>
+                    <li>Tian Lu, Feiwu Chen, J. Comput. Chem., 33, 580-592 (2012)</li>
+                    <li>Tian Lu, J. Chem. Phys., 161, 082503 (2024)</li>
+                </ul>
             </div>
-        );
-
-        // Examples Page Component
-        const ExamplesPage = () => (
-            <div className="content-wrapper">
-                <Title level={1} className="page-title">
-                    <i className="fas fa-flask"></i> Code Examples
-                </Title>
-                <Paragraph className="page-description">
-                    Real-world examples and use cases for PyMultiWFN in quantum chemistry research.
-                </Paragraph>
-
-                <Tabs defaultActiveKey="basic" type="card">
-                    <Tabs.TabPane tab="Basic Analysis" key="basic">
-                        <Space direction="vertical" style={{ width: '100%' }} size="large">
-                            <Card title="Example 1: Water Molecule Analysis">
-                                <CodeExample
-                                    title="Complete analysis workflow"
-                                    code={`import pymultiwfn as pw
-import numpy as np
-
-# Load water molecule
-wf = pw.Wavefunction.from_file('h2o.fchk')
-
-# Basic properties
-print(f"Total energy: {wf.total_energy:.6f} Hartree")
-print(f"Dipole moment: {wf.dipole_moment} Debye")
-
-# Density analysis
-grid = pw.Grid.uniform(center=[0, 0, 0], size=[6, 6, 6], spacing=0.15)
-density = wf.calculate_density(grid)
-
-# Find critical points
-cps = wf.find_critical_points(grid, density)
-print(f"Found {len(cps)} critical points")
-
-# Visualize
-pw.visualization.plot_molecule(wf.molecule)
-pw.visualization.plot_isosurface(density, grid, levels=[0.002])`}
-                                />
-                            </Card>
-
-                            <Card title="Example 2: Bond Critical Point Analysis">
-                                <CodeExample
-                                    title="Analyzing chemical bonds"
-                                    code={`# Perform AIM analysis
-aim = pw.AIMAnalysis(wf)
-
-# Find bond critical points
-bond_cps = aim.find_bond_critical_points()
-
-for cp in bond_cps:
-    # Calculate bond properties
-    bond_order = aim.calculate_bond_order(cp)
-    ellipticity = aim.calculate_ellipticity(cp)
-
-    print(f"Bond CP at {cp.position}:")
-    print(f"  Density: {cp.value:.6f}")
-    print(f"  Bond order: {bond_order:.3f}")
-    print(f"  Ellipticity: {ellipticity:.3f}")`}
-                                />
-                            </Card>
-                        </Space>
-                    </Tabs.TabPane>
-
-                    <Tabs.TabPane tab="Advanced Topics" key="advanced">
-                        <Space direction="vertical" style={{ width: '100%' }} size="large">
-                            <Card title="Example 3: Non-covalent Interaction Analysis">
-                                <CodeExample
-                                    title="NCI analysis for weak interactions"
-                                    code={`# NCI analysis
-nci = pw.NCIAnalysis(wf)
-
-# Calculate reduced density gradient
-rdg = nci.calculate_rdg(grid, density)
-
-# Find interaction regions
-signs = nci.get_sign_lambda2(grid, density)
-
-# Visualize NCI regions
-pw.visualization.plot_nci_scatter(density, rdg, signs)
-
-# Generate NCI isosurfaces
-nci_regions = nci.identify_nci_regions(density, rdg, signs)
-pw.visualization.plot_nci_isosurfaces(nci_regions, grid)`}
-                                />
-                            </Card>
-
-                            <Card title="Example 4: Machine Learning Integration">
-                                <CodeExample
-                                    title="ML-enhanced analysis"
-                                    code={`from pymultiwfn.ml import PropertyPredictor
-
-# Load pre-trained ML model
-predictor = PropertyPredictor.load_model('quantum_properties.pt')
-
-# Extract features from density
-features = predictor.extract_features(density, grid)
-
-# Predict molecular properties
-properties = predictor.predict(features)
-
-print(f"Predicted polarizability: {properties.polarizability:.3f}")
-print(f"Predicted hardness: {properties.hardness:.3f}")
-print(f"Predicted electrophilicity: {properties.electrophilicity:.3f}")`}
-                                />
-                            </Card>
-                        </Space>
-                    </Tabs.TabPane>
-
-                    <Tabs.TabPane tab="Research Applications" key="research">
-                        <Space direction="vertical" style={{ width: '100%' }} size="large">
-                            <Card title="Example 5: Reaction Path Analysis">
-                                <CodeExample
-                                    title="Following reaction coordinates"
-                                    code={`# Load reaction path
-reactant = pw.Wavefunction.from_file('reactant.fchk')
-product = pw.Wavefunction.from_file('product.fchk')
-transition_state = pw.Wavefunction.from_file('ts.fchk')
-
-# Generate reaction path
-path = pw.ReactionPath([reactant, transition_state, product])
-
-# Calculate properties along path
-for i, wf in enumerate(path.states):
-    density = wf.calculate_density(path.grids[i])
-    cps = wf.find_critical_points(path.grids[i], density)
-
-    print(f"State {i}: {len(cps)} critical points")
-    print(f"  Energy: {wf.total_energy:.6f} Hartree")`}
-                                />
-                            </Card>
-
-                            <Card title="Example 6: Excited State Analysis">
-                                <CodeExample
-                                    title="Analyzing excited states"
-                                    code={`# Load excited state wavefunctions
-ground_state = pw.Wavefunction.from_file('ground.fchk')
-excited_state = pw.Wavefunction.from_file('excited.fchk')
-
-# Calculate transition density
-transition_density = pw.calculate_transition_density(ground_state, excited_state)
-
-# Analyze excitation characteristics
-oscillator_strength = pw.calculate_oscillator_strength(transition_density)
-transition_dipole = pw.calculate_transition_dipole_moment(transition_density)
-
-print(f"Oscillator strength: {oscillator_strength:.4f}")
-print(f"Transition dipole: {transition_dipole} Debye")`}
-                                />
-                            </Card>
-                        </Space>
-                    </Tabs.TabPane>
-                </Tabs>
-            </div>
-        );
-
-        // Publications Page Component
-        const PublicationsPage = () => (
-            <div className="content-wrapper">
-                <Title level={1} className="page-title">
-                    <i className="fas fa-book-open"></i> Publications & Papers
-                </Title>
-                <Paragraph className="page-description">
-                    Research papers and citations featuring PyMultiWFN and its applications in quantum chemistry.
-                </Paragraph>
-
-                <Row gutter={[24, 24]}>
-                    <Col xs={24} lg={16}>
-                        <Card title="Key Publications" className="publications-card">
-                            <Space direction="vertical" style={{ width: '100%' }} size="large">
-                                <Card size="small" className="publication-item">
-                                    <Row gutter={16}>
-                                        <Col span={20}>
-                                            <Title level={5}>
-                                                PyMultiWFN: A Modern Python Implementation of Multiwfn for Wavefunction Analysis
-                                            </Title>
-                                            <Paragraph>
-                                                <strong>Authors:</strong> Your Name, Collaborators<br />
-                                                <strong>Journal:</strong> Journal of Computational Chemistry, 2024<br />
-                                                <strong>DOI:</strong> 10.1002/jcc.2024.123456
-                                            </Paragraph>
-                                            <Space>
-                                                <Tag color="blue">Original Paper</Tag>
-                                                <Tag color="green">Open Access</Tag>
-                                                <Button size="small" icon={<i className="fas fa-download"></i>}>PDF</Button>
-                                                <Button size="small" icon={<i className="fas fa-quote-right"></i>}>Cite</Button>
-                                            </Space>
-                                        </Col>
-                                        <Col span={4}>
-                                            <div className="publication-metrics">
-                                                <Statistic title="Citations" value={42} />
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </Card>
-
-                                <Card size="small" className="publication-item">
-                                    <Row gutter={16}>
-                                        <Col span={20}>
-                                            <Title level={5}>
-                                                Machine Learning-Enhanced Wavefunction Analysis with PyMultiWFN
-                                            </Title>
-                                            <Paragraph>
-                                                <strong>Authors:</strong> Your Name, ML Collaborators<br />
-                                                <strong>Journal:</strong> Nature Communications, 2024<br />
-                                                <strong>DOI:</strong> 10.1038/s41467-024-01234-5
-                                            </Paragraph>
-                                            <Space>
-                                                <Tag color="purple">Machine Learning</Tag>
-                                                <Tag color="orange">High Impact</Tag>
-                                                <Button size="small" icon={<i className="fas fa-download"></i>}>PDF</Button>
-                                                <Button size="small" icon={<i className="fas fa-quote-right"></i>}>Cite</Button>
-                                            </Space>
-                                        </Col>
-                                        <Col span={4}>
-                                            <div className="publication-metrics">
-                                                <Statistic title="Citations" value={28} />
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </Card>
-
-                                <Card size="small" className="publication-item">
-                                    <Row gutter={16}>
-                                        <Col span={20}>
-                                            <Title level={5}>
-                                                GPU-Accelerated Quantum Chemical Topology Analysis in PyMultiWFN
-                                            </Title>
-                                            <Paragraph>
-                                                <strong>Authors:</strong> Your Name, HPC Collaborators<br />
-                                                <strong>Journal:</strong> Computer Physics Communications, 2024<br />
-                                                <strong>DOI:</strong> 10.1016/j.cpc.2024.108765
-                                            </Paragraph>
-                                            <Space>
-                                                <Tag color="red">Performance</Tag>
-                                                <Tag color="cyan">GPU Computing</Tag>
-                                                <Button size="small" icon={<i className="fas fa-download"></i>}>PDF</Button>
-                                                <Button size="small" icon={<i className="fas fa-quote-right"></i>}>Cite</Button>
-                                            </Space>
-                                        </Col>
-                                        <Col span={4}>
-                                            <div className="publication-metrics">
-                                                <Statistic title="Citations" value={15} />
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </Card>
-                            </Space>
-                        </Card>
-                    </Col>
-
-                    <Col xs={24} lg={8}>
-                        <Card title="Citation Guidelines" className="citation-card">
-                            <Title level={5}>How to Cite PyMultiWFN</Title>
-                            <Alert
-                                message="Required Citations"
-                                description={
-                                    <div>
-                                        <Paragraph>
-                                            When using PyMultiWFN in your research, please cite both the original Multiwfn papers and the PyMultiWFN implementation paper:
-                                        </Paragraph>
-                                        <div className="citation-text">
-                                            <strong>Multiwfn:</strong><br />
-                                            Tian Lu, Feiwu Chen, J. Comput. Chem., 33, 580-592 (2012)<br />
-                                            Tian Lu, J. Chem. Phys., 161, 082503 (2024)
-                                            <hr style={{ margin: '12px 0' }} />
-                                            <strong>PyMultiWFN:</strong><br />
-                                            Your Name et al., J. Comput. Chem., 2024, DOI: 10.1002/jcc.2024.123456
-                                        </div>
-                                    </div>
-                                }
-                                type="info"
-                                showIcon
-                            />
-
-                            <Title level={5} style={{ marginTop: 24 }}>BibTeX</Title>
-                            <CodeExample
-                                title="Citation in BibTeX format"
-                                code={`@article{pymultiwfn2024,
-  title={PyMultiWFN: A Modern Python Implementation of Multiwfn for Wavefunction Analysis},
-  author={Your Name and Collaborators},
-  journal={Journal of Computational Chemistry},
-  volume={45},
-  number={12},
-  pages={1234--1250},
-  year={2024},
-  doi={10.1002/jcc.2024.123456}
-}`}
-                            />
-                        </Card>
-                    </Col>
-                </Row>
-
-                <Card title="Applications & Case Studies" style={{ marginTop: 24 }}>
-                    <Row gutter={[24, 24]}>
-                        <Col xs={24} md={8}>
-                            <Card size="small" title="Drug Discovery">
-                                <Paragraph>
-                                    Application of PyMultiWFN in analyzing non-covalent interactions in protein-ligand complexes.
-                                </Paragraph>
-                                <Tag color="blue">Pharmaceutical</Tag>
-                                <Tag color="green">Biochemistry</Tag>
-                            </Card>
-                        </Col>
-                        <Col xs={24} md={8}>
-                            <Card size="small" title="Materials Science">
-                                <Paragraph>
-                                    Using PyMultiWFN to understand bonding in novel 2D materials and heterostructures.
-                                </Paragraph>
-                                <Tag color="purple">Materials</Tag>
-                                <Tag color="orange">Nanotechnology</Tag>
-                            </Card>
-                        </Col>
-                        <Col xs={24} md={8}>
-                            <Card size="small" title="Catalysis">
-                                <Paragraph>
-                                    Reaction mechanism elucidation using AIM and NCI analysis in catalytic systems.
-                                </Paragraph>
-                                <Tag color="red">Catalysis</Tag>
-                                <Tag color="cyan">Reaction Dynamics</Tag>
-                            </Card>
-                        </Col>
-                    </Row>
-                </Card>
-            </div>
-        );
-
-        // Performance Page Component
-        const PerformancePage = () => (
-            <div className="content-wrapper">
-                <Title level={1} className="page-title">
-                    <i className="fas fa-tachometer-alt"></i> Performance & Optimization
-                </Title>
-                <Paragraph className="page-description">
-                    Performance benchmarks, optimization tips, and hardware acceleration guide for PyMultiWFN.
-                </Paragraph>
-
-                <Row gutter={[24, 24]}>
-                    <Col xs={24} lg={12}>
-                        <Card title="Benchmark Results" className="benchmark-results-card">
-                            <PerformanceBenchmark />
-
-                            <Title level={5}>Performance Summary</Title>
-                            <Space direction="vertical" style={{ width: '100%' }}>
-                                <div className="performance-item">
-                                    <Text strong>Grid Generation:</Text>
-                                    <Progress percent={98} status="success" showInfo={false} />
-                                    <Text type="secondary"> 2% faster than original</Text>
-                                </div>
-                                <div className="performance-item">
-                                    <Text strong>Density Calculation:</Text>
-                                    <Progress percent={92} status="active" showInfo={false} />
-                                    <Text type="secondary"> 8% slower (pure Python)</Text>
-                                </div>
-                                <div className="performance-item">
-                                    <Text strong>With Numba JIT:</Text>
-                                    <Progress percent={108} status="success" showInfo={false} />
-                                    <Text type="secondary"> 8% faster than Fortran</Text>
-                                </div>
-                                <div className="performance-item">
-                                    <Text strong>GPU Acceleration:</Text>
-                                    <Progress percent={145} status="success" showInfo={false} />
-                                    <Text type="secondary"> 45% faster with CUDA</Text>
-                                </div>
-                            </Space>
-                        </Card>
-                    </Col>
-
-                    <Col xs={24} lg={12}>
-                        <Card title="Optimization Tips" className="optimization-card">
-                            <Space direction="vertical" style={{ width: '100%' }} size="large">
-                                <Alert
-                                    message="High Performance Tips"
-                                    description="Enable these options for maximum performance in your calculations."
-                                    type="success"
-                                    showIcon
-                                />
-
-                                <div>
-                                    <Title level={5}>1. Use Numba JIT Compilation</Title>
-                                    <CodeExample
-                                        title="Enable Numba acceleration"
-                                        code={`import pymultiwfn as pw
-
-# Enable Numba JIT compilation
-pw.config.enable_numba = True
-
-# Or enable for specific functions
-wf.calculate_density = pw.numba.jit(wf.calculate_density)
-
-# Benchmark the performance
-import time
-start = time.time()
-density = wf.calculate_density(grid)
-print(f"Calculation time: {time.time() - start:.2f}s")`}
-                                    />
-                                </div>
-
-                                <div>
-                                    <Title level={5}>2. Optimize Grid Settings</Title>
-                                    <CodeExample
-                                        title="Efficient grid generation"
-                                        code={`# Use adaptive grids for better performance
-grid = pw.Grid.adaptive(
-    molecule=wf.molecule,
-    density=wfa.density,
-    threshold=0.001,  # Adjust based on required accuracy
-    max_points=1000000  # Limit total grid points
-)
-
-# Use coarse grid for initial analysis
-coarse_grid = pw.Grid.uniform(spacing=0.3)
-# Then refine regions of interest
-fine_grid = pw.Grid.refine_around_points(coarse_grid, critical_points, spacing=0.1)`}
-                                    />
-                                </div>
-                            </Space>
-                        </Card>
-                    </Col>
-                </Row>
-
-                <Card title="Hardware Acceleration" style={{ marginTop: 24 }}>
-                    <Row gutter={[24, 24]}>
-                        <Col xs={24} md={8}>
-                            <Card size="small" title="GPU Computing">
-                                <Space direction="vertical" style={{ width: '100%' }}>
-                                    <div className="hardware-item">
-                                        <i className="fab fa-nvidia"></i>
-                                        <Text strong> NVIDIA CUDA</Text>
-                                        <Tag color="green">Recommended</Tag>
-                                    </div>
-                                    <Paragraph>
-                                        Supports CUDA 11.0+ with automatic GPU memory management.
-                                    </Paragraph>
-                                    <CodeExample
-                                        title="Enable GPU acceleration"
-                                        code={`# Check GPU availability
-print(pw.gpu.is_available())
-
-# Enable GPU computation
-pw.config.use_gpu = True
-pw.config.gpu_device = 0  # GPU device ID
-
-# GPU-accelerated density calculation
-density = wf.calculate_density_gpu(grid)`}
-                                    />
-                                </Space>
-                            </Card>
-                        </Col>
-
-                        <Col xs={24} md={8}>
-                            <Card size="small" title="Multi-threading">
-                                <Space direction="vertical" style={{ width: '100%' }}>
-                                    <div className="hardware-item">
-                                        <i className="fas fa-microchip"></i>
-                                        <Text strong> CPU Threads</Text>
-                                        <Tag color="blue">Built-in</Tag>
-                                    </div>
-                                    <Paragraph>
-                                        Automatic parallelization across multiple CPU cores.
-                                    </Paragraph>
-                                    <CodeExample
-                                        title="Configure threading"
-                                        code={`# Set number of threads
-pw.config.n_threads = 8  # Use 8 CPU threads
-pw.config.enable_openmp = True
-
-# Or let PyMultiWFN decide automatically
-pw.config.n_threads = 'auto'  # Uses all available cores`}
-                                    />
-                                </Space>
-                            </Card>
-                        </Col>
-
-                        <Col xs={24} md={8}>
-                            <Card size="small" title="Distributed Computing">
-                                <Space direction="vertical" style={{ width: '100%' }}>
-                                    <div className="hardware-item">
-                                        <i className="fas fa-network-wired"></i>
-                                        <Text strong> MPI Cluster</Text>
-                                        <Tag color="purple">Advanced</Tag>
-                                    </div>
-                                    <Paragraph>
-                                        Scale calculations across multiple compute nodes.
-                                    </Paragraph>
-                                    <CodeExample
-                                        title="MPI setup"
-                                        code={`# Enable MPI for large systems
-pw.config.enable_mpi = True
-pw.config.mpi_processes = 16
-
-# Run distributed calculation
-density = wf.calculate_density_distributed(grid)`}
-                                    />
-                                </Space>
-                            </Card>
-                        </Col>
-                    </Row>
-                </Card>
-            </div>
-        );
-
-        // FAQ Page Component
-        const FAQPage = () => {
-            const [activeKey, setActiveKey] = useState(['1']);
-
-            const faqItems = [
-                {
-                    key: '1',
-                    header: 'How do I install PyMultiWFN?',
-                    content: (
-                        <div>
-                            <Paragraph>
-                                You can install PyMultiWFN using pip:
-                            </Paragraph>
-                            <CodeExample
-                                title="Installation commands"
-                                code={`# Standard installation
-pip install pymultiwfn
-
-# With GPU support
-pip install pymultiwfn[gpu]
-
-# Development version
-pip install pymultiwfn[dev]`}
-                            />
-                            <Paragraph>
-                                For detailed installation instructions, see our <Link href="#">Installation Guide</Link>.
-                            </Paragraph>
-                        </div>
-                    )
-                },
-                {
-                    key: '2',
-                    header: 'What file formats are supported?',
-                    content: (
-                        <div>
-                            <Paragraph>
-                                PyMultiWFN supports various quantum chemistry output formats:
-                            </Paragraph>
-                            <ul>
-                                <li><strong>Gaussian:</strong> .fchk, .fch (Formated checkpoint files)</li>
-                                <li><strong>Molpro:</strong> .molden, .wfn</li>
-                                <li><strong>ORCA:</strong> .molden</li>
-                                <li><strong>Q-Chem:</strong> .fchk</li>
-                                <li><strong>PSI4:</strong> .molden</li>
-                                <li><strong>NWChem:</strong> .molden</li>
-                            </ul>
-                            <CodeExample
-                                title="Loading different file formats"
-                                code={`# Gaussian formatted checkpoint
-wf = pw.Wavefunction.from_file('molecule.fchk')
-
-# Molden file
-wf = pw.Wavefunction.from_molden('molecule.molden')
-
-# Wavefunction file
-wf = pw.Wavefunction.from_wfn('molecule.wfn')`}
-                            />
-                        </div>
-                    )
-                },
-                {
-                    key: '3',
-                    header: 'How can I improve calculation performance?',
-                    content: (
-                        <div>
-                            <Paragraph>
-                                Several optimization strategies are available:
-                            </Paragraph>
-                            <ul>
-                                <li><strong>Enable Numba JIT:</strong> Automatic compilation of Python functions</li>
-                                <li><strong>Use GPU acceleration:</strong> CUDA-enabled calculations</li>
-                                <li><strong>Optimize grid settings:</strong> Adaptive grids and appropriate spacing</li>
-                                <li><strong>Parallel processing:</strong> Multi-threading and MPI support</li>
-                            </ul>
-                            <CodeExample
-                                title="Performance optimization example"
-                                code={`# Enable all optimizations
-pw.config.enable_numba = True
-pw.config.use_gpu = True
-pw.config.n_threads = 'auto'
-
-# Use adaptive grid
-grid = pw.Grid.adaptive(wf.molecule, threshold=0.001)
-
-# Benchmark performance
-import time
-start = time.time()
-result = wf.calculate_density(grid)
-print(f"Time: {time.time() - start:.2f}s")`}
-                            />
-                        </div>
-                    )
-                },
-                {
-                    key: '4',
-                    header: 'How do I cite PyMultiWFN in my research?',
-                    content: (
-                        <div>
-                            <Paragraph>
-                                Please cite both the original Multiwfn papers and the PyMultiWFN paper:
-                            </Paragraph>
-                            <div className="citation-text">
-                                <strong>Required citations:</strong><br />
-                                Tian Lu, Feiwu Chen, J. Comput. Chem., 33, 580-592 (2012)<br />
-                                Tian Lu, J. Chem. Phys., 161, 082503 (2024)<br />
-                                Your Name et al., J. Comput. Chem., 2024 (PyMultiWFN paper)
-                            </div>
-                            <Paragraph>
-                                See our <Link href="#">Publications page</Link> for the complete citation format and BibTeX entries.
-                            </Paragraph>
-                        </div>
-                    )
-                },
-                {
-                    key: '5',
-                    header: 'Is PyMultiWFN compatible with the original Multiwfn?',
-                    content: (
-                        <div>
-                            <Paragraph>
-                                PyMultiWFN maintains full compatibility with Multiwfn:
-                            </Paragraph>
-                            <ul>
-                                <li>Identical numerical results (validated with consistency verifier)</li>
-                                <li>Same analysis methods and theoretical approaches</li>
-                                <li>Compatible file formats</li>
-                                <li>Enhanced Python API while preserving Multiwfn functionality</li>
-                            </ul>
-                            <Alert
-                                message="Validation Guarantee"
-                                description="All calculations have been validated against the original Multiwfn code to ensure numerical consistency."
-                                type="success"
-                                showIcon
-                            />
-                        </div>
-                    )
-                },
-                {
-                    key: '6',
-                    header: 'What are the system requirements?',
-                    content: (
-                        <div>
-                            <Paragraph>
-                                <strong>Minimum requirements:</strong>
-                            </Paragraph>
-                            <ul>
-                                <li>Python 3.8 or higher</li>
-                                <li>4GB RAM (8GB+ recommended)</li>
-                                <li>2GB free disk space</li>
-                                <li>Linux, macOS, or Windows 10+</li>
-                            </ul>
-                            <Paragraph>
-                                <strong>Optional for enhanced performance:</strong>
-                            </Paragraph>
-                            <ul>
-                                <li>NVIDIA GPU with CUDA 11.0+ support</li>
-                                <li>Multi-core CPU (8+ cores recommended)</li>
-                                <li>SSD storage for faster I/O</li>
-                            </ul>
-                        </div>
-                    )
-                }
-            ];
-
-            return (
-                <div className="content-wrapper">
-                    <Title level={1} className="page-title">
-                        <i className="fas fa-question-circle"></i> Frequently Asked Questions
-                    </Title>
-                    <Paragraph className="page-description">
-                        Find answers to common questions about PyMultiWFN installation, usage, and troubleshooting.
-                    </Paragraph>
-
-                    <Card className="faq-card">
-                        <Collapse
-                            items={faqItems}
-                            activeKey={activeKey}
-                            onChange={setActiveKey}
-                            ghost
-                        />
-                    </Card>
-
-                    <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-                        <Col xs={24} md={12}>
-                            <Card title="Still Need Help?" className="help-card">
-                                <Space direction="vertical" style={{ width: '100%' }}>
-                                    <div>
-                                        <Title level={5}>
-                                            <i className="fab fa-github"></i> GitHub Issues
-                                        </Title>
-                                        <Paragraph>
-                                            Report bugs and request features on our GitHub repository.
-                                        </Paragraph>
-                                        <Button type="primary" icon={<i className="fab fa-github"></i>}>
-                                            Open an Issue
-                                        </Button>
-                                    </div>
-
-                                    <div>
-                                        <Title level={5}>
-                                            <i className="fas fa-users"></i> Community Forum
-                                        </Title>
-                                        <Paragraph>
-                                            Join our community discussion for help and collaboration.
-                                        </Paragraph>
-                                        <Button icon={<i className="fas fa-comments"></i>}>
-                                            Visit Forum
-                                        </Button>
-                                    </div>
-                                </Space>
-                            </Card>
-                        </Col>
-
-                        <Col xs={24} md={12}>
-                            <Card title="Quick Links" className="links-card">
-                                <Space direction="vertical" style={{ width: '100%' }}>
-                                    <Link href="#"><i className="fas fa-book"></i> Complete Documentation</Link>
-                                    <Link href="#"><i className="fas fa-code"></i> API Reference</Link>
-                                    <Link href="#"><i className="fas fa-graduation-cap"></i> Video Tutorials</Link>
-                                    <Link href="#"><i className="fas fa-flask"></i> Example Gallery</Link>
-                                    <Link href="#"><i className="fab fa-youtube"></i> YouTube Channel</Link>
-                                    <Link href="#"><i className="fab fa-discord"></i> Discord Server</Link>
-                                </Space>
-                            </Card>
-                        </Col>
-                    </Row>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div>
+                    ©2024 PyMultiWFN - Advanced Wavefunction Analysis for Quantum Chemistry
                 </div>
-            );
-        };
-
-        // Community Page Component
-        const CommunityPage = () => (
-            <div className="content-wrapper">
-                <Title level={1} className="page-title">
-                    <i className="fas fa-users"></i> Community & Contributing
-                </Title>
-                <Paragraph className="page-description">
-                    Join the PyMultiWFN community and contribute to the future of quantum chemical analysis.
-                </Paragraph>
-
-                <Row gutter={[24, 24]}>
-                    <Col xs={24} lg={12}>
-                        <Card title="Get Involved" className="get-involved-card">
-                            <Space direction="vertical" style={{ width: '100%' }} size="large">
-                                <div>
-                                    <Title level={4}>
-                                        <i className="fab fa-github"></i> Development
-                                    </Title>
-                                    <Paragraph>
-                                        Contribute code, report bugs, and help improve PyMultiWFN.
-                                    </Paragraph>
-                                    <Space>
-                                        <Button type="primary" icon={<i className="fab fa-github"></i>}>
-                                            GitHub Repository
-                                        </Button>
-                                        <Button icon={<i className="fas fa-code-branch"></i>}>
-                                            Contributing Guide
-                                        </Button>
-                                    </Space>
-                                </div>
-
-                                <div>
-                                    <Title level={4}>
-                                        <i className="fas fa-comments"></i> Discussion
-                                    </Title>
-                                    <Paragraph>
-                                        Join our community forums and connect with other users.
-                                    </Paragraph>
-                                    <Space>
-                                        <Button icon={<i className="fab fa-discord"></i>}>
-                                            Discord Server
-                                        </Button>
-                                        <Button icon={<i className="fas fa-envelope"></i>}>
-                                            Mailing List
-                                        </Button>
-                                    </Space>
-                                </div>
-
-                                <div>
-                                    <Title level={4}>
-                                        <i className="fas fa-share-alt"></i> Spread the Word
-                                    </Title>
-                                    <Paragraph>
-                                        Help us grow the community by sharing PyMultiWFN.
-                                    </Paragraph>
-                                    <Space>
-                                        <Button icon={<i className="fab fa-twitter"></i>}>
-                                            Twitter
-                                        </Button>
-                                        <Button icon={<i className="fab fa-linkedin"></i>}>
-                                            LinkedIn
-                                        </Button>
-                                        <Button icon={<i className="fas fa-microscope"></i>}>
-                                            ResearchGate
-                                        </Button>
-                                    </Space>
-                                </div>
-                            </Space>
-                        </Card>
-                    </Col>
-
-                    <Col xs={24} lg={12}>
-                        <Card title="Community Stats" className="stats-card">
-                            <Row gutter={[16, 16]}>
-                                <Col span={12}>
-                                    <Statistic title="GitHub Stars" value={1234} prefix={<i className="fab fa-github"></i>} />
-                                </Col>
-                                <Col span={12}>
-                                    <Statistic title="Active Users" value={5678} prefix={<i className="fas fa-users"></i>} />
-                                </Col>
-                                <Col span={12}>
-                                    <Statistic title="Contributors" value={89} prefix={<i className="fas fa-code-branch"></i>} />
-                                </Col>
-                                <Col span={12}>
-                                    <Statistic title="Publications" value={156} prefix={<i className="fas fa-book"></i>} />
-                                </Col>
-                            </Row>
-
-                            <Title level={5} style={{ marginTop: 24 }}>Recent Activity</Title>
-                            <Timeline>
-                                <Timeline.Item color="green">
-                                    <Text>v2.1.0 released with GPU acceleration</Text>
-                                    <br />
-                                    <Text type="secondary">2 days ago</Text>
-                                </Timeline.Item>
-                                <Timeline.Item color="blue">
-                                    <Text>New documentation website launched</Text>
-                                    <br />
-                                    <Text type="secondary">1 week ago</Text>
-                                </Timeline.Item>
-                                <Timeline.Item color="orange">
-                                    <Text>Community webinar: Advanced NCI analysis</Text>
-                                    <br />
-                                    <Text type="secondary">2 weeks ago</Text>
-                                </Timeline.Item>
-                            </Timeline>
-                        </Card>
-                    </Col>
-                </Row>
-
-                <Card title="Contributor Spotlight" style={{ marginTop: 24 }}>
-                    <Row gutter={[24, 24]}>
-                        <Col xs={24} sm={12} md={6}>
-                            <Card size="small" className="contributor-card">
-                                <div className="contributor-avatar">
-                                    <i className="fas fa-user-circle"></i>
-                                </div>
-                                <Title level={5}>Dr. Jane Smith</Title>
-                                <Text type="secondary">Core Developer</Text>
-                                <Paragraph>
-                                    Lead developer of the analysis modules and GPU acceleration features.
-                                </Paragraph>
-                                <Space>
-                                    <i className="fab fa-github"></i>
-                                    <i className="fab fa-twitter"></i>
-                                    <i className="fas fa-globe"></i>
-                                </Space>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={12} md={6}>
-                            <Card size="small" className="contributor-card">
-                                <div className="contributor-avatar">
-                                    <i className="fas fa-user-circle"></i>
-                                </div>
-                                <Title level={5}>Prof. John Doe</Title>
-                                <Text type="secondary">Academic Advisor</Text>
-                                <Paragraph>
-                                    Providing theoretical guidance and validation against experimental data.
-                                </Paragraph>
-                                <Space>
-                                    <i className="fab fa-github"></i>
-                                    <i className="fas fa-university"></i>
-                                </Space>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={12} md={6}>
-                            <Card size="small" className="contributor-card">
-                                <div className="contributor-avatar">
-                                    <i className="fas fa-user-circle"></i>
-                                </div>
-                                <Title level={5}>Alice Johnson</Title>
-                                <Text type="secondary">Documentation Lead</Text>
-                                <Paragraph>
-                                    Creating comprehensive tutorials and examples for the community.
-                                </Paragraph>
-                                <Space>
-                                    <i className="fab fa-github"></i>
-                                    <i className="fab fa-twitter"></i>
-                                </Space>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={12} md={6}>
-                            <Card size="small" className="contributor-card">
-                                <div className="contributor-avatar">
-                                    <i className="fas fa-user-circle"></i>
-                                </div>
-                                <Title level={5}>Bob Wilson</Title>
-                                <Text type="secondary">Community Manager</Text>
-                                <Paragraph>
-                                    Managing forums, organizing events, and supporting users.
-                                </Paragraph>
-                                <Space>
-                                    <i className="fab fa-discord"></i>
-                                    <i className="fas fa-envelope"></i>
-                                </Space>
-                            </Card>
-                        </Col>
-                    </Row>
-                </Card>
+                <div class="footer-links">
+                    <a href="https://github.com/yourusername/PyMultiWFN">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                    <a href="#docs">
+                        <i class="fas fa-book"></i> Documentation
+                    </a>
+                    <a href="https://github.com/yourusername/PyMultiWFN/issues">
+                        <i class="fas fa-bug"></i> Issues
+                    </a>
+                </div>
             </div>
-        );
+        </footer>
+    </div>
 
-        // Main App Component
-        const App = () => {
-            const [currentPage, setCurrentPage] = useState('home');
-            const [isDarkMode, setIsDarkMode] = useState(false);
+    <!-- Font Awesome (essential for icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          onerror="this.onerror=null;console.warn('Font Awesome failed to load');">
 
-            const menuItems = [
-                {
-                    key: 'home',
-                    icon: <i className="fas fa-home"></i>,
-                    label: 'Home',
-                },
-                {
-                    type: 'divider',
-                },
-                {
-                    key: 'docs',
-                    icon: <i className="fas fa-book"></i>,
-                    label: 'Documentation',
-                    children: [
-                        {
-                            key: 'installation',
-                            label: 'Installation',
-                        },
-                        {
-                            key: 'api',
-                            label: 'API Reference',
-                        },
-                        {
-                            key: 'tutorials',
-                            label: 'Tutorials',
-                        },
-                        {
-                            key: 'examples',
-                            label: 'Examples',
-                        }
-                    ]
-                },
-                {
-                    key: 'agents',
-                    icon: <i className="fas fa-robot"></i>,
-                    label: 'Development',
-                },
-                {
-                    type: 'divider',
-                },
-                {
-                    key: 'resources',
-                    icon: <i className="fas fa-flask"></i>,
-                    label: 'Resources',
-                    children: [
-                        {
-                            key: 'papers',
-                            label: 'Publications',
-                        },
-                        {
-                            key: 'performance',
-                            label: 'Performance',
-                        },
-                        {
-                            key: 'faq',
-                            label: 'FAQ',
-                        }
-                    ]
-                },
-                {
-                    key: 'community',
-                    icon: <i className="fas fa-users"></i>,
-                    label: 'Community',
-                },
-                {
-                    type: 'divider',
-                },
-                {
-                    key: 'github',
-                    icon: <i className="fab fa-github"></i>,
-                    label: 'GitHub',
-                }
-            ];
+    <!-- JavaScript -->
+    <script>
+        // Simple vanilla JavaScript implementation
+        function showSection(section) {
+            // Hide all sections first
+            document.getElementById('home').classList.add('hidden');
+            document.getElementById('installation-section').classList.add('hidden');
+            document.getElementById('api-section').classList.add('hidden');
 
-            const handleMenuClick = (e) => {
-                if (e.key === 'github') {
-                    window.open('https://github.com/yourusername/PyMultiWFN', '_blank');
-                } else {
-                    setCurrentPage(e.key);
-                }
-            };
+            // Show the selected section
+            if (section === 'home') {
+                document.getElementById('home').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (section === 'installation') {
+                document.getElementById('installation-section').classList.remove('hidden');
+                document.getElementById('installation-section').scrollIntoView({ behavior: 'smooth' });
+            } else if (section === 'api') {
+                document.getElementById('api-section').classList.remove('hidden');
+                document.getElementById('api-section').scrollIntoView({ behavior: 'smooth' });
+            } else if (section === 'docs') {
+                // Redirect to installation for now
+                showSection('installation');
+            }
+        }
 
-            const toggleTheme = () => {
-                setIsDarkMode(!isDarkMode);
-            };
+        // Initialize app
+        function initApp() {
+            try {
+                console.log('Initializing PyMultiWFN website...');
 
-            const HomePage = () => (
-                <ThemeContext.Provider value={isDarkMode ? 'dark' : 'light'}>
-                    <div className={`content-wrapper ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
-                        <div className="hero-section">
-                            <div className="hero-content">
-                                <Title level={1} className="hero-title">
-                                    <i className="fas fa-atom"></i> PyMultiWFN
-                                </Title>
-                                <Title level={3} className="hero-subtitle">
-                                    Advanced Wavefunction Analysis for Quantum Chemistry
-                                </Title>
-                                <Paragraph className="hero-description">
-                                    Next-generation Python implementation of Multiwfn featuring cutting-edge computational methods,
-                                    real-time visualization, and seamless integration with modern scientific computing ecosystems.
-                                    Experience quantum chemical analysis with unprecedented performance and flexibility.
-                                </Paragraph>
-                                <Space size="large">
-                                    <Button type="primary" size="large" icon={<i className="fas fa-book"></i>}>
-                                        Documentation
-                                    </Button>
-                                    <Button size="large" icon={<i className="fab fa-github"></i>}>
-                                        View on GitHub
-                                    </Button>
-                                    <Button size="large" icon={<i className="fas fa-download"></i>}>
-                                        pip install pymultiwfn
-                                    </Button>
-                                </Space>
-                            </div>
-                        </div>
+                // Hide loading screen
+                document.getElementById('loading').style.display = 'none';
 
-                        {/* Interactive Orbital Visualization */}
-                        <div className="visualization-section">
-                            <Title level={2} className="section-title">
-                                <i className="fas fa-cube"></i> Real-time Orbital Visualization
-                            </Title>
-                            <Row gutter={[24, 24]}>
-                                <Col xs={24} lg={12}>
-                                    <Card title="3D Molecular Orbital Rendering" className="viz-card">
-                                        <OrbitalVisualization />
-                                        <Paragraph style={{ marginTop: 16 }}>
-                                            Interactive 3D visualization of electron density and molecular orbitals
-                                            with real-time rendering using WebGL technology.
-                                        </Paragraph>
-                                    </Card>
-                                </Col>
-                                <Col xs={24} lg={12}>
-                                    <Card title="Quantum Properties Dashboard" className="viz-card">
-                                        <Row gutter={[16, 16]}>
-                                            <Col span={12}>
-                                                <Statistic title="Computational Speed" value={108} suffix="%" prefix={<i className="fas fa-rocket"></i>} />
-                                            </Col>
-                                            <Col span={12}>
-                                                <Statistic title="Accuracy" value={99.7} suffix="%" prefix={<i className="fas fa-bullseye"></i>} />
-                                            </Col>
-                                            <Col span={12}>
-                                                <Statistic title="Memory Efficiency" value={85} suffix="%" prefix={<i className="fas fa-memory"></i>} />
-                                            </Col>
-                                            <Col span={12}>
-                                                <Statistic title="API Functions" value={256} prefix={<i className="fas fa-code"></i>} />
-                                            </Col>
-                                        </Row>
-                                    </Card>
-                                </Col>
-                            </Row>
-                        </div>
+                // Show main app
+                const app = document.getElementById('app');
+                app.classList.add('loaded');
 
-                        <div className="features-section">
-                            <Title level={2} className="section-title">
-                                <i className="fas fa-star"></i> Advanced Features
-                            </Title>
-                            <Row gutter={[24, 24]}>
-                                <Col xs={24} sm={12} lg={8}>
-                                    <Card hoverable className="feature-card advanced-feature">
-                                        <div className="feature-icon">
-                                            <i className="fas fa-brain"></i>
-                                        </div>
-                                        <Title level={4}>AI-Enhanced Analysis</Title>
-                                        <Paragraph>
-                                            Machine learning algorithms for pattern recognition in electron density topology
-                                            and automatic bond critical point detection.
-                                        </Paragraph>
-                                        <Tag color="blue">Neural Networks</Tag>
-                                        <Tag color="green">Pattern Recognition</Tag>
-                                    </Card>
-                                </Col>
-                                <Col xs={24} sm={12} lg={8}>
-                                    <Card hoverable className="feature-card advanced-feature">
-                                        <div className="feature-icon">
-                                            <i className="fas fa-bolt"></i>
-                                        </div>
-                                        <Title level={4}>GPU Acceleration</Title>
-                                        <Paragraph>
-                                            CUDA and OpenCL support for massive parallelization of grid calculations
-                                            and density matrix operations.
-                                        </Paragraph>
-                                        <Tag color="orange">CUDA</Tag>
-                                        <Tag color="purple">OpenCL</Tag>
-                                    </Card>
-                                </Col>
-                                <Col xs={24} sm={12} lg={8}>
-                                    <Card hoverable className="feature-card advanced-feature">
-                                        <div className="feature-icon">
-                                            <i className="fas fa-network-wired"></i>
-                                        </div>
-                                        <Title level={4}>Distributed Computing</Title>
-                                    <Paragraph>
-                                            Native support for MPI and cloud-based parallel processing across multiple nodes.
-                                        </Paragraph>
-                                        <Tag color="cyan">MPI</Tag>
-                                        <Tag color="geekblue">Cloud Ready</Tag>
-                                    </Card>
-                                </Col>
-                            </Row>
-                        </div>
+                console.log('App initialized successfully');
 
-                    {/* Performance Benchmarking Section */}
-                    <div className="performance-section">
-                        <Title level={2} className="section-title">
-                            <i className="fas fa-chart-bar"></i> Computational Performance Analysis
-                        </Title>
-                        <Card title="Benchmarks: PyMultiWFN vs Original Multiwfn" className="benchmark-card">
-                            <PerformanceBenchmark />
-                            <Alert
-                                message="Performance Insights"
-                                description="PyMultiWFN achieves superior performance through NumPy vectorization and optional Numba JIT compilation. In specific workloads, Python implementation outperforms original Fortran code by up to 8%."
-                                type="info"
-                                showIcon
-                                style={{ marginTop: 16 }}
-                            />
-                        </Card>
-                    </div>
+                // Hide loading spinner if it's still visible
+                setTimeout(() => {
+                    const loading = document.getElementById('loading');
+                    if (loading.style.display !== 'none') {
+                        loading.style.display = 'none';
+                    }
+                }, 1000);
 
-                    {/* Feature Comparison Section */}
-                    <div className="comparison-section">
-                        <Title level={2} className="section-title">
-                            <i className="fas fa-balance-scale"></i> Comprehensive Feature Comparison
-                        </Title>
-                        <Card title="PyMultiWFN vs Multiwfn Feature Matrix" className="comparison-card">
-                            <FeatureComparison />
-                        </Card>
-                    </div>
+            } catch (error) {
+                console.error('App initialization failed:', error);
+                showError();
+            }
+        }
 
-                    {/* Interactive Code Examples */}
-                    <div className="code-section">
-                        <Title level={2} className="section-title">
-                            <i className="fas fa-code"></i> Interactive Python API Examples
-                        </Title>
-                        <Row gutter={[24, 24]}>
-                            <Col xs={24} lg={12}>
-                                <CodeExample
-                                    title="Basic Electron Density Analysis"
-                                    code={`import pymultiwfn as pw
-import numpy as np
+        function showError() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'flex';
+        }
 
-# Load wavefunction from Gaussian fchk file
-wf = pw.load_wavefunction('molecule.fchk')
+        // Error handling
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript error:', e);
+            showError();
+        });
 
-# Calculate electron density on a grid
-grid = pw.generate_grid(wf.molecule, spacing=0.1)
-density = wf.calculate_density(grid)
+        // Fallback timeout
+        setTimeout(function() {
+            const loading = document.getElementById('loading');
+            if (loading.style.display !== 'none') {
+                console.warn('Loading timeout, showing app anyway');
+                initApp();
+            }
+        }, 3000);
 
-# Find critical points
-critical_points = pw.find_critical_points(density, grid)
-print(f"Found {len(critical_points)} critical points")`}
-                                />
-                            </Col>
-                            <Col xs={24} lg={12}>
-                                <CodeExample
-                                    title="Advanced Topological Analysis"
-                                    code={`# Perform AIM analysis
-aim_analysis = pw.AIMAnalysis(wf)
-bond_paths = aim_analysis.find_bond_paths()
-laplacian = aim_analysis.calculate_laplacian()
-
-# Calculate ELF for basin analysis
-elf = pw.calculate_elf(wf, grid)
-basins = pw.identify_elf_basins(elf, threshold=0.8)
-
-# Visualize results
-pw.visualize_density_isosurfaces(density, levels=[0.002, 0.01])
-pw.plot_elf_basins(basins, grid)`}
-                                />
-                            </Col>
-                        </Row>
-                    </div>
-
-                    {/* Interactive Demo Section */}
-                    <div className="demo-section">
-                        <Title level={2} className="section-title">
-                            <i className="fas fa-flask"></i> Live Quantum Chemical Calculator
-                        </Title>
-                        <Row gutter={[24, 24]}>
-                            <Col xs={24} lg={14}>
-                                <InteractiveDemo />
-                            </Col>
-                            <Col xs={24} lg={10}>
-                                <Card title="Mathematical Foundation" className="math-card">
-                                    <Title level={5}>Electron Density Formula:</Title>
-                                    <div style={{
-                                        background: '#f6f8fa',
-                                        padding: '16px',
-                                        borderRadius: '8px',
-                                        textAlign: 'center',
-                                        fontFamily: 'Times New Roman, serif'
-                                    }}>
-                                        $$\\rho(r) = \\sum_{i,j} P_{ij} \\phi_i(r) \\phi_j(r)$$
-                                    </div>
-                                    <Paragraph style={{ marginTop: 16 }}>
-                                        Where <code>P<sub>ij</sub></code> is the density matrix and
-                                        <code>φ<sub>i</sub>(r)</code> are the basis functions.
-                                    </Paragraph>
-                                </Card>
-                            </Col>
-                        </Row>
-                    </div>
-
-                    <div className="architecture-section">
-                        <Title level={2} className="section-title">
-                            <i className="fas fa-sitemap"></i> Advanced Architecture
-                        </Title>
-                        <Card>
-                            <Row gutter={[16, 16]}>
-                                <Col xs={24} md={12}>
-                                    <Title level={4}>Next-Generation Technology Stack</Title>
-                                    <ul className="tech-list">
-                                        <li><strong>Language:</strong> Python 3.10+ with async support</li>
-                                        <li><strong>Computation:</strong> NumPy, Numba, CuPy, JAX</li>
-                                        <li><strong>Parallel:</strong> MPI, Dask, Ray, Joblib</li>
-                                        <li><strong>Visualization:</strong> Matplotlib, Plotly, Three.js</li>
-                                        <li><strong>Quantum Chemistry:</strong> PySCF, Psi4, Q-Chem API</li>
-                                        <li><strong>Machine Learning:</strong> PyTorch, TensorFlow, Scikit-learn</li>
-                                    </ul>
-                                </Col>
-                                <Col xs={24} md={12}>
-                                    <Title level={4}>Enhanced Directory Structure</Title>
-                                    <ul className="tech-list">
-                                        <li><code>core/</code> - Advanced data structures with type hints</li>
-                                        <li><code>io/</code> - Multi-format parsers (fchk, molden, wfn, etc.)</li>
-                                        <li><code>math/</code> - Mathematical engines with GPU support</li>
-                                        <li><code>analysis/</code> - ML-enhanced analysis modules</li>
-                                        <li><code>vis/</code> - Interactive 3D/4D visualizations</li>
-                                        <li><code>ml/</code> - Machine learning models and training</li>
-                                        <li><code>parallel/</code> - Distributed computing frameworks</li>
-                                    </ul>
-                                </Col>
-                            </Row>
-                        </Card>
-                    </div>
-
-                    <div className="status-section">
-                        <Title level={2} className="section-title">
-                            <i className="fas fa-chart-line"></i> Development Status
-                        </Title>
-                        <Row gutter={[24, 24]}>
-                            <Col xs={24} lg={12}>
-                                <Card title="Phase 1: Reconnaissance & Architecture" extra={<Badge status="success" text="Completed" />}>
-                                    <Timeline>
-                                        <Timeline.Item color="green">Analyzed original Fortran source code</Timeline.Item>
-                                        <Timeline.Item color="green">Designed Python package structure</Timeline.Item>
-                                        <Timeline.Item color="green">Established performance strategies</Timeline.Item>
-                                    </Timeline>
-                                </Card>
-                            </Col>
-                            <Col xs={24} lg={12}>
-                                <Card title="Phase 2: Foundation" extra={<Badge status="processing" text="In Progress" />}>
-                                    <Timeline>
-                                        <Timeline.Item color="green">Project skeleton setup</Timeline.Item>
-                                        <Timeline.Item color="green">Core data structures</Timeline.Item>
-                                        <Timeline.Item color="blue">Basic file I/O implementation</Timeline.Item>
-                                        <Timeline.Item>Advanced analysis modules</Timeline.Item>
-                                    </Timeline>
-                                </Card>
-                            </Col>
-                        </Row>
-                    </div>
-
-                    <div className="license-section">
-                        <Alert
-                            message="License Information"
-                            description={
-                                <div>
-                                    <Paragraph>
-                                        PyMultiWFN is based on the original Multiwfn program. When using this software,
-                                        please cite the original Multiwfn papers:
-                                    </Paragraph>
-                                    <ul>
-                                        <li>Tian Lu, Feiwu Chen, J. Comput. Chem., 33, 580-592 (2012)</li>
-                                        <li>Tian Lu, J. Chem. Phys., 161, 082503 (2024)</li>
-                                    </ul>
-                                </div>
-                            }
-                            type="info"
-                            showIcon
-                        />
-                    </div>
-                </div>
-            );
-
-            const AgentsPage = () => (
-                <div className="content-wrapper">
-                    <Title level={1} className="page-title">
-                        <i className="fas fa-robot"></i> Development Process & Agents
-                    </Title>
-                    <Paragraph className="page-description">
-                        A comprehensive log of the AI-assisted development process for refactoring Multiwfn from Fortran to Python.
-                    </Paragraph>
-
-                    <Card className="agents-intro">
-                        <Title level={3}>
-                            <i className="fas fa-bullseye"></i> Project Goal
-                        </Title>
-                        <Paragraph>
-                            Refactor the renowned wavefunction analysis program Multiwfn from Fortran to Python while maintaining
-                            analytical capabilities and leveraging Python's ecosystem for better modularity and extensibility.
-                        </Paragraph>
-                    </Card>
-
-                    <Row gutter={[24, 24]}>
-                        <Col xs={24} lg={12}>
-                            <Card title="Phase 1: Reconnaissance & Architecture">
-                                <Timeline>
-                                    <Timeline.Item color="blue">
-                                        <Text strong>File Structure Analysis</Text>
-                                        <br />
-                                        <Text type="secondary">Analyzed Fortran source code distribution and module organization</Text>
-                                    </Timeline.Item>
-                                    <Timeline.Item color="blue">
-                                        <Text strong>Python Architecture Design</Text>
-                                        <br />
-                                        <Text type="secondary">Designed modern Python package structure with proper separation of concerns</Text>
-                                    </Timeline.Item>
-                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
-                                        <Text strong>Global Variable Strategy</Text>
-                                        <br />
-                                        <Text type="secondary">Planned migration from Fortran COMMON blocks to Python data classes</Text>
-                                    </Timeline.Item>
-                                </Timeline>
-                            </Card>
-                        </Col>
-                        <Col xs={24} lg={12}>
-                            <Card title="Phase 2: Foundation Setup">
-                                <Timeline>
-                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
-                                        <Text strong>Package Configuration</Text>
-                                        <br />
-                                        <Text type="secondary">Created pyproject.toml for pip-installable package</Text>
-                                    </Timeline.Item>
-                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
-                                        <Text strong>Core Implementation</Text>
-                                        <br />
-                                        <Text type="secondary">Implemented constants, data structures, and configuration</Text>
-                                    </Timeline.Item>
-                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
-                                        <Text strong>IO Implementation</Text>
-                                        <br />
-                                        <Text type="secondary">Created FCHK file parser for Gaussian output files</Text>
-                                    </Timeline.Item>
-                                </Timeline>
-                            </Card>
-                        </Col>
-                    </Row>
-
-                    <Row gutter={[24, 24]} style={{ marginTop: '24px' }}>
-                        <Col xs={24} lg={12}>
-                            <Card title="Phase 3: Core Logic Refactoring">
-                                <Timeline>
-                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
-                                        <Text strong>Vectorization</Text>
-                                        <br />
-                                        <Text type="secondary">Implemented NumPy-based basis function evaluation</Text>
-                                    </Timeline.Item>
-                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
-                                        <Text strong>Density Calculation</Text>
-                                        <br />
-                                        <Text type="secondary">Created vectorized electron density calculation</Text>
-                                    </Timeline.Item>
-                                </Timeline>
-                            </Card>
-                        </Col>
-                        <Col xs={24} lg={12}>
-                            <Card title="Phase 4: Hybrid Programming">
-                                <Timeline>
-                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
-                                        <Text strong>Fortran Integration</Text>
-                                        <br />
-                                        <Text type="secondary">Designed f2py strategy for complex calculations</Text>
-                                    </Timeline.Item>
-                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
-                                        <Text strong>Infrastructure Setup</Text>
-                                        <br />
-                                        <Text type="secondary">Created extension compilation framework</Text>
-                                    </Timeline.Item>
-                                </Timeline>
-                            </Card>
-                        </Col>
-                    </Row>
-
-                    <Card title="Validation & Consistency" style={{ marginTop: '24px' }}>
-                        <Alert
-                            message="Consistency Verifier"
-                            description="A dedicated consistency verifier tool validates that PyMultiWFN and the original Multiwfn generate exactly the same output, ensuring functional parity during the refactoring process."
-                            type="success"
-                            showIcon
-                        />
-                    </Card>
-
-                    <Card title="Key Achievements" style={{ marginTop: '24px' }}>
-                        <Row gutter={[16, 16]}>
-                            <Col xs={24} sm={8}>
-                                <div className="achievement-stat">
-                                    <Title level={2}>4</Title>
-                                    <Text>Development Phases</Text>
-                                </div>
-                            </Col>
-                            <Col xs={24} sm={8}>
-                                <div className="achievement-stat">
-                                    <Title level={2}>100%</Title>
-                                    <Text>API Compatibility Goal</Text>
-                                </div>
-                            </Col>
-                            <Col xs={24} sm={8}>
-                                <div className="achievement-stat">
-                                    <Title level={2}>NumPy</Title>
-                                    <Text>Performance Optimization</Text>
-                                </div>
-                            </Col>
-                        </Row>
-                    </Card>
-                </div>
-            );
-
-            return (
-                <Layout className="layout">
-                    <Header className="header">
-                        <div className="logo">
-                            <i className="fas fa-atom"></i>
-                            <span className="logo-text">PyMultiWFN</span>
-                        </div>
-                        <Menu
-                            theme="dark"
-                            mode="horizontal"
-                            selectedKeys={[currentPage]}
-                            items={menuItems}
-                            onClick={handleMenuClick}
-                            className="nav-menu"
-                        />
-                    </Header>
-                    <Content className="content">
-                        {(() => {
-                            switch (currentPage) {
-                                case 'home': return <HomePage />;
-                                case 'installation': return <InstallationPage />;
-                                case 'api': return <APIPage />;
-                                case 'tutorials': return <TutorialsPage />;
-                                case 'examples': return <ExamplesPage />;
-                                case 'agents': return <AgentsPage />;
-                                case 'papers': return <PublicationsPage />;
-                                case 'performance': return <PerformancePage />;
-                                case 'faq': return <FAQPage />;
-                                case 'community': return <CommunityPage />;
-                                default: return <HomePage />;
-                            }
-                        })()}
-                    </Content>
-                    <Footer className={`footer ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
-                        <div className="footer-content">
-                            <Text>
-                                ©2024 PyMultiWFN - Advanced Wavefunction Analysis for Quantum Chemistry
-                            </Text>
-                            <Space split={<Divider type="vertical" />}>
-                                <Text><i className="fab fa-github"></i> GitHub</Text>
-                                <Text><i className="fas fa-book"></i> Documentation</Text>
-                                <Text><i className="fas fa-bug"></i> Issues</Text>
-                                <Text><i className="fas fa-papers"></i> Papers</Text>
-                            </Space>
-                        </div>
-                    </Footer>
-
-                    {/* Floating Action Button for Theme Toggle */}
-                    <FloatButton.Group
-                        shape="circle"
-                        style={{
-                            right: 24,
-                            bottom: 24,
-                        }}
-                    >
-                        <FloatButton
-                            icon={isDarkMode ? <i className="fas fa-sun"></i> : <i className="fas fa-moon"></i>}
-                            tooltip={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                            onClick={toggleTheme}
-                        />
-                        <FloatButton.BackTop visibilityHeight={300} />
-                    </FloatButton.Group>
-                </Layout>
-            );
-        };
-
-        ReactDOM.render(<App />, document.getElementById('root'));
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
     </script>
 </body>
 </html>
