@@ -95,3 +95,6 @@ consistency_verifier/examples/*.txt
 consistency_verifier/examples/*.png
 consistency_verifier/examples/*.pdf
 consistency_verifier/examples/*.exe
+
+# Docs test files
+docs/test/

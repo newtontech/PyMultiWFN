@@ -24,6 +24,7 @@ class FchkLoader:
         self._parse_mo()
         self._parse_overlap_matrix()
         
+        self.wfn._infer_occupations()
         return self.wfn
 
     def _read_section(self, label: str, dtype=float) -> np.ndarray:
