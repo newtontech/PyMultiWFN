@@ -55,6 +55,42 @@ Thumbs.db
 
 # Verification script generated outputs
 output_*.txt
+*_multiwfn.txt
+*_pymultiwfn.txt
+*_diff.txt
+test_reports/
+*.cube
+*.grid
+*.dens
+*.pot
+*.grad
+*.nbo
+*.molden
+*.wfx
+*.fchk
+# Large intermediate files from Multiwfn tests
+*.cub
+*.den
+*.eld
+*.esp
+*.lap
+*.nci
+*.vdw
+*.iscan
 
 .gemini/
 gha-creds-*.json
+
+# Ignore specific binary files in Multiwfn_3.8_dev_bin_Win64/examples
+Multiwfn_3.8_dev_bin_Win64/examples/*.xyz
+Multiwfn_3.8_dev_bin_Win64/examples/*.fch
+Multiwfn_3.8_dev_bin_Win64/examples/*.gjf
+Multiwfn_3.8_dev_bin_Win64/examples/*.pdb
+Multiwfn_3.8_dev_bin_Win64/examples/*.mwfn
+Multiwfn_3.8_dev_bin_Win64/examples/*.opj
+Multiwfn_3.8_dev_bin_Win64/examples/*.mol
+Multiwfn_3.8_dev_bin_Win64/examples/*.vmd
+Multiwfn_3.8_dev_bin_Win64/examples/*.47
+Multiwfn_3.8_dev_bin_Win64/examples/*.txt
+Multiwfn_3.8_dev_bin_Win64/examples/*.png
+Multiwfn_3.8_dev_bin_Win64/examples/*.pdf

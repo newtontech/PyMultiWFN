@@ -1,0 +1,4 @@
+# Requirements for PyMultiWFN consistency testing
+numpy>=1.20.0
+pathlib
+typing-extensions

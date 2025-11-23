@@ -463,29 +463,738 @@ body {
     background: #096dd9;
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: #141414;
-        color: rgba(255, 255, 255, 0.85);
+/* Advanced Features Styling */
+
+/* Orbital Visualization Card */
+.viz-card {
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(24, 144, 255, 0.1) !important;
+    border: 1px solid rgba(24, 144, 255, 0.1) !important;
+    overflow: hidden;
+}
+
+.viz-card .ant-card-head {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);
+    border-bottom: 1px solid rgba(24, 144, 255, 0.1);
+}
+
+/* Advanced Feature Cards */
+.advanced-feature {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    border: 1px solid rgba(24, 144, 255, 0.1) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.advanced-feature::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(24, 144, 255, 0.05) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+.advanced-feature .feature-icon {
+    background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+    color: white;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Benchmark Card */
+.benchmark-card {
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(82, 196, 26, 0.1) !important;
+}
+
+.benchmark-card .ant-card-head {
+    background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%);
+}
+
+/* Comparison Card */
+.comparison-card {
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(250, 173, 20, 0.1) !important;
+}
+
+.comparison-card .ant-card-head {
+    background: linear-gradient(135deg, #fffbe6 0%, #fff1b8 100%);
+}
+
+/* Code Example Cards */
+.code-example-card {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.code-example-card pre {
+    background: #2d2d2d !important;
+    border-radius: 8px !important;
+    margin: 0 !important;
+    padding: 16px !important;
+    overflow-x: auto;
+}
+
+.code-example-card code {
+    color: #f8f8f2 !important;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+/* Result Card */
+.result-card {
+    background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%) !important;
+    border: 1px solid #b7eb8f !important;
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Math Card */
+.math-card {
+    background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%) !important;
+    border: 1px solid #d3adf7 !important;
+}
+
+/* Performance Section */
+.performance-section {
+    margin-bottom: 64px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* Comparison Section */
+.comparison-section {
+    margin-bottom: 64px;
+    animation: fadeInUp 1s ease-out;
+}
+
+/* Code Section */
+.code-section {
+    margin-bottom: 64px;
+    animation: fadeInUp 1.2s ease-out;
+}
+
+/* Demo Section */
+.demo-section {
+    margin-bottom: 64px;
+    animation: fadeInUp 1.4s ease-out;
+}
+
+/* Visualization Section */
+.visualization-section {
+    margin-bottom: 64px;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Table Enhancements */
+.ant-table {
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+.ant-table-thead > tr > th {
+    background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%) !important;
+    font-weight: 600 !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+    background: rgba(24, 144, 255, 0.05) !important;
+}
+
+/* Progress Bar Enhancements */
+.ant-progress-bg {
+    background: linear-gradient(90deg, #52c41a 0%, #73d13d 100%) !important;
+}
+
+/* Tag Enhancements */
+.ant-tag {
+    border-radius: 12px !important;
+    font-weight: 500 !important;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Statistic Enhancements */
+.ant-statistic-content {
+    font-weight: 600 !important;
+}
+
+/* Button Enhancements */
+.ant-btn-primary {
+    background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%) !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.ant-btn-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(24, 144, 255, 0.4) !important;
+}
+
+/* Float Button Enhancements */
+.ant-float-btn {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.3s ease !important;
+}
+
+.ant-float-btn:hover {
+    transform: scale(1.1) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Dark Theme Support */
+.dark-theme {
+    background-color: #141414;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.dark-theme .content {
+    background: #141414;
+}
+
+.dark-theme .hero-section {
+    background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+}
+
+.dark-theme .feature-card,
+.dark-theme .ant-card,
+.dark-theme .advanced-feature {
+    background: #1f1f1f !important;
+    border-color: #434343 !important;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.dark-theme .tech-list li {
+    border-bottom-color: #434343;
+}
+
+.dark-theme .achievement-stat {
+    background: linear-gradient(135deg, #111b26 0%, #0d1117 100%);
+    border-color: #1890ff;
+}
+
+.dark-theme .viz-card .ant-card-head {
+    background: linear-gradient(135deg, #262626 0%, #1f1f1f 100%);
+    border-bottom-color: #434343;
+}
+
+.dark-theme .benchmark-card .ant-card-head {
+    background: linear-gradient(135deg, #162312 0%, #0d1f09 100%);
+}
+
+.dark-theme .comparison-card .ant-card-head {
+    background: linear-gradient(135deg, #2b2111 0%, #1a1508 100%);
+}
+
+.dark-theme .code-example-card pre {
+    background: #1a1a1a !important;
+}
+
+.dark-theme .result-card {
+    background: linear-gradient(135deg, #162312 0%, #0d1f09 100%) !important;
+    border-color: #274916 !important;
+}
+
+.dark-theme .math-card {
+    background: linear-gradient(135deg, #1a0d2a 0%, #0f0819 100%) !important;
+    border-color: #391085 !important;
+}
+
+.dark-theme .ant-table-thead > tr > th {
+    background: linear-gradient(135deg, #262626 0%, #1f1f1f 100%) !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.dark-theme .ant-table-tbody > tr > td {
+    border-color: #434343 !important;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.dark-theme .ant-table-tbody > tr:hover > td {
+    background: rgba(24, 144, 255, 0.1) !important;
+}
+
+.dark-theme .footer {
+    background: #000000 !important;
+    border-top-color: #434343 !important;
+}
+
+/* Advanced Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Loading Animation */
+.loading-animation {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(24, 144, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #1890ff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Glow Effects */
+.glow-effect {
+    box-shadow: 0 0 20px rgba(24, 144, 255, 0.3) !important;
+    transition: box-shadow 0.3s ease !important;
+}
+
+.glow-effect:hover {
+    box-shadow: 0 0 30px rgba(24, 144, 255, 0.5) !important;
+}
+
+/* Interactive Elements */
+.interactive-element {
+    cursor: pointer;
+    transition: all 0.3s ease !important;
+}
+
+.interactive-element:hover {
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .advanced-feature::before {
+        display: none;
+    }
+
+    .code-example-card pre {
+        font-size: 12px !important;
+    }
+}
+
+/* New Page Components Styling */
+
+/* Installation Page */
+.installation-card {
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(82, 196, 26, 0.1) !important;
+}
+
+.requirements-card {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%) !important;
+    border: 1px solid #bae7ff !important;
+}
+
+.requirements-card ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.requirements-card li {
+    margin-bottom: 8px;
+}
+
+/* API Page */
+.api-class-card {
+    border-radius: 12px !important;
+    border-left: 4px solid #1890ff !important;
+}
+
+.api-method-list {
+    background: #f8f9fa !important;
+    padding: 16px !important;
+    border-radius: 8px !important;
+}
+
+.api-method-list li {
+    margin-bottom: 8px;
+    padding-left: 8px;
+}
+
+.api-method-list code {
+    background: #e6f7ff !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-family: 'SFMono-Regular', Consolas, monospace !important;
+}
+
+/* Tutorials Page */
+.tutorial-card {
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+}
+
+.tutorial-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.tutorial-cover {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.tutorial-cover.beginner {
+    background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+}
+
+.tutorial-cover.intermediate {
+    background: linear-gradient(135deg, #fa8c16 0%, #ffa940 100%);
+}
+
+.tutorial-cover.advanced {
+    background: linear-gradient(135deg, #f5222d 0%, #ff4d4f 100%);
+}
+
+.tutorial-cover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+/* Examples Page */
+.example-card {
+    border-radius: 12px !important;
+    border-left: 4px solid #722ed1 !important;
+}
+
+.example-tabs .ant-tabs-tab {
+    font-weight: 600 !important;
+}
+
+.example-tabs .ant-tabs-tab-active {
+    background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%) !important;
+}
+
+/* Publications Page */
+.publications-card {
+    border-radius: 16px !important;
+}
+
+.publication-item {
+    border-radius: 12px !important;
+    border: 1px solid #f0f0f0 !important;
+    margin-bottom: 16px !important;
+    transition: all 0.3s ease !important;
+}
+
+.publication-item:hover {
+    border-color: #1890ff !important;
+    box-shadow: 0 4px 16px rgba(24, 144, 255, 0.1) !important;
+}
+
+.publication-metrics {
+    text-align: center;
+    padding: 16px;
+    background: linear-gradient(135deg, #f6f8fa 0%, #f0f2f5 100%);
+    border-radius: 8px;
+}
+
+.citation-card {
+    background: linear-gradient(135deg, #fff7e6 0%, #fff1b8 100%) !important;
+    border: 1px solid #ffd591 !important;
+}
+
+.citation-text {
+    background: white !important;
+    padding: 16px !important;
+    border-radius: 8px !important;
+    border: 1px solid #f0f0f0 !important;
+    font-family: 'Times New Roman', serif !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+/* Performance Page */
+.benchmark-results-card {
+    border-radius: 16px !important;
+    border-left: 4px solid #52c41a !important;
+}
+
+.optimization-card {
+    background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%) !important;
+    border: 1px solid #b7eb8f !important;
+}
+
+.performance-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.performance-item:last-child {
+    border-bottom: none;
+}
+
+.performance-item .ant-progress {
+    flex: 1;
+    margin: 0 16px;
+}
+
+.hardware-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.hardware-item i {
+    font-size: 1.5rem;
+    color: #1890ff;
+}
+
+/* FAQ Page */
+.faq-card {
+    border-radius: 16px !important;
+    border: 1px solid #f0f0f0 !important;
+}
+
+.faq-card .ant-collapse {
+    background: transparent !important;
+    border: none !important;
+}
+
+.faq-card .ant-collapse-item {
+    border-bottom: 1px solid #f0f0f0 !important;
+    margin-bottom: 0 !important;
+}
+
+.faq-card .ant-collapse-header {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    padding: 16px 24px !important;
+}
+
+.faq-card .ant-collapse-content {
+    background: #fafafa !important;
+    border-top: 1px solid #f0f0f0 !important;
+}
+
+.faq-card .ant-collapse-content-box {
+    padding: 20px 24px !important;
+}
+
+.help-card {
+    background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%) !important;
+    border: 1px solid #91d5ff !important;
+}
+
+.links-card {
+    background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%) !important;
+    border: 1px solid #d3adf7 !important;
+}
+
+.links-card .ant-space-item {
+    width: 100%;
+}
+
+.links-card a {
+    display: block;
+    padding: 12px 16px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    text-decoration: none;
+    color: #1890ff;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.links-card a:hover {
+    background: #f0f9ff;
+    transform: translateX(4px);
+}
+
+/* Community Page */
+.get-involved-card {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%) !important;
+    border: 1px solid #bae7ff !important;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #fff7e6 0%, #fff1b8 100%) !important;
+    border: 1px solid #ffd591 !important;
+}
+
+.stats-card .ant-statistic {
+    text-align: center;
+}
+
+.contributor-card {
+    text-align: center;
+    border-radius: 12px !important;
+    transition: all 0.3s ease !important;
+}
+
+.contributor-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.contributor-avatar {
+    font-size: 4rem;
+    color: #1890ff;
+    margin-bottom: 16px;
+}
+
+/* Responsive Design for New Components */
+@media (max-width: 768px) {
+    .tutorial-cover {
+        height: 80px;
+        font-size: 2rem;
+    }
+
+    .publication-item .ant-row {
+        flex-direction: column;
+    }
+
+    .publication-metrics {
+        margin-top: 16px;
+    }
+
+    .performance-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .performance-item .ant-progress {
+        width: 100%;
+        margin: 0;
+    }
+
+    .hardware-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .contributor-card {
+        margin-bottom: 16px;
+    }
+}
+
+/* Additional Animation Classes */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.bounce-animation {
+    animation: bounce 2s ease-in-out infinite;
+}
+
+/* Loading States */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+    border-radius: 4px;
+    height: 20px;
+    margin: 8px 0;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .ant-float-btn-group,
+    .nav-menu,
+    .footer {
+        display: none !important;
     }
 
     .content {
-        background: #141414;
+        margin-top: 0 !important;
     }
 
-    .feature-card,
-    .ant-card {
-        background: #1f1f1f;
-        border-color: #434343;
+    .hero-section {
+        background: none !important;
+        color: black !important;
     }
 
-    .tech-list li {
-        border-bottom-color: #434343;
-    }
-
-    .achievement-stat {
-        background: linear-gradient(135deg, #111b26 0%, #0d1117 100%);
-        border-color: #1890ff;
+    .tutorial-card,
+    .publication-item,
+    .contributor-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
 }
