@@ -55,3 +55,6 @@ Thumbs.db
 
 # Verification script generated outputs
 output_*.txt
+
+.gemini/
+gha-creds-*.json

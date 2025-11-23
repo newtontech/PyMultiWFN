@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyMultiWFN - Modern Wavefunction Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/antd/5.12.8/antd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/5.12.8/reset.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { Layout, Menu, Typography, Button, Card, Row, Col, Space, Timeline, Badge, Alert, Anchor, Divider } = antd;
+
+        const { Header, Content, Footer } = Layout;
+        const { Title, Paragraph, Text } = Typography;
+
+        // Main App Component
+        const App = () => {
+            const [currentPage, setCurrentPage] = useState('home');
+
+            const menuItems = [
+                {
+                    key: 'home',
+                    icon: <i className="fas fa-home"></i>,
+                    label: 'Home',
+                },
+                {
+                    key: 'agents',
+                    icon: <i className="fas fa-robot"></i>,
+                    label: 'Development Process',
+                },
+                {
+                    key: 'github',
+                    icon: <i className="fab fa-github"></i>,
+                    label: 'GitHub',
+                }
+            ];
+
+            const handleMenuClick = (e) => {
+                if (e.key === 'github') {
+                    window.open('https://github.com/yourusername/PyMultiWFN', '_blank');
+                } else {
+                    setCurrentPage(e.key);
+                }
+            };
+
+            const HomePage = () => (
+                <div className="content-wrapper">
+                    <div className="hero-section">
+                        <div className="hero-content">
+                            <Title level={1} className="hero-title">
+                                <i className="fas fa-atom"></i> PyMultiWFN
+                            </Title>
+                            <Title level={3} className="hero-subtitle">
+                                Modern Wavefunction Analysis for Quantum Chemistry
+                            </Title>
+                            <Paragraph className="hero-description">
+                                A Python refactoring of the renowned Multiwfn program, combining powerful analytical capabilities
+                                with Python's ecosystem for better modularity, readability, and extensibility.
+                            </Paragraph>
+                            <Space size="large">
+                                <Button type="primary" size="large" icon={<i className="fas fa-book"></i>}>
+                                    Documentation
+                                </Button>
+                                <Button size="large" icon={<i className="fab fa-github"></i>}>
+                                    View on GitHub
+                                </Button>
+                                <Button size="large" icon={<i className="fas fa-download"></i>}>
+                                    Download
+                                </Button>
+                            </Space>
+                        </div>
+                    </div>
+
+                    <div className="features-section">
+                        <Title level={2} className="section-title">
+                            <i className="fas fa-star"></i> Key Features
+                        </Title>
+                        <Row gutter={[24, 24]}>
+                            <Col xs={24} sm={12} lg={8}>
+                                <Card hoverable className="feature-card">
+                                    <div className="feature-icon">
+                                        <i className="fas fa-rocket"></i>
+                                    </div>
+                                    <Title level={4}>Modern Architecture</Title>
+                                    <Paragraph>
+                                        Modular design with clear separation of data, logic, and visualization components.
+                                    </Paragraph>
+                                </Card>
+                            </Col>
+                            <Col xs={24} sm={12} lg={8}>
+                                <Card hoverable className="feature-card">
+                                    <div className="feature-icon">
+                                        <i className="fas fa-tachometer-alt"></i>
+                                    </div>
+                                    <Title level={4}>High Performance</Title>
+                                    <Paragraph>
+                                        NumPy vectorization and Numba JIT compilation for computationally intensive tasks.
+                                    </Paragraph>
+                                </Card>
+                            </Col>
+                            <Col xs={24} sm={12} lg={8}>
+                                <Card hoverable className="feature-card">
+                                    <div className="feature-icon">
+                                        <i className="fas fa-puzzle-piece"></i>
+                                    </div>
+                                    <Title level={4}>Extensible</Title>
+                                    <Paragraph>
+                                        Leverages Python's rich ecosystem of scientific computing libraries.
+                                    </Paragraph>
+                                </Card>
+                            </Col>
+                        </Row>
+                    </div>
+
+                    <div className="architecture-section">
+                        <Title level={2} className="section-title">
+                            <i className="fas fa-sitemap"></i> Project Architecture
+                        </Title>
+                        <Card>
+                            <Row gutter={[16, 16]}>
+                                <Col xs={24} md={12}>
+                                    <Title level={4}>Technology Stack</Title>
+                                    <ul className="tech-list">
+                                        <li><strong>Language:</strong> Python 3.10+</li>
+                                        <li><strong>Computation:</strong> NumPy, Numba</li>
+                                        <li><strong>Visualization:</strong> Matplotlib</li>
+                                        <li><strong>Quantum Chemistry:</strong> PySCF (optional)</li>
+                                    </ul>
+                                </Col>
+                                <Col xs={24} md={12}>
+                                    <Title level={4}>Directory Structure</Title>
+                                    <ul className="tech-list">
+                                        <li><code>core/</code> - Core data structures</li>
+                                        <li><code>io/</code> - File I/O parsers</li>
+                                        <li><code>math/</code> - Mathematical engines</li>
+                                        <li><code>analysis/</code> - Analysis modules</li>
+                                        <li><code>vis/</code> - Visualization tools</li>
+                                    </ul>
+                                </Col>
+                            </Row>
+                        </Card>
+                    </div>
+
+                    <div className="status-section">
+                        <Title level={2} className="section-title">
+                            <i className="fas fa-chart-line"></i> Development Status
+                        </Title>
+                        <Row gutter={[24, 24]}>
+                            <Col xs={24} lg={12}>
+                                <Card title="Phase 1: Reconnaissance & Architecture" extra={<Badge status="success" text="Completed" />}>
+                                    <Timeline>
+                                        <Timeline.Item color="green">Analyzed original Fortran source code</Timeline.Item>
+                                        <Timeline.Item color="green">Designed Python package structure</Timeline.Item>
+                                        <Timeline.Item color="green">Established performance strategies</Timeline.Item>
+                                    </Timeline>
+                                </Card>
+                            </Col>
+                            <Col xs={24} lg={12}>
+                                <Card title="Phase 2: Foundation" extra={<Badge status="processing" text="In Progress" />}>
+                                    <Timeline>
+                                        <Timeline.Item color="green">Project skeleton setup</Timeline.Item>
+                                        <Timeline.Item color="green">Core data structures</Timeline.Item>
+                                        <Timeline.Item color="blue">Basic file I/O implementation</Timeline.Item>
+                                        <Timeline.Item>Advanced analysis modules</Timeline.Item>
+                                    </Timeline>
+                                </Card>
+                            </Col>
+                        </Row>
+                    </div>
+
+                    <div className="license-section">
+                        <Alert
+                            message="License Information"
+                            description={
+                                <div>
+                                    <Paragraph>
+                                        PyMultiWFN is based on the original Multiwfn program. When using this software,
+                                        please cite the original Multiwfn papers:
+                                    </Paragraph>
+                                    <ul>
+                                        <li>Tian Lu, Feiwu Chen, J. Comput. Chem., 33, 580-592 (2012)</li>
+                                        <li>Tian Lu, J. Chem. Phys., 161, 082503 (2024)</li>
+                                    </ul>
+                                </div>
+                            }
+                            type="info"
+                            showIcon
+                        />
+                    </div>
+                </div>
+            );
+
+            const AgentsPage = () => (
+                <div className="content-wrapper">
+                    <Title level={1} className="page-title">
+                        <i className="fas fa-robot"></i> Development Process & Agents
+                    </Title>
+                    <Paragraph className="page-description">
+                        A comprehensive log of the AI-assisted development process for refactoring Multiwfn from Fortran to Python.
+                    </Paragraph>
+
+                    <Card className="agents-intro">
+                        <Title level={3}>
+                            <i className="fas fa-bullseye"></i> Project Goal
+                        </Title>
+                        <Paragraph>
+                            Refactor the renowned wavefunction analysis program Multiwfn from Fortran to Python while maintaining
+                            analytical capabilities and leveraging Python's ecosystem for better modularity and extensibility.
+                        </Paragraph>
+                    </Card>
+
+                    <Row gutter={[24, 24]}>
+                        <Col xs={24} lg={12}>
+                            <Card title="Phase 1: Reconnaissance & Architecture">
+                                <Timeline>
+                                    <Timeline.Item color="blue">
+                                        <Text strong>File Structure Analysis</Text>
+                                        <br />
+                                        <Text type="secondary">Analyzed Fortran source code distribution and module organization</Text>
+                                    </Timeline.Item>
+                                    <Timeline.Item color="blue">
+                                        <Text strong>Python Architecture Design</Text>
+                                        <br />
+                                        <Text type="secondary">Designed modern Python package structure with proper separation of concerns</Text>
+                                    </Timeline.Item>
+                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
+                                        <Text strong>Global Variable Strategy</Text>
+                                        <br />
+                                        <Text type="secondary">Planned migration from Fortran COMMON blocks to Python data classes</Text>
+                                    </Timeline.Item>
+                                </Timeline>
+                            </Card>
+                        </Col>
+                        <Col xs={24} lg={12}>
+                            <Card title="Phase 2: Foundation Setup">
+                                <Timeline>
+                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
+                                        <Text strong>Package Configuration</Text>
+                                        <br />
+                                        <Text type="secondary">Created pyproject.toml for pip-installable package</Text>
+                                    </Timeline.Item>
+                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
+                                        <Text strong>Core Implementation</Text>
+                                        <br />
+                                        <Text type="secondary">Implemented constants, data structures, and configuration</Text>
+                                    </Timeline.Item>
+                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
+                                        <Text strong>IO Implementation</Text>
+                                        <br />
+                                        <Text type="secondary">Created FCHK file parser for Gaussian output files</Text>
+                                    </Timeline.Item>
+                                </Timeline>
+                            </Card>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={[24, 24]} style={{ marginTop: '24px' }}>
+                        <Col xs={24} lg={12}>
+                            <Card title="Phase 3: Core Logic Refactoring">
+                                <Timeline>
+                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
+                                        <Text strong>Vectorization</Text>
+                                        <br />
+                                        <Text type="secondary">Implemented NumPy-based basis function evaluation</Text>
+                                    </Timeline.Item>
+                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
+                                        <Text strong>Density Calculation</Text>
+                                        <br />
+                                        <Text type="secondary">Created vectorized electron density calculation</Text>
+                                    </Timeline.Item>
+                                </Timeline>
+                            </Card>
+                        </Col>
+                        <Col xs={24} lg={12}>
+                            <Card title="Phase 4: Hybrid Programming">
+                                <Timeline>
+                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
+                                        <Text strong>Fortran Integration</Text>
+                                        <br />
+                                        <Text type="secondary">Designed f2py strategy for complex calculations</Text>
+                                    </Timeline.Item>
+                                    <Timeline.Item color="green" dot={<i className="fas fa-check" />}>
+                                        <Text strong>Infrastructure Setup</Text>
+                                        <br />
+                                        <Text type="secondary">Created extension compilation framework</Text>
+                                    </Timeline.Item>
+                                </Timeline>
+                            </Card>
+                        </Col>
+                    </Row>
+
+                    <Card title="Validation & Consistency" style={{ marginTop: '24px' }}>
+                        <Alert
+                            message="Consistency Verifier"
+                            description="A dedicated consistency verifier tool validates that PyMultiWFN and the original Multiwfn generate exactly the same output, ensuring functional parity during the refactoring process."
+                            type="success"
+                            showIcon
+                        />
+                    </Card>
+
+                    <Card title="Key Achievements" style={{ marginTop: '24px' }}>
+                        <Row gutter={[16, 16]}>
+                            <Col xs={24} sm={8}>
+                                <div className="achievement-stat">
+                                    <Title level={2}>4</Title>
+                                    <Text>Development Phases</Text>
+                                </div>
+                            </Col>
+                            <Col xs={24} sm={8}>
+                                <div className="achievement-stat">
+                                    <Title level={2}>100%</Title>
+                                    <Text>API Compatibility Goal</Text>
+                                </div>
+                            </Col>
+                            <Col xs={24} sm={8}>
+                                <div className="achievement-stat">
+                                    <Title level={2}>NumPy</Title>
+                                    <Text>Performance Optimization</Text>
+                                </div>
+                            </Col>
+                        </Row>
+                    </Card>
+                </div>
+            );
+
+            return (
+                <Layout className="layout">
+                    <Header className="header">
+                        <div className="logo">
+                            <i className="fas fa-atom"></i>
+                            <span className="logo-text">PyMultiWFN</span>
+                        </div>
+                        <Menu
+                            theme="dark"
+                            mode="horizontal"
+                            selectedKeys={[currentPage]}
+                            items={menuItems}
+                            onClick={handleMenuClick}
+                            className="nav-menu"
+                        />
+                    </Header>
+                    <Content className="content">
+                        {currentPage === 'home' ? <HomePage /> : <AgentsPage />}
+                    </Content>
+                    <Footer className="footer">
+                        <div className="footer-content">
+                            <Text>
+                                ©2024 PyMultiWFN - Modern Wavefunction Analysis for Quantum Chemistry
+                            </Text>
+                            <Space split={<Divider type="vertical" />}>
+                                <Text><i className="fab fa-github"></i> GitHub</Text>
+                                <Text><i className="fas fa-book"></i> Documentation</Text>
+                                <Text><i className="fas fa-bug"></i> Issues</Text>
+                            </Space>
+                        </div>
+                    </Footer>
+                </Layout>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
