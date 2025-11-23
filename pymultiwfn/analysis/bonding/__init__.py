@@ -8,6 +8,7 @@ from .aromaticity import calculate_homa
 from .eda import calculate_eda_ff
 from .adndp import search_adndp_candidates
 from .ets_nocv import calculate_ets_nocv
+from .lsb import calculate_lsb_analysis, LSBResult, print_lsb_results
 
 __all__ = [
     "calculate_mayer_bond_order",
@@ -20,4 +21,7 @@ __all__ = [
     "calculate_eda_ff",
     "search_adndp_candidates",
     "calculate_ets_nocv",
+    "calculate_lsb_analysis",
+    "LSBResult",
+    "print_lsb_results",
 ]
