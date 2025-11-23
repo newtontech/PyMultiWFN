@@ -5,7 +5,7 @@ Parser for Gaussian Formatted Checkpoint (.fchk) files.
 import re
 import numpy as np
 from pymultiwfn.core.data import Wavefunction, Shell
-from pymultiwfn.core.constants import ELEMENT_NAMES
+from pymultiwfn.core.definitions import ELEMENT_NAMES # Corrected import
 
 class FchkLoader:
     def __init__(self, filename: str):
@@ -22,6 +22,7 @@ class FchkLoader:
         self._parse_atoms()
         self._parse_basis()
         self._parse_mo()
+        self._parse_overlap_matrix()
         
         return self.wfn
 
@@ -31,59 +32,69 @@ class FchkLoader:
         Format:
         Label                   Type   N=       Value
         Data...
+        
+        Handles both scalar and array data.
         """
-        # Regex to find the section header
-        # Example: Number of electrons                    I               76
-        # Example: Atomic numbers                         I   N=          24
-        pattern = re.escape(label) + r"\s+[IR]\s+(?:N=\s+(\d+))?"
-        match = re.search(pattern, self.content)
+        escaped_label = re.escape(label)
+        # Pattern to capture scalar value on the same line OR N=count on the same line
+        pattern_scalar_or_n = rf"{escaped_label}\s+[IR]\s+(?:N=\s*(\d+)\s*)?(.+)?(?=\n|$)"
+        
+        match = re.search(pattern_scalar_or_n, self.content)
         
         if not match:
             return np.array([])
             
-        # If N is not present in the header, the value is typically right there (scalar)
-        if match.group(1) is None:
-            # Try to read the scalar value at the end of the line
-            line_end = self.content.find('\n', match.end())
-            val_str = self.content[match.end():line_end].strip()
-            return np.array([dtype(val_str)])
+        count_str = match.group(1)
+        scalar_val_str = match.group(2)
         
-        count = int(match.group(1))
-        start_idx = self.content.find('\n', match.end()) + 1
-        
-        # We need to read 'count' values. Fchk formats are fixed width but space separated usually works.
-        # However, for robustness, we can just grab the next N tokens.
-        # A simpler approach for large data is to find the start and estimate end, or just split.
-        
-        # Optimization: Slice the string to avoid processing the whole file
-        # Fchk lines are usually 72-80 chars.
-        # We can just split the substring starting from start_idx
-        
-        data_str = self.content[start_idx:]
-        
-        # Find the start of the next section to limit the split (heuristic: next line starting with capital letter and no leading spaces is rare in data block, but FCHK labels start at col 0)
-        # Better: FCHK data lines start with space. Labels start with non-space.
-        # Actually, FCHK data lines might not start with space.
-        # Let's just tokenize until we have enough values.
-        
-        values = []
-        tokens = data_str.split()
-        # This might be slow for huge files, but okay for prototype.
-        # For production, we should use numpy.fromstring or similar if possible, but FCHK formatting is weird (e.g. 1.234E-10).
-        
-        # NumPy's fromstring with sep=' ' handles scientific notation well.
-        # We need to be careful not to read into the next section.
-        # Let's find the next section header.
-        
-        # Heuristic: Find next line that looks like a label "Label   Type"
-        next_label_match = re.search(r"\n[A-Z][a-zA-Z\s]+\s+[IR]", data_str)
-        if next_label_match:
-            data_chunk = data_str[:next_label_match.start()]
-        else:
-            data_chunk = data_str
+        if count_str: # It's an array with N=count
+            count = int(count_str)
+            start_idx = self.content.find('\n', match.end()) + 1
             
-        arr = np.fromstring(data_chunk, sep=' ', dtype=dtype, count=count)
-        return arr
+            data_str = self.content[start_idx:]
+            
+            # Find the start of the next label to delimit the current data block
+            next_label_match = re.search(r"\n[A-Z][a-zA-Z\s]+\s+[IR]", data_str)
+            if next_label_match:
+                data_chunk = data_str[:next_label_match.start()]
+            else:
+                data_chunk = data_str
+                
+            arr = np.fromstring(data_chunk, sep=' ', dtype=dtype, count=count)
+            return arr
+        elif scalar_val_str: # It's a scalar value on the same line
+            try:
+                # Need to find the actual scalar value at the end of the matched line
+                # Example: "Number of electrons I 76" -> scalar_val_str will be "76"
+                return np.array([dtype(scalar_val_str.strip())])
+            except ValueError:
+                return np.array([])
+        return np.array([])
+
+    def _parse_overlap_matrix(self):
+        """Parses the overlap matrix from the fchk content."""
+        if self.wfn.num_basis == 0:
+            print("Warning: num_basis is 0, cannot parse Overlap matrix.")
+            return
+
+        overlap_vals = self._read_section("Overlap matrix", float)
+        
+        if len(overlap_vals) > 0:
+            # Overlap matrix is typically stored as a flattened symmetric matrix
+            # Gaussian stores lower triangle, column-wise.
+            # Number of elements = nbasis * (nbasis + 1) / 2
+            expected_len = self.wfn.num_basis * (self.wfn.num_basis + 1) // 2
+            if len(overlap_vals) == expected_len:
+                overlap_mat = np.zeros((self.wfn.num_basis, self.wfn.num_basis))
+                k = 0
+                for i in range(self.wfn.num_basis):
+                    for j in range(i + 1):
+                        overlap_mat[i, j] = overlap_vals[k]
+                        overlap_mat[j, i] = overlap_vals[k] # Symmetric
+                        k += 1
+                self.wfn.overlap_matrix = overlap_mat
+            else:
+                print(f"Warning: Overlap matrix size mismatch. Expected {expected_len}, got {len(overlap_vals)}.")
 
     def _parse_header(self):
         lines = self.content.splitlines()
