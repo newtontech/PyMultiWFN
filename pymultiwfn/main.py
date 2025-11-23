@@ -28,7 +28,23 @@ def process_file(filepath):
         print(f"Error: File {filepath} not found.")
         return
 
-    print(f"Loaded {filepath} successfully!")
+    # Determine file extension and load accordingly
+    ext = os.path.splitext(filepath)[1].lower()
+    if ext == ".fch":
+        from pymultiwfn.io.loader import load_fch
+        wf = load_fch(filepath)
+    elif ext == ".wfn":
+        from pymultiwfn.io.parsers.wfn import load_wfn
+        wf = load_wfn(filepath)
+    else:
+        print(f"Unsupported file type: {ext}. Loading skipped.")
+        wf = None
+
+    if wf is not None:
+        print(f"Loaded wavefunction with {wf.num_atoms} atoms.")
+    else:
+        print("No wavefunction loaded.")
+
     # Here we would enter the main menu loop
     main_menu()
 
