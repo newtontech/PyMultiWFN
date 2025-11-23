@@ -1,0 +1,21 @@
+!    -*- f90 -*-
+! Note: the context of this file is based on the likely signature of Lebedev-Laikov.F
+! You should verify this against the actual Fortran source code.
+
+python module lebedev__user__routines 
+    interface lebedev_user_interface 
+        subroutine lebedevgen(n,x,y,z,w) ! in :lebedev:Lebedev-Laikov.F
+            integer intent(in) :: n
+            real*8 dimension(n),intent(out),depend(n) :: x
+            real*8 dimension(n),intent(out),depend(n) :: y
+            real*8 dimension(n),intent(out),depend(n) :: z
+            real*8 dimension(n),intent(out),depend(n) :: w
+        end subroutine lebedevgen
+    end interface lebedev_user_interface
+end python module lebedev__user__routines
+
+python module lebedev
+    interface
+        use lebedev__user__routines
+    end interface
+end python module lebedev

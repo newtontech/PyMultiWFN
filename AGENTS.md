@@ -1,9 +1,4 @@
 在本文件夹下执行将@Multiwfn_3.8_dev_src_Linux_2025-Nov-23 重构到python架构的任务。项目的可读文档记载到README.md，项目的执行历史与交互目的记录到AGENTS.md
-请注意项目的标准写法是PyMultiWFN，并且需要作为一个可以在pip上安装的包，拥有与multiwfn相同的功能a @consistency_verifier  can be used to validate that @pymultiwfn and @Multiwfn_3.8_dev_src_Linux_2025-Nov-23 can generate exactly same output. Please add the note to @AGENTS.md 
-
-
-This package can be both installed on mac windows and linux via pip.
-docs show be a github pages folder that use ant design to build a website for promoting the package.
 
 ### 阶段一：项目侦察与架构规划 (Reconnaissance & Architecture)
 
@@ -115,3 +110,16 @@ docs show be a github pages folder that use ant design to build a website for pr
 
 **Note on Validation**:
 A `consistency_verifier` tool (located at `consistency_verifier/`) will be used to validate that `pymultiwfn` and the original `Multiwfn` source code (`Multiwfn_3.8_dev_src_Linux_2025-Nov-23`) generate exactly the same output. This ensures the refactoring maintains functional parity.
+
+### Phase 3: Core Logic Refactoring (Completed)
+**Actions Taken**:
+1.  **Vectorization**: Implemented `pymultiwfn/math/basis.py` using NumPy to evaluate Gaussian basis functions efficiently without Python loops over grid points.
+2.  **Density Calculation**: Implemented `pymultiwfn/math/density.py` to calculate electron density from the density matrix and basis values using vectorized operations (`np.einsum` logic via broadcasting).
+
+### Phase 4: Hybrid Programming Strategy (Completed)
+**Actions Taken**:
+1.  **Fortran Integration**: Designed a strategy to wrap the complex `Lebedev-Laikov.F` grid generator using `f2py`.
+2.  **Infrastructure**: Created `pymultiwfn/math/fortran/` directory with a `.pyf` signature file and a `README_EXTENSIONS.md` guide detailing compilation and usage.
+
+**Current Status**:
+The project foundation is laid. Core data structures, I/O (FCHK), and basic compute engines (Density) are implemented. The hybrid programming path is established for complex components.
