@@ -310,7 +310,10 @@ class FchkLoader:
         coords = self._read_section("Current cartesian coordinates", float)
         
         num_atoms = len(atomic_numbers)
-        coords = coords.reshape((num_atoms, 3))
+        if len(coords) == num_atoms * 3:
+            coords = coords.reshape((num_atoms, 3))
+        else:
+            raise ValueError(f"Coordinate array size mismatch: expected {num_atoms * 3}, got {len(coords)}")
         
         for i in range(num_atoms):
             z = atomic_numbers[i]

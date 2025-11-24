@@ -88,7 +88,11 @@ class PDBLoader:
                 'charge': charge
             }
 
-            self.wfn.add_atom(element, atomic_num, x_bohr, y_bohr, z_bohr, float(atomic_num), atom_info)
+            self.wfn.add_atom(element, atomic_num, x_bohr, y_bohr, z_bohr, float(atomic_num))
+            # Store additional atom info as metadata
+            if not hasattr(self.wfn, 'atom_metadata'):
+                self.wfn.atom_metadata = {}
+            self.wfn.atom_metadata[len(self.wfn.atoms) - 1] = atom_info
 
         except (ValueError, IndexError):
             # Skip malformed lines

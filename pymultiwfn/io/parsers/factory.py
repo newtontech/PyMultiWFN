@@ -25,7 +25,7 @@ from .cif import CIFLoader
 from .gms import GMSLoader
 from .mopac import MOPACLoader
 from .orca import ORCALoader
-from .turbomole import VASPLoader  # Using VASPLoader as alias
+from .turbomole import TurbomoleLoader
 from .vasp import VASPLoader
 from .dx import DXLoader
 
@@ -71,6 +71,7 @@ class ParserFactory:
         # Program-specific formats
         '.inp': CP2KLoader,
         '.restart': CP2KLoader,
+        '.coord': TurbomoleLoader,  # Turbomole coordinate files
         'poscar': VASPLoader,
         'contcar': VASPLoader,
         'chgc': VASPLoader,  # VASP charge density
@@ -219,7 +220,7 @@ class ParserFactory:
 
             # Check for Turbomole format ($coord section)
             if any('$COORD' in line.upper() for line in first_lines):
-                return VASPLoader
+                return TurbomoleLoader
 
             # Check for MOL format (counts line)
             if len(first_lines) >= 4:

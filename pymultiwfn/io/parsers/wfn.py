@@ -203,11 +203,82 @@ class WFNLoader:
         return symbol_to_number.get(element_symbol.capitalize(), 0)
 
     def _parse_mo_coefficients(self):
-        """Parse molecular orbital coefficients if present."""
-        # WFN format typically has coefficients embedded in basis function section
-        # This is a placeholder for more sophisticated MO coefficient parsing
-        # The actual parsing would depend on the specific WFN variant
-        pass
+        """Enhanced parsing of molecular orbital coefficients from WFN file."""
+        # WFN format typically has MO coefficients in a specific section
+        # Look for MO coefficient patterns in the file
+
+        # Pattern for MO coefficients in WFN format
+        # Usually appears after basis function definitions
+        mo_section_start = -1
+        for i, line in enumerate(self.lines):
+            if 'MO' in line.upper() and 'COEFF' in line.upper():
+                mo_section_start = i
+                break
+            elif 'MOLECULAR ORBITAL' in line.upper():
+                mo_section_start = i
+                break
+
+        if mo_section_start == -1:
+            # Try to find MO coefficients by pattern matching
+            # WFN format often has coefficients after basis function definitions
+            for i, line in enumerate(self.lines):
+                if len(line.split()) >= 5 and all(self._is_float_or_int(p) for p in line.split()[:5]):
+                    # Could be MO coefficient line
+                    mo_section_start = i
+                    break
+
+        if mo_section_start == -1:
+            warnings.warn("No MO coefficient section found in WFN file", RuntimeWarning)
+            return
+
+        # Parse MO coefficients
+        mo_coeffs = []
+        current_mo = []
+
+        for line in self.lines[mo_section_start:]:
+            line = line.strip()
+            if not line:
+                continue
+
+            # Check for end of MO section
+            if line.upper().startswith(('END', 'BASIS', 'ATOM')):
+                break
+
+            # Parse coefficient values
+            parts = line.split()
+            if len(parts) >= 2 and all(self._is_float_or_int(p) for p in parts):
+                try:
+                    # Try to parse as MO coefficients
+                    coeffs = [float(p) for p in parts]
+                    current_mo.extend(coeffs)
+                except ValueError:
+                    continue
+            elif current_mo:
+                # End of current MO
+                mo_coeffs.append(np.array(current_mo))
+                current_mo = []
+
+        # Add the last MO if exists
+        if current_mo:
+            mo_coeffs.append(np.array(current_mo))
+
+        if mo_coeffs:
+            # Ensure consistent MO coefficient matrix
+            max_len = max(len(coeffs) for coeffs in mo_coeffs)
+            normalized_coeffs = []
+
+            for coeffs in mo_coeffs:
+                if len(coeffs) < max_len:
+                    # Pad with zeros
+                    padded = np.zeros(max_len)
+                    padded[:len(coeffs)] = coeffs
+                    normalized_coeffs.append(padded)
+                else:
+                    normalized_coeffs.append(coeffs[:max_len])
+
+            self.wfn.coefficients = np.array(normalized_coeffs)
+            self.metadata['mo_coefficients_parsed'] = True
+            self.metadata['num_mos_parsed'] = len(normalized_coeffs)
 
     def _parse_orbital_energies(self):
         """Parse orbital energies if present."""

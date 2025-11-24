@@ -245,16 +245,22 @@ class MoldenLoader:
                     prim_exps.append(exp)
 
                     if current_shell_type == 'SP':
-                        # SP shells have two coefficients
+                        # SP shells have two coefficients (S and P)
                         if len(prim_coeffs) == 0:
+                            # Initialize with S and P coefficient lists
                             prim_coeffs = [[coeff], []]
                         else:
+                            # Add S coefficient
                             prim_coeffs[0].append(coeff)
+                            # Add P coefficient (if available)
                             if len(parts) > 2:
                                 prim_coeffs[1].append(float(parts[2]))
                             else:
-                                prim_coeffs[1].append(0.0)
+                                # Some Molden variants may have P coefficients on separate lines
+                                # or may use different formats
+                                prim_coeffs[1].append(0.0)  # Default P coefficient
                     else:
+                        # Regular shells (S, P, D, F, etc.)
                         if len(prim_coeffs) == 0:
                             prim_coeffs = []
                         prim_coeffs.append(coeff)
