@@ -51,22 +51,20 @@ def _make_density_matrix(coeffs: np.ndarray, occs: np.ndarray) -> np.ndarray:
     coeffs: (nmo, nbasis)
     occs: (nmo,)
     """
-    # Multiply each row i of C by occ[i]
-    # C_occ = coeffs * occs[:, np.newaxis]
-    # P = C.T @ C_occ
-    
     # Optimization: Only use occupied orbitals
     occ_idx = occs > 1e-8
+
+    if not np.any(occ_idx):
+        return np.zeros((coeffs.shape[1], coeffs.shape[1]))
+
     C_occ = coeffs[occ_idx]
     n_occ = occs[occ_idx]
-    
+
+    # Use einsum for better numerical stability
     # P_mu_nu = sum_i n_i C_i_mu C_i_nu
-    # P = (C_occ.T * n_occ) @ C_occ
-    
-    # C_occ.T shape: (nbasis, n_occupied)
-    # n_occ shape: (n_occupied,)
-    
-    return (C_occ.T * n_occ) @ C_occ
+    P = np.einsum('i,ij,ik->jk', n_occ, C_occ, C_occ)
+
+    return P
 
 def _contract_density(phi: np.ndarray, P: np.ndarray) -> np.ndarray:
     """

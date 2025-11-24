@@ -108,7 +108,7 @@ class PQRLoader:
 
         except (ValueError, IndexError):
             # Skip malformed lines
-            continue
+            return
 
     def _parse_title_line(self, line: str):
         """Parse TITLE/HEADER line."""

@@ -109,7 +109,24 @@ class FchkLoader:
             else:
                 data_chunk = data_str
                 
-            arr = np.fromstring(data_chunk, sep=' ', dtype=dtype, count=count)
+            # Use more robust parsing that handles scientific notation and Fortran D notation
+            if 'D' in data_chunk:
+                # Convert Fortran D notation to Python e notation
+                data_chunk = data_chunk.replace('D+', 'e+').replace('D-', 'e-')
+
+            # Split by whitespace and convert
+            values = []
+            for val in data_chunk.split():
+                try:
+                    if dtype == int:
+                        values.append(int(val))
+                    else:
+                        values.append(float(val))
+                except ValueError:
+                    continue
+                if len(values) >= count:
+                    break
+            arr = np.array(values, dtype=dtype)
             return arr
         elif scalar_val_str: # It's a scalar value on the same line
             try:

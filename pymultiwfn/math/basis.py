@@ -95,12 +95,11 @@ def _eval_contraction(exps, coeffs, r2):
     """
     Evaluates the radial contraction: sum_k c_k * exp(-alpha_k * r^2)
     """
-    # This loop is over primitives (usually small, e.g. 3 for STO-3G, 6 for 6-31G)
-    # It is faster to loop in Python than to vectorize if N_prim is small and N_points is large,
-    # because we avoid allocating intermediate arrays for each primitive.
-    # However, we can use numba here for best performance.
-    
+    # Add numerical stability checks
     res = np.zeros_like(r2)
     for a, c in zip(exps, coeffs):
-        res += c * np.exp(-a * r2)
+        # Avoid overflow in exp
+        arg = -a * r2
+        arg = np.where(arg < -700, -700, arg)  # Prevent exp(-inf) = 0
+        res += c * np.exp(arg)
     return res
