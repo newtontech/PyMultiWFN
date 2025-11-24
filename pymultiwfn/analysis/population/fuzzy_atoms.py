@@ -214,7 +214,7 @@ class FuzzyAtomsAnalyzer:
             distances = np.linalg.norm(points - atom_pos, axis=1)
 
             # Calculate free atomic density (simplified)
-            atomic_density = self._free_atomic_density(atom.atomic_number, distances)
+            atomic_density = self._free_atomic_density(atom.index, distances)
             atomic_densities[i] = atomic_density
             promol_density += atomic_density
 
@@ -484,7 +484,7 @@ class FuzzyAtomsAnalyzer:
             di_ij = 2.0 * np.trace(aom_matrices[atom_indices[i]] @ aom_matrices[atom_indices[j]])
 
             # Get reference value
-            key = (atom_i.atomic_number, atom_j.atomic_number)
+            key = (atom_i.index, atom_j.index)
             ref_value = self.config.aromaticity_reference_values.get(key, 1.0)
 
             # Calculate FLU contribution
@@ -600,9 +600,9 @@ class FuzzyAtomsAnalyzer:
             atomic_volumes[i] = np.sum(integrand)
 
         # Get atomic polarizabilities and C6 coefficients
-        polarizabilities = np.array([atomic_polarizability.get(atom.atomic_number, 0.0)
+        polarizabilities = np.array([atomic_polarizability.get(atom.index, 0.0)
                                    for atom in self.wavefunction.atoms])
-        c6_coefficients = np.array([atomic_c6.get(atom.atomic_number, 0.0)
+        c6_coefficients = np.array([atomic_c6.get(atom.index, 0.0)
                                   for atom in self.wavefunction.atoms])
 
         return {
@@ -622,7 +622,7 @@ class FuzzyAtomsAnalyzer:
             distances = np.linalg.norm(points - atom_pos, axis=1)
 
             # Add atomic density contribution
-            density += self._free_atomic_density(atom.atomic_number, distances)
+            density += self._free_atomic_density(atom.index, distances)
 
         return density
 
