@@ -188,6 +188,12 @@ class MoldenLoader:
             warnings.warn("No [GTO] section found in Molden file", RuntimeWarning)
             return
 
+        # Initialize variables for parsing
+        current_atom = None
+        current_shell_type = None
+        prim_exps = []
+        prim_coeffs = []
+
         for line in gto_section:
             line = line.strip()
             if not line or line.startswith('#'):
@@ -198,7 +204,7 @@ class MoldenLoader:
             # New atom definition
             if len(parts) >= 2 and parts[0].isdigit():
                 # Save previous shell if exists
-                if current_atom is not None and current_shell_type is not None:
+                if current_atom is not None and current_shell_type is not None and prim_exps:
                     shell = Shell(
                         type=self._molden_to_shell_type(current_shell_type),
                         center_idx=current_atom - 1,  # Molden is 1-based
@@ -209,17 +215,18 @@ class MoldenLoader:
 
                 # Start new atom
                 current_atom = int(parts[0])
+                current_shell_type = None
                 prim_exps = []
                 prim_coeffs = []
                 continue
 
             # Shell definition
-            if len(parts) >= 2 and parts[0] in ['s', 'p', 'd', 'f', 'g', 'h', 'sp', 'SP']:
+            if len(parts) >= 1 and parts[0].upper() in ['S', 'P', 'D', 'F', 'G', 'H', 'SP']:
                 # Save previous shell if exists
-                if current_shell_type is not None:
+                if current_shell_type is not None and prim_exps:
                     shell = Shell(
                         type=self._molden_to_shell_type(current_shell_type),
-                        center_idx=current_atom - 1,
+                        center_idx=current_atom - 1 if current_atom is not None else 0,
                         exponents=np.array(prim_exps),
                         coefficients=np.array([prim_coeffs]) if current_shell_type != 'SP' else np.array(prim_coeffs)
                     )
@@ -255,7 +262,7 @@ class MoldenLoader:
                     continue
 
         # Save last shell
-        if current_atom is not None and current_shell_type is not None:
+        if current_atom is not None and current_shell_type is not None and prim_exps:
             shell = Shell(
                 type=self._molden_to_shell_type(current_shell_type),
                 center_idx=current_atom - 1,

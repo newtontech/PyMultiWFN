@@ -67,7 +67,7 @@ class WFNLoader:
         # Parse all sections
         self._parse_header()
         self._parse_atoms()
-        self._parse_basis_and_mo()
+        self._parse_basis_and_mo(self.lines)
         self._parse_mo_coefficients()
         self._parse_orbital_energies()
 
