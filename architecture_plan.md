@@ -479,9 +479,32 @@ python -m pip install -U --extra-index-url https://test.pypi.org/simple pymultiw
 - Added overflow protection in basis function evaluation
 - Removed test files as specified in project requirements
 
+### Current Project Reality (Based on AGENTS.md):
+
+**MVP Finalization Status (2025-Nov-24):**
+- ✅ **Pure-Python MVP completed and ready for TestPyPI**
+- ✅ **Package cleaned for distribution** (removed cached bytecode, added missing `__init__` files)
+- ✅ **MIT LICENSE added** and `pyproject.toml` metadata refreshed
+- ✅ **Version bumped to 0.1.2** with proper classifiers, keywords, package data, scripts, and URLs
+- ✅ **CLI entry points exposed** (`pymultiwfn`/`pymwfn`) and `python -m pymultiwfn` support
+- ✅ **README updated** with TestPyPI build/upload/install steps, quick-start API/CLI usage
+- ✅ **Stale `pymultiwfn.egg-info` removed** to avoid packaging contamination
+- ✅ **Build artifacts generated**: `dist/pymultiwfn-0.1.2.tar.gz` and `dist/pymultiwfn-0.1.2-py3-none-any.whl`
+- ✅ **License metadata adjusted** (SPDX string, removed license classifier) to satisfy setuptools validation
+
+**Recent Development Milestones:**
+- **2025-Nov-23**: Project reconnaissance, architecture design, and foundation setup completed
+- **2025-Nov-24**: MVP finalized with comprehensive parser module, enhanced error handling, and TestPyPI readiness
+- **Current**: Package is ready for TestPyPI publishing with all core functionality implemented
+
 ### Next Development Priorities:
 1. Upload MVP to TestPyPI and gather user feedback
 2. Complete comprehensive testing suite with consistency verification
 3. Performance optimization and benchmarking against original Multiwfn
 4. Create documentation website as specified in project requirements
 5. Complete advanced grid generation capabilities (Lebedev integration)
+
+**Immediate Action Required:**
+- Execute TestPyPI upload using: `python3 -m twine upload --repository testpypi dist/*`
+- Verify installation from TestPyPI works correctly
+- Gather initial user feedback on the MVP functionality
