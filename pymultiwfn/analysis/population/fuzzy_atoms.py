@@ -161,7 +161,7 @@ class FuzzyAtomsAnalyzer:
             distances = np.linalg.norm(points - atom_pos, axis=1)
 
             # Get atomic radius
-            radius = self.covalent_radii_bohr.get(atom.atomic_number, 1.0)
+            radius = self.covalent_radii_bohr.get(atom.index, 1.0)
 
             # Calculate Becke step function
             for j in range(n_points):
