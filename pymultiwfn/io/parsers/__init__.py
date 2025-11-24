@@ -26,11 +26,12 @@ from .gms import GMSLoader
 from .gro import GROLoader
 from .dx import DXLoader
 from .vasp import VASPParser
+from .factory import ParserFactory
 
 __all__ = [
     "FchkLoader", "MoldenLoader", "WFNLoader", "WFXLoader", "MWFNLoader",
     "XYZLoader", "PDBLoader", "PQRLoader", "MOLLoader", "MOL2Loader",
     "CubeLoader", "GJFLoader", "CP2KLoader", "ORCALoader", "QEParser",
     "TurbomoleLoader", "MOPACLoader", "CIFLoader", "GMSLoader",
-    "GROLoader", "DXLoader", "VASPParser"
+    "GROLoader", "DXLoader", "VASPParser", "ParserFactory"
 ]

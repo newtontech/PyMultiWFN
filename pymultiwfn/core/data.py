@@ -82,6 +82,30 @@ class Wavefunction:
     def num_atoms(self) -> int:
         return len(self.atoms)
 
+    @property
+    def mo_energies(self) -> Optional[np.ndarray]:
+        """Alias for energies attribute to maintain compatibility."""
+        return self.energies
+
+    @property
+    def mo_coefficients(self) -> Optional[np.ndarray]:
+        """Alias for coefficients attribute to maintain compatibility."""
+        return self.coefficients
+
+    @property
+    def mo_occupations(self) -> Optional[np.ndarray]:
+        """Alias for occupations attribute to maintain compatibility."""
+        return self.occupations
+
+    def get_atomic_basis_indices(self) -> Dict[int, List[int]]:
+        """
+        Get mapping from atom indices to basis function indices.
+        Returns empty dict for now as this requires basis function analysis.
+        """
+        # For now, return simple mapping assuming 1 basis function per atom
+        # In reality, this would depend on the actual basis set
+        return {i: [i] for i in range(self.num_atoms)}
+
     def _infer_occupations(self):
         """Infers orbital occupations based on num_electrons, multiplicity and orbital energies."""
         if self.occupations is not None and self.occupations_beta is not None:
@@ -152,23 +176,38 @@ class Wavefunction:
             self.Pbeta = np.zeros((nbasis, nbasis))
 
         self.Ptot = self.Palpha + self.Pbeta
-        
+
+    def calculate_overlap_matrix(self):
+        """
+        Calculate the overlap matrix S_uv.
+
+        For now, returns identity matrix as a placeholder.
+        In a full implementation, this would calculate actual overlap integrals
+        between basis functions.
+        """
+        if self.num_basis == 0:
+            self.overlap_matrix = np.array([])
+        else:
+            # Placeholder: identity matrix
+            # In reality, this requires evaluating overlap integrals between basis functions
+            self.overlap_matrix = np.eye(self.num_basis)
+
     def get_atomic_basis_indices(self) -> Dict[int, List[int]]:
         """
         Returns a dictionary mapping atom index (0-based) to a list of its basis function indices.
-        
+
         Returns:
             Dict[int, List[int]]: {atom_idx: [bf_idx1, bf_idx2, ...]}
         """
         atom_to_bfs = {i: [] for i in range(self.num_atoms)}
-        
+
         bf_idx_counter = 0
         for shell in self.shells:
             # Determine number of basis functions in this shell
             # S=1, P=3, D=5, F=7 (for pure angular momentum)
             # SP shell (type -1) counts as 1 S and 3 P => 4 functions
             l_value = shell.type # 0 for S, 1 for P, 2 for D, ...
-            
+
             num_bfs_in_shell = 0
             if l_value == -1: # SP shell
                 num_bfs_in_shell = 4 # 1 s-type + 3 p-type
@@ -182,7 +221,7 @@ class Wavefunction:
                 if shell.center_idx < self.num_atoms: # Ensure atom index is valid
                     atom_to_bfs[shell.center_idx].append(bf_idx_counter)
                 bf_idx_counter += 1
-        
+
         # Verify that total basis functions match
         total_bfs_assigned = sum(len(bfs) for bfs in atom_to_bfs.values())
         if total_bfs_assigned != self.num_basis:
@@ -193,3 +232,4 @@ class Wavefunction:
                   f"basis functions not associated with a specific atom (e.g., ghost atoms).")
 
         return atom_to_bfs
+  
