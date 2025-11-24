@@ -16,8 +16,8 @@ import numpy as np
 from typing import Dict, List, Tuple, Optional, Union
 from dataclasses import dataclass
 
-from ..core.data import WavefunctionData
-from ..core.constants import BOHR_TO_ANGSTROM
+from pymultiwfn.core.data import Wavefunction
+from pymultiwfn.core.constants import BOHR_TO_ANGSTROM
 
 
 @dataclass
@@ -42,7 +42,7 @@ class FuzzyAtomsAnalyzer:
     in fuzzy atomic spaces defined by different partitioning schemes.
     """
 
-    def __init__(self, wavefunction_data: WavefunctionData, config: Optional[FuzzyAnalysisConfig] = None):
+    def __init__(self, wavefunction_data: Wavefunction, config: Optional[FuzzyAnalysisConfig] = None):
         """
         Initialize the fuzzy atoms analyzer.
 
@@ -627,16 +627,19 @@ class FuzzyAtomsAnalyzer:
         return density
 
 
-def perform_fuzzy_analysis(wavefunction_data: WavefunctionData,
+def perform_fuzzy_analysis(wavefunction_data: Wavefunction,
                           analysis_type: str = "di_li",
-                          config: Optional[FuzzyAnalysisConfig] = None) -> Dict:
+                          config: Optional[FuzzyAnalysisConfig] = None,
+                          **kwargs) -> Dict:
     """
     High-level function to perform fuzzy atomic space analysis.
 
     Args:
         wavefunction_data: Wavefunction data
-        analysis_type: Type of analysis ("di_li", "aom", "multipole", "integration")
+        analysis_type: Type of analysis ("di_li", "aom", "multipole", "integration",
+                       "fragment_di", "pdi", "flu", "atomic_properties")
         config: Analysis configuration
+        **kwargs: Additional arguments for specific analysis types
 
     Returns:
         Dictionary containing analysis results
@@ -663,6 +666,31 @@ def perform_fuzzy_analysis(wavefunction_data: WavefunctionData,
             density_values, grid_points, grid_weights
         )
         return {"atomic_integrals": integrals}
+
+    elif analysis_type == "fragment_di":
+        fragment1 = kwargs.get('fragment1_indices', [])
+        fragment2 = kwargs.get('fragment2_indices', [])
+        if not fragment1 or not fragment2:
+            raise ValueError("Fragment indices must be provided for fragment analysis")
+        return analyzer.calculate_fragment_delocalization(fragment1, fragment2)
+
+    elif analysis_type == "pdi":
+        atom_indices = kwargs.get('atom_indices', [])
+        if not atom_indices:
+            raise ValueError("Atom indices must be provided for PDI calculation")
+        pdi = analyzer.calculate_para_delocalization_index(atom_indices)
+        return {"pdi": pdi}
+
+    elif analysis_type == "flu":
+        atom_indices = kwargs.get('atom_indices', [])
+        if not atom_indices:
+            raise ValueError("Atom indices must be provided for FLU calculation")
+        flu = analyzer.calculate_flu_index(atom_indices)
+        return {"flu": flu}
+
+    elif analysis_type == "atomic_properties":
+        properties = analyzer.calculate_atomic_properties()
+        return {"atomic_properties": properties}
 
     else:
         raise ValueError(f"Unknown analysis type: {analysis_type}")

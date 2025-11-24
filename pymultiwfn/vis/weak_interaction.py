@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from ..core.data import Wavefunction
-from ..math.density import DensityCalculator
+from ..math.density import calc_density
 from ..math.basis import evaluate_basis
 from ..config import Config
 
@@ -66,7 +66,7 @@ class WeakInteractionAnalyzer:
     including NCI, IGM, and related approaches.
     """
 
-    def __init__(self, wavefunction: Wavefunction, config: Optional[Config] = None):
+    def __init__(self, wavefunction: Optional[Wavefunction] = None, config: Optional[Config] = None):
         """
         Initialize the weak interaction analyzer.
 
@@ -79,7 +79,7 @@ class WeakInteractionAnalyzer:
         """
         self.wfn = wavefunction
         self.config = config or Config()
-        self.density_calc = DensityCalculator(wavefunction, config) if hasattr(DensityCalculator, '__call__') else None
+        self.density_calc = calc_density if callable(calc_density) else None
 
         # Grid parameters
         self._grid_cache = {}
