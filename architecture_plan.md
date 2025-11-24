@@ -217,7 +217,16 @@ This section summarizes the status of tasks identified in the architecture plan,
 ### Phase 3: 核心功能重写 (Core Logic Refactoring) - **Completed**
 - `pymultiwfn/math/basis.py` implementation: Completed
 - `pymultiwfn/math/density.py` implementation: Completed
-- `pymultiwfn/math/general.py` implementation: Completed (Additional)
+- `pymultiwfn/math/general.py` implementation: **Completed (Comprehensive)**
+  - Hermite polynomial integration tables and functions (from util.f90)
+  - Gaussian primitive overlap integrals (from integral.f90)
+  - Boys function for electron repulsion integrals
+  - Multi-dimensional B-spline interpolation (from Bspline.f90)
+  - Trilinear 3D interpolation on grids
+  - Vector/matrix geometry operations (vector angles, dihedral angles, cross products)
+  - Distance matrices and coordinate transformations
+  - Critical point detection for topology analysis
+  - Atomic radius estimations and sorting utilities
 
 ### Phase 4: 混合编程策略 (Hybrid Programming Strategy) - **Completed**
 - `f2py` integration for `Lebedev-Laikov.F` (strategy designed and infrastructure set up in `pymultiwfn/math/fortran/`): Completed
@@ -313,11 +322,30 @@ Based on the actual codebase analysis, the project has significantly expanded be
 ### Recently Completed Components (2025-Nov-24):
 - ✅ All major file format parsers (cube, gjf, molden, mwfn, pdb, pqr, wfx, xyz)
 - ✅ Enhanced spectrum analysis (DOS implementation)
+- ✅ **Electronic excitation analysis module** (2025-Nov-24)
+  - Complete TD-DFT excitation analysis with support for Gaussian, ORCA, and plain text formats
+  - Transition density matrix calculation and natural transition orbitals (NTOs)
+  - Charge transfer analysis and transition dipole moment calculations
+  - Comprehensive data structures for excited states and MO transitions
 - ✅ Hyperpolarizability analysis module
 - ✅ Improved GUI widgets and molecular visualization
 - ✅ Enhanced weak interaction visualization
 - ✅ Orbital visualization capabilities
 - ✅ Parser factory for automatic file format detection
+- ✅ **Comprehensive mathematical functions from Fortran modules** (2025-Nov-24)
+  - Complete reimplementation of core mathematical routines from 0123dim.f90, Bspline.f90,
+    integral.f90, util.f90, and other Fortran modules
+  - Hermite polynomial integration, Gaussian overlap integrals, B-spline interpolation
+  - Vector/matrix operations, 3D interpolation, and topology analysis utilities
+  - All functions tested and optimized using NumPy and SciPy
+- ✅ **Density of States (DOS) analysis module** (2025-Nov-24)
+  - Complete implementation based on Multiwfn's DOS.f90 functionality
+  - Total DOS (TDOS) with configurable energy ranges and broadening functions
+  - Projected DOS (PDOS) with atomic, basis function, and molecular orbital fragments
+  - Multiple broadening functions: Gaussian, Lorentzian, Pseudo-Voigt
+  - Support for both atomic units and eV energy scales
+  - Frontier orbital analysis (HOMO/LUMO detection)
+  - Vectorized NumPy implementation for optimal performance
 
 ### Pending Components:
 - ⏳ Advanced grid generation and integration (Lebedev grids via f2py)
