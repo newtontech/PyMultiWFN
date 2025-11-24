@@ -188,7 +188,7 @@ class MoldenLoader:
             warnings.warn("No [GTO] section found in Molden file", RuntimeWarning)
             return
 
-              for line in gto_section:
+        for line in gto_section:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
@@ -267,8 +267,70 @@ class MoldenLoader:
         # Calculate number of basis functions
         self.wfn.num_basis = sum(self._shell_num_functions(shell.type) for shell in self.wfn.shells)
 
-    def _parse_mo(self, content: str):
-        """Parse molecular orbital information from [MO] section."""
+    def _parse_mo(self):
+        """Enhanced parsing of molecular orbital information from [MO] section."""
+        mo_section = self.sections.get('MO')
+
+        if not mo_section:
+            warnings.warn("No [MO] section found in Molden file", RuntimeWarning)
+            return
+
+        # MO data format:
+        # Orbital information lines (Ene, Occup, Spin)
+        # Followed by coefficient data
+
+        current_orbital = 0
+        energies = []
+        occupations = []
+        coeffs = []
+        mo_coeffs_list = []
+
+        for line in mo_section:
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
+
+            # Check for orbital header
+            if 'Ene=' in line or 'Occup=' in line or 'Spin=' in line:
+                # Extract energy and occupation
+                energy_match = re.search(r'Ene\s*=\s*([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)', line)
+                occup_match = re.search(r'Occup\s*=\s*([-+]?\d*\.?\d+(?:[eE][-+]?\d+)?)', line)
+
+                if energy_match:
+                    energies.append(float(energy_match.group(1)))
+                if occup_match:
+                    occupations.append(float(occup_match.group(1)))
+                else:
+                    occupations.append(2.0)  # Default occupation
+                continue
+
+            # Check for coefficient line
+            if re.match(r'^\s*\d+\s+', line):
+                try:
+                    parts = line.split()
+                    if len(parts) >= 2:
+                        coeff = float(parts[1])
+                        coeffs.append(coeff)
+                except ValueError:
+                    continue
+            elif line == '' and coeffs:  # End of MO
+                mo_coeffs_list.append(np.array(coeffs))
+                coeffs = []
+                current_orbital += 1
+
+        # Add the last MO if exists
+        if coeffs:
+            mo_coeffs_list.append(np.array(coeffs))
+
+        if mo_coeffs_list:
+            self.wfn.energies = np.array(energies) if energies else np.zeros(len(mo_coeffs_list))
+            self.wfn.coefficients = np.array(mo_coeffs_list)
+
+            # Set occupations if available
+            if occupations:
+                self.wfn.occupations = np.array(occupations)
+            self.metadata['mo_coefficients_parsed'] = True
+            self.metadata['num_mos_parsed'] = len(mo_coeffs_list)
         mo_match = re.search(r'\[MO\].*?\n(.*?)(?=\[|\Z)', content, re.DOTALL | re.IGNORECASE)
         if not mo_match:
             return  # No MO section, that's OK for some files
