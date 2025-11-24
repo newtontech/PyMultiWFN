@@ -11,6 +11,7 @@ PI = np.pi
 # Physical constants (2018 CODATA)
 BOHR_TO_ANGSTROM = 0.529177210903
 ANGSTROM_TO_BOHR = 1.0 / BOHR_TO_ANGSTROM
+NM_TO_BOHR = 10.0 * ANGSTROM_TO_BOHR  # 1 nm = 10 Angstrom
 
 # Energy conversion factors
 AU_TO_KCAL_MOL = 627.51

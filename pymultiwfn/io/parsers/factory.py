@@ -17,6 +17,17 @@ from .pdb import PDBLoader
 from .cube import CubeLoader
 from .gjf import GJFLoader
 from .cp2k import CP2KLoader
+from .mol import MOLLoader
+from .mol2 import MOL2Loader
+from .pqr import PQRLoader
+from .gro import GROLoader
+from .cif import CIFLoader
+from .gms import GMSLoader
+from .mopac import MOPACLoader
+from .orca import ORCALoader
+from .turbomole import VASPLoader  # Using VASPLoader as alias
+from .vasp import VASPLoader
+from .dx import DXLoader
 
 class ParserFactory:
     """Factory class for creating appropriate parser instances based on file extension."""
@@ -35,18 +46,37 @@ class ParserFactory:
         # Coordinate formats
         '.xyz': XYZLoader,
         '.pdb': PDBLoader,
+        '.mol': MOLLoader,
+        '.sdf': MOLLoader,
+        '.mol2': MOL2Loader,
+        '.pqr': PQRLoader,
+        '.gro': GROLoader,
+        '.cif': CIFLoader,
 
         # Input file formats
         '.gjf': GJFLoader,
         '.com': GJFLoader,
+        '.gjf': GJFLoader,
+        '.gms': GMSLoader,
+        '.dat': GMSLoader,  # GAMESS files
+        '.mop': MOPACLoader,
+        '.inp': ORCALoader,  # ORCA input
+        '.out': ORCALoader,  # ORCA output
 
         # Grid data formats
         '.cube': CubeLoader,
         '.cub': CubeLoader,
+        '.dx': DXLoader,
 
         # Program-specific formats
         '.inp': CP2KLoader,
         '.restart': CP2KLoader,
+        'poscar': VASPLoader,
+        'contcar': VASPLoader,
+        'chgc': VASPLoader,  # VASP charge density
+        'chg': VASPLoader,
+        'elfc': VASPLoader,  # VASP ELF
+        'locpot': VASPLoader,
     }
 
     @classmethod
@@ -168,6 +198,53 @@ class ParserFactory:
                     parts = first_lines[1].split()
                     if len(parts) >= 4:
                         return CubeLoader
+                except:
+                    pass
+
+            # Check for DX format
+            if any('object' in line and ('gridpositions' in line or 'field' in line) for line in first_lines):
+                return DXLoader
+
+            # Check for GAMESS format ($DATA section)
+            if any('$DATA' in line.upper() for line in first_lines):
+                return GMSLoader
+
+            # Check for ORCA input format (! and * xyz)
+            if any(line.startswith('!') for line in first_lines[:3]):
+                return ORCALoader
+
+            # Check for MOPAC format
+            if any('XYZ' in line.upper() for line in first_lines[:1]):
+                return MOPACLoader
+
+            # Check for Turbomole format ($coord section)
+            if any('$COORD' in line.upper() for line in first_lines):
+                return VASPLoader
+
+            # Check for MOL format (counts line)
+            if len(first_lines) >= 4:
+                try:
+                    counts_line = first_lines[3].strip()
+                    if len(counts_line) >= 6 and counts_line[0:3].isdigit() and counts_line[3:6].isdigit():
+                        return MOLLoader
+                except:
+                    pass
+
+            # Check for MOL2 format (@<TRIPOS>)
+            if any('@<TRIPOS>' in line for line in first_lines):
+                return MOL2Loader
+
+            # Check for CIF format (data_ or loop_)
+            if any(line.startswith('data_') or line.startswith('loop_') for line in first_lines):
+                return CIFLoader
+
+            # Check for GRO format (second line is atom count)
+            if len(first_lines) >= 2:
+                try:
+                    int(first_lines[1].strip())
+                    # Additional check for GRO format (residue format)
+                    if len(first_lines) >= 3 and len(first_lines[2].split()) >= 5:
+                        return GROLoader
                 except:
                     pass
 

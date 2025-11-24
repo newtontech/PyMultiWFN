@@ -69,4 +69,4 @@ class VASPGridLoader(VASPParser):
         raise NotImplementedError("VASP grid parser not yet implemented")
 
 # Convenience aliases
-VASPParser = POSCARLoader  # Default to POSCAR
+VASPLoader = POSCARLoader  # Default to POSCAR
