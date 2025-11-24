@@ -13,8 +13,7 @@ import plotly.express as px
 from typing import List, Dict, Tuple, Optional, Union
 
 from ..core.data import Wavefunction, Atom
-from ..math.basis import evaluate_basis_functions
-from ..math.density import calculate_density_on_grid
+from ..math.basis import evaluate_basis
 
 
 class OrbitalVisualizer:

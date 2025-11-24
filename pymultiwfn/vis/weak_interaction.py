@@ -19,7 +19,7 @@ from enum import Enum
 
 from ..core.data import Wavefunction
 from ..math.density import DensityCalculator
-from ..math.basis import BasisFunctionEvaluator
+from ..math.basis import evaluate_basis
 from ..config import Config
 
 
@@ -79,8 +79,7 @@ class WeakInteractionAnalyzer:
         """
         self.wfn = wavefunction
         self.config = config or Config()
-        self.density_calc = DensityCalculator(wavefunction, config)
-        self.basis_eval = BasisFunctionEvaluator(wavefunction, config)
+        self.density_calc = DensityCalculator(wavefunction, config) if hasattr(DensityCalculator, '__call__') else None
 
         # Grid parameters
         self._grid_cache = {}

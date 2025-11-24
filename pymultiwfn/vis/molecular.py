@@ -1,8 +1,9 @@
 """
 Molecular Visualization Module for PyMultiWFN
 
-This module provides functionality for visualizing molecular structures,
-including bonds, atoms, and molecular properties.
+This module provides comprehensive functionality for visualizing molecular structures,
+including bonds, atoms, and molecular properties. Based on the molecular visualization
+features from Multiwfn's GUI and display modules.
 """
 
 import numpy as np
@@ -10,9 +11,42 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import plotly.graph_objects as go
 import plotly.express as px
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Union
+from dataclasses import dataclass
+from enum import Enum
 
 from ..core.data import Wavefunction, Atom
+from ..config import Config
+
+
+class VisualizationStyle(Enum):
+    """Styles for molecular visualization"""
+    CPK = "cpk"           # Corey-Pauling-Koltun space-filling
+    VDW = "vdw"           # van der Waals radii
+    LINE = "line"         # Line/ball-and-stick model
+    TUBE = "tube"         # Tubular bonds
+
+
+class ColorScheme(Enum):
+    """Color schemes for atoms"""
+    DEFAULT = "default"
+    CPK = "cpk"
+    JMOL = "jmol"
+    VMD = "vmd"
+
+
+@dataclass
+class VisualizationSettings:
+    """Settings for molecular visualization"""
+    style: VisualizationStyle = VisualizationStyle.LINE
+    color_scheme: ColorScheme = ColorScheme.CPK
+    scale_factor: float = 1.0
+    show_hydrogens: bool = True
+    show_labels: bool = False
+    show_bonds: bool = True
+    bond_threshold: float = 1.15  # Factor for bond detection
+    atom_scale: Dict[str, float] = None  # Custom scaling per element
+    colors: Dict[str, Tuple[float, float, float]] = None  # Custom colors per element
 
 
 class MolecularVisualizer:
@@ -21,15 +55,72 @@ class MolecularVisualizer:
 
     This class provides various methods for displaying molecular structures,
     bonds, and related properties using different visualization backends.
+    Based on Multiwfn's molecular visualization capabilities.
     """
 
-    def __init__(self):
-        """Initialize the molecular visualizer"""
-        self.current_structure = None
-        self.bond_threshold = 1.15  # Default bond threshold in Angstroms
+    def __init__(self, wavefunction: Wavefunction = None, config: Optional[Config] = None):
+        """
+        Initialize the molecular visualizer
+
+        Parameters
+        ----------
+        wavefunction : Wavefunction, optional
+            Wavefunction object containing molecular structure
+        config : Config, optional
+            Configuration object for visualization settings
+        """
+        self.wfn = wavefunction
+        self.config = config or Config()
+
+        # Default visualization settings
+        self.settings = VisualizationSettings()
+
+        # Standard atomic radii (in Angstroms)
+        self.atomic_radii = {
+            'H': 0.31, 'He': 0.28, 'Li': 1.28, 'Be': 0.96, 'B': 0.85, 'C': 0.76,
+            'N': 0.71, 'O': 0.66, 'F': 0.57, 'Ne': 0.58, 'Na': 1.66, 'Mg': 1.41,
+            'Al': 1.21, 'Si': 1.11, 'P': 1.07, 'S': 1.05, 'Cl': 1.02, 'Ar': 1.06,
+            'K': 2.03, 'Ca': 1.76, 'Sc': 1.70, 'Ti': 1.60, 'V': 1.53, 'Cr': 1.39,
+            'Mn': 1.39, 'Fe': 1.32, 'Co': 1.26, 'Ni': 1.24, 'Cu': 1.32, 'Zn': 1.22,
+            'Ga': 1.22, 'Ge': 1.20, 'As': 1.19, 'Se': 1.16, 'Br': 1.14, 'Kr': 1.17,
+        }
+
+        # Van der Waals radii (in Angstroms)
+        self.vdw_radii = {
+            'H': 1.20, 'He': 1.40, 'Li': 1.82, 'Be': 1.53, 'B': 1.92, 'C': 1.70,
+            'N': 1.55, 'O': 1.52, 'F': 1.47, 'Ne': 1.54, 'Na': 2.27, 'Mg': 1.73,
+            'Al': 2.00, 'Si': 2.10, 'P': 1.80, 'S': 1.80, 'Cl': 1.75, 'Ar': 1.88,
+            'K': 2.75, 'Ca': 2.31, 'Sc': 2.30, 'Ti': 2.15, 'V': 2.05, 'Cr': 2.05,
+            'Mn': 2.05, 'Fe': 2.05, 'Co': 2.00, 'Ni': 2.00, 'Cu': 2.00, 'Zn': 2.10,
+            'Ga': 2.10, 'Ge': 2.10, 'As': 2.05, 'Se': 1.90, 'Br': 1.85, 'Kr': 2.02,
+        }
+
+        # CPK colors (RGB normalized to 0-1)
+        self.cpk_colors = {
+            'H': (1.0, 1.0, 1.0),      # White
+            'He': (0.85, 0.85, 1.0),    # Light blue
+            'Li': (0.8, 0.5, 1.0),      # Purple
+            'Be': (0.76, 1.0, 0.0),     # Lime
+            'B': (1.0, 0.71, 0.71),     # Pink
+            'C': (0.25, 0.25, 0.25),    # Dark gray
+            'N': (0.0, 0.0, 1.0),       # Blue
+            'O': (1.0, 0.0, 0.0),       # Red
+            'F': (0.56, 0.88, 0.31),    # Light green
+            'Ne': (0.7, 0.89, 0.96),    # Light cyan
+            'Na': (0.67, 0.36, 0.95),   # Indigo
+            'Mg': (0.54, 1.0, 0.0),     # Bright green
+            'Al': (0.75, 0.65, 0.65),   # Gray
+            'Si': (0.94, 0.78, 0.63),   # Brown
+            'P': (1.0, 0.5, 0.0),       # Orange
+            'S': (1.0, 1.0, 0.0),       # Yellow
+            'Cl': (0.12, 0.94, 0.12),   # Green
+            'Ar': (0.5, 0.82, 0.89),    # Cyan
+        }
+
+        # Hex colors for matplotlib compatibility
         self.atom_colors = {
             'H': '#FFFFFF',  # White
-            'C': '#909090',  # Gray
+            'C': '#404040',  # Dark gray
             'N': '#3050F8',  # Blue
             'O': '#FF0D0D',  # Red
             'F': '#90E050',  # Light green
@@ -39,14 +130,13 @@ class MolecularVisualizer:
             'Br': '#A62929', # Dark red
             'I': '#940094',  # Purple
         }
-        self.vdw_radii = {
-            'H': 1.20, 'C': 1.70, 'N': 1.55, 'O': 1.52,
-            'F': 1.47, 'P': 1.80, 'S': 1.80, 'Cl': 1.75,
-            'Br': 1.85, 'I': 1.98
-        }
+
+        # Legacy compatibility
+        self.bond_threshold = 1.15
 
     def set_structure(self, wavefunction: Wavefunction):
-        """Set the molecular structure to visualize"""
+        """Set the molecular structure to visualize (legacy compatibility)"""
+        self.wfn = wavefunction
         self.current_structure = wavefunction
 
     def calculate_bonds(self) -> List[Tuple[int, int]]:
@@ -56,11 +146,10 @@ class MolecularVisualizer:
         Returns:
             List of tuples containing bonded atom indices
         """
-        if not self.current_structure:
+        if not self.wfn and not self.current_structure:
             return []
 
-        bonds = []
-        atoms = self.current_structure.atoms
+        atoms = self.wfn.atoms if self.wfn else self.current_structure.atoms
         n_atoms = len(atoms)
 
         for i in range(n_atoms):

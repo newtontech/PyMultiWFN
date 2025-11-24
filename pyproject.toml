@@ -30,7 +30,6 @@ dependencies = [
   "scipy>=1.7",
   "matplotlib>=3.5",
   "numba>=0.55",
-  "tkinter",
   "PyQt5>=5.15",
   "plotly>=5.0",
   "pyvista>=0.35"
