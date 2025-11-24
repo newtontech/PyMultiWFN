@@ -144,7 +144,9 @@ class WFNLoader:
             # Alternative format with element symbol: ELEMENT X Y Z
             r'^([A-Z][a-z]?)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)$',
             # Format with charges: X Y Z ATOMIC_NUMBER CHARGE
-            r'^(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(\d+)\s+(-?\d+\.\d+)$'
+            r'^(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(\d+)\s+(-?\d+\.\d+)$',
+            # WFN format: ELEMENT index (CENTRE n) x y z CHARGE = charge
+            r'^([A-Z][a-z]?)\s+\d+\s+\(CENTRE\s+\d+\)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+CHARGE\s*=\s*(\d+\.\d+)$'
         ]
 
         atoms_found = 0
@@ -163,22 +165,25 @@ class WFNLoader:
                             # X Y Z ATOMIC_NUMBER format
                             x, y, z = float(groups[0]), float(groups[1]), float(groups[2])
                             atomic_num = int(float(groups[3]))
+                            element = ELEMENT_NAMES[atomic_num] if atomic_num < len(ELEMENT_NAMES) else f"X{atomic_num}"
+                            charge = float(atomic_num)
                         elif len(groups) == 4 and groups[0].isalpha():
                             # ELEMENT X Y Z format
                             element = groups[0]
                             x, y, z = float(groups[1]), float(groups[2]), float(groups[3])
                             atomic_num = self._get_atomic_number(element)
+                            charge = float(atomic_num)
+                        elif len(groups) == 5 and groups[0].isalpha():
+                            # WFN format: ELEMENT index (CENTRE n) x y z CHARGE = charge
+                            element = groups[0]
+                            x, y, z = float(groups[1]), float(groups[2]), float(groups[3])
+                            charge = float(groups[4])
+                            atomic_num = int(float(charge))
                         else:
                             continue
 
-                        # Get element symbol
-                        if isinstance(groups[0], str) and groups[0].isalpha():
-                            element = groups[0]
-                        else:
-                            element = ELEMENT_NAMES[atomic_num] if atomic_num < len(ELEMENT_NAMES) else f"X{atomic_num}"
-
-                        # Add atom with charge equal to atomic number (default)
-                        self.wfn.add_atom(element, atomic_num, x, y, z, float(atomic_num))
+                        # Add atom
+                        self.wfn.add_atom(element, atomic_num, x, y, z, charge)
                         atoms_found += 1
                         break
                     except (ValueError, IndexError) as e:
