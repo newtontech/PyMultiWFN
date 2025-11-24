@@ -1,30 +1,78 @@
 """
 Parser for Gaussian Formatted Checkpoint (.fchk) files.
+Enhanced version with comprehensive error handling and additional data parsing.
 """
 
 import re
 import numpy as np
+import warnings
+from typing import Optional, Dict, Any, List
 from pymultiwfn.core.data import Wavefunction, Shell
-from pymultiwfn.core.definitions import ELEMENT_NAMES # Corrected import
+from pymultiwfn.core.definitions import ELEMENT_NAMES
 
 class FchkLoader:
+    """
+    Enhanced loader for Gaussian Formatted Checkpoint (.fchk) files.
+
+    This parser extracts comprehensive wavefunction information from FCHK files,
+    including molecular structure, basis sets, MO coefficients, and additional
+    properties like density matrices and electrostatic data.
+    """
+
     def __init__(self, filename: str):
+        """
+        Initialize the FCHK loader.
+
+        Args:
+            filename: Path to the .fchk file
+
+        Raises:
+            FileNotFoundError: If the file does not exist
+            ValueError: If the file extension is not .fchk or .fch
+        """
+        if not filename.lower().endswith(('.fchk', '.fch')):
+            raise ValueError(f"File must have .fchk or .fch extension, got: {filename}")
+
         self.filename = filename
         self.content = ""
         self.wfn = Wavefunction()
+        self.metadata: Dict[str, Any] = {}
 
     def load(self) -> Wavefunction:
-        """Parses the .fchk file and returns a Wavefunction object."""
-        with open(self.filename, 'r') as f:
-            self.content = f.read()
-        
+        """
+        Parse the .fchk file and return a complete Wavefunction object.
+
+        Returns:
+            Wavefunction: Complete wavefunction object with all parsed data
+
+        Raises:
+            Exception: If there are critical parsing errors
+        """
+        try:
+            with open(self.filename, 'r', encoding='utf-8') as f:
+                self.content = f.read()
+        except UnicodeDecodeError:
+            # Try with different encoding
+            with open(self.filename, 'r', encoding='latin-1') as f:
+                self.content = f.read()
+
+        if not self.content.strip():
+            raise ValueError(f"File {self.filename} appears to be empty")
+
+        # Parse all sections in order
         self._parse_header()
         self._parse_atoms()
         self._parse_basis()
         self._parse_mo()
         self._parse_overlap_matrix()
-        
+        self._parse_density_matrices()
+        self._parse_electrostatic_data()
+        self._parse_additional_properties()
+
+        # Validate and finalize
+        self._validate_parsed_data()
         self.wfn._infer_occupations()
+
         return self.wfn
 
     def _read_section(self, label: str, dtype=float) -> np.ndarray:
@@ -73,29 +121,154 @@ class FchkLoader:
         return np.array([])
 
     def _parse_overlap_matrix(self):
-        """Parses the overlap matrix from the fchk content."""
+        """Enhanced parsing of the overlap matrix from the fchk content."""
         if self.wfn.num_basis == 0:
-            print("Warning: num_basis is 0, cannot parse Overlap matrix.")
+            warnings.warn("num_basis is 0, cannot parse Overlap matrix.", RuntimeWarning)
             return
 
         overlap_vals = self._read_section("Overlap matrix", float)
-        
-        if len(overlap_vals) > 0:
-            # Overlap matrix is typically stored as a flattened symmetric matrix
-            # Gaussian stores lower triangle, column-wise.
-            # Number of elements = nbasis * (nbasis + 1) / 2
+
+        if len(overlap_vals) == 0:
+            warnings.warn("No overlap matrix found in FCHK file.", RuntimeWarning)
+            return
+
+        expected_len = self.wfn.num_basis * (self.wfn.num_basis + 1) // 2
+        if len(overlap_vals) != expected_len:
+            warnings.warn(f"Overlap matrix size mismatch. Expected {expected_len}, got {len(overlap_vals)}.", RuntimeWarning)
+            return
+
+        # Reconstruct symmetric matrix from lower triangle
+        overlap_mat = np.zeros((self.wfn.num_basis, self.wfn.num_basis))
+        k = 0
+        for i in range(self.wfn.num_basis):
+            for j in range(i + 1):
+                overlap_mat[i, j] = overlap_vals[k]
+                overlap_mat[j, i] = overlap_vals[k]  # Symmetric
+                k += 1
+
+        self.wfn.overlap_matrix = overlap_mat
+        self.metadata['overlap_matrix_available'] = True
+
+    def _parse_density_matrices(self):
+        """Parse density matrices (total, alpha, beta) if available."""
+        # Total density matrix
+        total_dens = self._read_section("Total SCF Density", float)
+        if len(total_dens) > 0:
             expected_len = self.wfn.num_basis * (self.wfn.num_basis + 1) // 2
-            if len(overlap_vals) == expected_len:
-                overlap_mat = np.zeros((self.wfn.num_basis, self.wfn.num_basis))
-                k = 0
-                for i in range(self.wfn.num_basis):
-                    for j in range(i + 1):
-                        overlap_mat[i, j] = overlap_vals[k]
-                        overlap_mat[j, i] = overlap_vals[k] # Symmetric
-                        k += 1
-                self.wfn.overlap_matrix = overlap_mat
-            else:
-                print(f"Warning: Overlap matrix size mismatch. Expected {expected_len}, got {len(overlap_vals)}.")
+            if len(total_dens) == expected_len:
+                self.wfn.density_matrix = self._reconstruct_symmetric_matrix(total_dens)
+                self.metadata['total_density_available'] = True
+
+        # Alpha density matrix
+        alpha_dens = self._read_section("Alpha SCF Density", float)
+        if len(alpha_dens) > 0:
+            expected_len = self.wfn.num_basis * (self.wfn.num_basis + 1) // 2
+            if len(alpha_dens) == expected_len:
+                self.wfn.density_matrix_alpha = self._reconstruct_symmetric_matrix(alpha_dens)
+                self.metadata['alpha_density_available'] = True
+
+        # Beta density matrix
+        beta_dens = self._read_section("Beta SCF Density", float)
+        if len(beta_dens) > 0:
+            expected_len = self.wfn.num_basis * (self.wfn.num_basis + 1) // 2
+            if len(beta_dens) == expected_len:
+                self.wfn.density_matrix_beta = self._reconstruct_symmetric_matrix(beta_dens)
+                self.metadata['beta_density_available'] = True
+
+    def _parse_electrostatic_data(self):
+        """Parse electrostatic potential and related data."""
+        # ESP charges
+        esp_charges = self._read_section("ESP Charges", float)
+        if len(esp_charges) > 0:
+            if len(esp_charges) == self.wfn.num_atoms:
+                self.wfn.esp_charges = esp_charges
+                self.metadata['esp_charges_available'] = True
+
+        # Mulliken charges
+        mulliken_charges = self._read_section("Mulliken Atomic Charges", float)
+        if len(mulliken_charges) > 0:
+            if len(mulliken_charges) == self.wfn.num_atoms:
+                self.wfn.mulliken_charges = mulliken_charges
+                self.metadata['mulliken_charges_available'] = True
+
+        # Natural charges
+        natural_charges = self._read_section("Natural Population Analysis", float)
+        if len(natural_charges) > 0:
+            # NPA data format: [charge, core, valence, rydberg, total] for each atom
+            if len(natural_charges) >= self.wfn.num_atoms:
+                self.wfn.npa_charges = natural_charges[::5][:self.wfn.num_atoms]
+                self.metadata['npa_charges_available'] = True
+
+    def _parse_additional_properties(self):
+        """Parse additional properties and metadata."""
+        # Dipole moment
+        dipole = self._read_section("Dipole Moment", float)
+        if len(dipole) >= 3:
+            self.wfn.dipole_moment = dipole[:3]
+            self.metadata['dipole_available'] = True
+
+        # Quadrupole moment
+        quadrupole = self._read_section("Quadrupole Moment", float)
+        if len(quadrupole) >= 6:
+            self.wfn.quadrupole_moment = quadrupole[:6]
+            self.metadata['quadrupole_available'] = True
+
+        # SCF energy
+        scf_energy = self._read_section("Total Energy", float)
+        if len(scf_energy) > 0:
+            self.wfn.scf_energy = scf_energy[0]
+            self.metadata['scf_energy_available'] = True
+
+        # Computational methods details
+        self.metadata['scf_converged'] = self._read_section("SCF Converged", int)[0] if len(self._read_section("SCF Converged", int)) > 0 else None
+        self.metadata['efield'] = self._read_section("Electric Field", float)
+
+    def _reconstruct_symmetric_matrix(self, packed_array: np.ndarray) -> np.ndarray:
+        """
+        Reconstruct symmetric matrix from packed lower triangular format.
+
+        Args:
+            packed_array: Packed lower triangular matrix elements
+
+        Returns:
+            Full symmetric matrix
+        """
+        n = int((-1 + np.sqrt(1 + 8 * len(packed_array))) // 2)
+        if n != self.wfn.num_basis:
+            warnings.warn(f"Matrix reconstruction size mismatch: expected {self.wfn.num_basis}, got {n}", RuntimeWarning)
+
+        matrix = np.zeros((self.wfn.num_basis, self.wfn.num_basis))
+        k = 0
+        for i in range(self.wfn.num_basis):
+            for j in range(i + 1):
+                matrix[i, j] = packed_array[k]
+                matrix[j, i] = packed_array[k]
+                k += 1
+        return matrix
+
+    def _validate_parsed_data(self):
+        """Validate parsed data for consistency."""
+        if self.wfn.num_atoms == 0:
+            raise ValueError("No atoms were parsed from the FCHK file")
+
+        if self.wfn.num_basis == 0:
+            raise ValueError("No basis functions were parsed from the FCHK file")
+
+        if self.wfn.num_electrons == 0:
+            raise ValueError("No electron count was parsed from the FCHK file")
+
+        # Validate basis set consistency
+        if len(self.wfn.shells) == 0:
+            raise ValueError("No basis shells were parsed from the FCHK file")
+
+        # Validate MO coefficients
+        if hasattr(self.wfn, 'coefficients') and self.wfn.coefficients.size > 0:
+            if self.wfn.coefficients.shape[1] != self.wfn.num_basis:
+                warnings.warn(f"MO coefficients shape mismatch: {self.wfn.coefficients.shape}, expected (nmo, {self.wfn.num_basis})", RuntimeWarning)
+
+        # Store validation metadata
+        self.metadata['validation_passed'] = True
+        self.metadata['validation_timestamp'] = np.datetime64('now')
 
     def _parse_header(self):
         lines = self.content.splitlines()

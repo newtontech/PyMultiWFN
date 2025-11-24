@@ -6,6 +6,8 @@ This module implements fuzzy atomic space analysis methods including:
 - Atomic Overlap Matrix (AOM) calculations
 - Delocalization Index (DI) and Localization Index (LI)
 - Various aromaticity indices (PDI, FLU, etc.)
+- Multipole moments and atomic properties
+- Fragment analysis and interfragment delocalization
 
 Based on the original Multiwfn fuzzy.f90 Fortran implementation.
 """
@@ -27,6 +29,9 @@ class FuzzyAnalysisConfig:
     n_becke_iterations: int = 3
     integration_grid_type: str = "molecular"  # "atomic" or "molecular"
     aom_grid_type: str = "atomic"  # "atomic" or "molecular" for AOM calculations
+    radius_definition: str = "modified_csd"  # "modified_csd", "csd", "pyykko", "suresh", "custom"
+    custom_radii: Optional[Dict[int, float]] = None  # Custom atomic radii in Bohr
+    aromaticity_reference_values: Optional[Dict[Tuple[int, int], float]] = None  # FLU reference values
 
 
 class FuzzyAtomsAnalyzer:
@@ -53,8 +58,10 @@ class FuzzyAtomsAnalyzer:
 
     def _init_atomic_radii(self):
         """Initialize atomic radii for different partitioning methods."""
-        # Covalent radii from various sources (in Angstrom)
-        self.covalent_radii = {
+        # Different covalent radii definitions (in Angstrom)
+
+        # Modified CSD radii (Tian Lu's modification)
+        self.covalent_radii_modified_csd = {
             # H to Ne
             1: 0.31, 2: 0.28, 3: 1.28, 4: 0.96, 5: 0.84, 6: 0.76, 7: 0.71, 8: 0.66, 9: 0.57, 10: 0.58,
             # Na to Ar
@@ -64,6 +71,56 @@ class FuzzyAtomsAnalyzer:
             27: 1.26, 28: 1.24, 29: 1.32, 30: 1.22, 31: 1.22, 32: 1.20, 33: 1.19, 34: 1.20,
             35: 1.20, 36: 1.16,
         }
+
+        # CSD radii
+        self.covalent_radii_csd = {
+            # H to Ne
+            1: 0.31, 2: 0.28, 3: 1.28, 4: 0.96, 5: 0.84, 6: 0.76, 7: 0.71, 8: 0.66, 9: 0.57, 10: 0.58,
+            # Na to Ar
+            11: 1.66, 12: 1.41, 13: 1.21, 14: 1.11, 15: 1.07, 16: 1.05, 17: 1.02, 18: 1.06,
+            # K to Kr
+            19: 2.03, 20: 1.76, 21: 1.70, 22: 1.60, 23: 1.53, 24: 1.39, 25: 1.39, 26: 1.32,
+            27: 1.26, 28: 1.24, 29: 1.32, 30: 1.22, 31: 1.22, 32: 1.20, 33: 1.19, 34: 1.20,
+            35: 1.20, 36: 1.16,
+        }
+
+        # Pyykko radii
+        self.covalent_radii_pyykko = {
+            # H to Ne
+            1: 0.32, 2: 0.46, 3: 1.33, 4: 1.02, 5: 0.85, 6: 0.75, 7: 0.71, 8: 0.63, 9: 0.64, 10: 0.67,
+            # Na to Ar
+            11: 1.55, 12: 1.39, 13: 1.26, 14: 1.16, 15: 1.11, 16: 1.03, 17: 0.99, 18: 0.96,
+            # K to Kr
+            19: 1.96, 20: 1.71, 21: 1.48, 22: 1.36, 23: 1.34, 24: 1.22, 25: 1.19, 26: 1.16,
+            27: 1.11, 28: 1.10, 29: 1.12, 30: 1.18, 31: 1.24, 32: 1.21, 33: 1.21, 34: 1.16,
+            35: 1.14, 36: 1.17,
+        }
+
+        # Suresh radii
+        self.covalent_radii_suresh = {
+            # H to Ne
+            1: 0.32, 2: 0.28, 3: 1.34, 4: 0.90, 5: 0.82, 6: 0.77, 7: 0.75, 8: 0.73, 9: 0.71, 10: 0.69,
+            # Na to Ar
+            11: 1.54, 12: 1.30, 13: 1.18, 14: 1.11, 15: 1.06, 16: 1.02, 17: 0.99, 18: 0.97,
+            # K to Kr
+            19: 1.96, 20: 1.74, 21: 1.44, 22: 1.36, 23: 1.25, 24: 1.27, 25: 1.39, 26: 1.25,
+            27: 1.26, 28: 1.21, 29: 1.38, 30: 1.31, 31: 1.26, 32: 1.22, 33: 1.19, 34: 1.16,
+            35: 1.14, 36: 1.10,
+        }
+
+        # Select the appropriate radii based on configuration
+        if self.config.radius_definition == "modified_csd":
+            self.covalent_radii = self.covalent_radii_modified_csd
+        elif self.config.radius_definition == "csd":
+            self.covalent_radii = self.covalent_radii_csd
+        elif self.config.radius_definition == "pyykko":
+            self.covalent_radii = self.covalent_radii_pyykko
+        elif self.config.radius_definition == "suresh":
+            self.covalent_radii = self.covalent_radii_suresh
+        elif self.config.radius_definition == "custom" and self.config.custom_radii:
+            self.covalent_radii = self.config.custom_radii
+        else:
+            self.covalent_radii = self.covalent_radii_modified_csd
 
         # Convert to Bohr units
         self.covalent_radii_bohr = {k: v / BOHR_TO_ANGSTROM for k, v in self.covalent_radii.items()}
@@ -314,6 +371,129 @@ class FuzzyAtomsAnalyzer:
 
         return DI, LI
 
+    def calculate_fragment_delocalization(self, fragment1_indices: List[int],
+                                        fragment2_indices: List[int],
+                                        aom: Optional[Dict[str, np.ndarray]] = None) -> Dict[str, float]:
+        """
+        Calculate fragment localization index (FLI) and interfragment delocalization index (IFDI).
+
+        Args:
+            fragment1_indices: Atom indices for fragment 1
+            fragment2_indices: Atom indices for fragment 2
+            aom: Pre-calculated AOM (will calculate if None)
+
+        Returns:
+            Dictionary containing FLI and IFDI values
+        """
+        if aom is None:
+            aom = self.calculate_atomic_overlap_matrix()
+
+        n_atoms = len(self.wavefunction.atoms)
+
+        # Extract AOM matrices
+        aom_matrices = [aom[f"atom_{i+1}"] for i in range(n_atoms)]
+
+        # Calculate fragment AOMs
+        fom1 = np.zeros_like(aom_matrices[0])
+        fom2 = np.zeros_like(aom_matrices[0])
+
+        for i in fragment1_indices:
+            fom1 += aom_matrices[i]
+        for i in fragment2_indices:
+            fom2 += aom_matrices[i]
+
+        # Calculate FLI and IFDI
+        fli1 = np.trace(fom1 @ fom1)
+        fli2 = np.trace(fom2 @ fom2)
+        ifdi = 2.0 * np.trace(fom1 @ fom2)
+
+        return {
+            "fragment1_li": fli1,
+            "fragment2_li": fli2,
+            "interfragment_di": ifdi
+        }
+
+    def calculate_para_delocalization_index(self, atom_indices: List[int],
+                                          aom: Optional[Dict[str, np.ndarray]] = None) -> float:
+        """
+        Calculate Para-delocalization Index (PDI) for aromaticity analysis.
+
+        Args:
+            atom_indices: Atom indices in the aromatic ring
+            aom: Pre-calculated AOM (will calculate if None)
+
+        Returns:
+            PDI value
+        """
+        if aom is None:
+            aom = self.calculate_atomic_overlap_matrix()
+
+        n_atoms = len(self.wavefunction.atoms)
+        aom_matrices = [aom[f"atom_{i+1}"] for i in range(n_atoms)]
+
+        # Calculate PDI (average of DI between para positions)
+        pdi_total = 0.0
+        n_pairs = 0
+
+        # For a 6-membered ring, para positions are (0,3), (1,4), (2,5)
+        for i in range(len(atom_indices)):
+            j = (i + 3) % len(atom_indices)
+            if j < len(atom_indices):
+                pdi_total += 2.0 * np.trace(aom_matrices[atom_indices[i]] @ aom_matrices[atom_indices[j]])
+                n_pairs += 1
+
+        return pdi_total / n_pairs if n_pairs > 0 else 0.0
+
+    def calculate_flu_index(self, atom_indices: List[int],
+                          aom: Optional[Dict[str, np.ndarray]] = None) -> float:
+        """
+        Calculate Aromatic Fluctuation Index (FLU).
+
+        Args:
+            atom_indices: Atom indices in the aromatic ring
+            aom: Pre-calculated AOM (will calculate if None)
+
+        Returns:
+            FLU value
+        """
+        if aom is None:
+            aom = self.calculate_atomic_overlap_matrix()
+
+        n_atoms = len(self.wavefunction.atoms)
+        aom_matrices = [aom[f"atom_{i+1}"] for i in range(n_atoms)]
+
+        # Initialize FLU reference values if not provided
+        if self.config.aromaticity_reference_values is None:
+            self.config.aromaticity_reference_values = {
+                (6, 6): 1.468,  # Benzene
+                (6, 7): 1.566,  # Pyridine
+                (7, 6): 1.566,
+                (5, 7): 1.260,  # Borazine
+                (7, 5): 1.260,
+            }
+
+        flu_total = 0.0
+        n_bonds = 0
+
+        for i in range(len(atom_indices)):
+            j = (i + 1) % len(atom_indices)
+            atom_i = self.wavefunction.atoms[atom_indices[i]]
+            atom_j = self.wavefunction.atoms[atom_indices[j]]
+
+            # Calculate DI for this bond
+            di_ij = 2.0 * np.trace(aom_matrices[atom_indices[i]] @ aom_matrices[atom_indices[j]])
+
+            # Get reference value
+            key = (atom_i.atomic_number, atom_j.atomic_number)
+            ref_value = self.config.aromaticity_reference_values.get(key, 1.0)
+
+            # Calculate FLU contribution
+            flu_contribution = ((di_ij - ref_value) / ref_value) ** 2
+            flu_total += flu_contribution
+            n_bonds += 1
+
+        return flu_total / n_bonds if n_bonds > 0 else 0.0
+
     def integrate_function_in_atomic_spaces(self, function_values: np.ndarray,
                                           grid_points: np.ndarray,
                                           grid_weights: np.ndarray) -> np.ndarray:
@@ -383,6 +563,53 @@ class FuzzyAtomsAnalyzer:
                     )
 
         return results
+
+    def calculate_atomic_properties(self) -> Dict[str, np.ndarray]:
+        """
+        Calculate atomic properties including volume, polarizability, and C6 coefficients.
+
+        Returns:
+            Dictionary containing atomic properties
+        """
+        n_atoms = len(self.wavefunction.atoms)
+
+        # Atomic polarizability table (2020 version)
+        atomic_polarizability = {
+            1: 4.50711, 2: 1.38375, 3: 164.1125, 4: 37.74, 5: 20.5, 6: 11.3, 7: 7.4, 8: 5.3, 9: 3.74, 10: 2.66110,
+            11: 162.7, 12: 71.2, 13: 57.8, 14: 37.3, 15: 25.0, 16: 19.4, 17: 14.6, 18: 11.083,
+            19: 289.7, 20: 160.8, 21: 97.0, 22: 100.0, 23: 87.0, 24: 83.0, 25: 68.0, 26: 62.0, 27: 55.0, 28: 49.0,
+            29: 46.5, 30: 38.67, 31: 50.0, 32: 40.0, 33: 30.0, 34: 28.9, 35: 21.0, 36: 16.78,
+        }
+
+        # Atomic C6 dispersion coefficients
+        atomic_c6 = {
+            1: 6.5, 2: 1.42, 3: 1392.0, 4: 227.0, 5: 99.5, 6: 46.6, 7: 24.2, 8: 15.6, 9: 9.52, 10: 6.20,
+            11: 1518.0, 12: 626.0, 13: 528.0, 14: 305.0, 15: 185.0, 16: 134.0, 17: 94.6, 18: 64.2,
+            19: 3923.0, 20: 2163.0, 21: 1383.0, 22: 1044.0, 23: 832.0, 24: 602.0, 25: 552.0, 26: 482.0,
+            27: 408.0, 28: 373.0, 29: 253.0, 30: 284.0, 31: 498.0, 32: 354.0, 33: 246.0, 34: 210.0,
+            35: 162.0, 36: 130.0,
+        }
+
+        # Calculate atomic volumes using integration
+        grid_points, grid_weights = self._generate_integration_grid()
+        atomic_weights = self.calculate_atomic_weights(grid_points)
+
+        atomic_volumes = np.zeros(n_atoms)
+        for i in range(n_atoms):
+            integrand = atomic_weights[i] * grid_weights
+            atomic_volumes[i] = np.sum(integrand)
+
+        # Get atomic polarizabilities and C6 coefficients
+        polarizabilities = np.array([atomic_polarizability.get(atom.atomic_number, 0.0)
+                                   for atom in self.wavefunction.atoms])
+        c6_coefficients = np.array([atomic_c6.get(atom.atomic_number, 0.0)
+                                  for atom in self.wavefunction.atoms])
+
+        return {
+            'atomic_volumes': atomic_volumes,
+            'atomic_polarizabilities': polarizabilities,
+            'atomic_c6_coefficients': c6_coefficients
+        }
 
     def _calculate_electron_density(self, points: np.ndarray) -> np.ndarray:
         """Calculate electron density at grid points."""
