@@ -331,50 +331,6 @@ class MoldenLoader:
                 self.wfn.occupations = np.array(occupations)
             self.metadata['mo_coefficients_parsed'] = True
             self.metadata['num_mos_parsed'] = len(mo_coeffs_list)
-        mo_match = re.search(r'\[MO\].*?\n(.*?)(?=\[|\Z)', content, re.DOTALL | re.IGNORECASE)
-        if not mo_match:
-            return  # No MO section, that's OK for some files
-
-        mo_lines = mo_match.group(1).strip().split('\n')
-        current_mo = 0
-        energies = []
-        occupations = []
-        coeffs = []
-        mo_coeffs_list = []
-
-        for line in mo_lines:
-            line = line.strip()
-            if not line or line.startswith('#'):
-                continue
-
-            if line.startswith('Ene='):
-                energies.append(float(line.split('=')[1]))
-            elif line.startswith('Occup='):
-                occupations.append(float(line.split('=')[1]))
-            elif line.startswith('Sym='):
-                # Symmetry information, can be ignored for now
-                pass
-            elif re.match(r'^\s*\d+\s+', line):  # MO coefficient line
-                parts = line.split()
-                if len(parts) >= 2:
-                    coeff = float(parts[1])
-                    coeffs.append(coeff)
-            elif line == '' and coeffs:  # End of MO
-                mo_coeffs_list.append(np.array(coeffs))
-                coeffs = []
-                current_mo += 1
-
-        # Add the last MO if exists
-        if coeffs:
-            mo_coeffs_list.append(np.array(coeffs))
-
-        if mo_coeffs_list:
-            self.wfn.energies = np.array(energies) if energies else np.zeros(len(mo_coeffs_list))
-            self.wfn.coefficients = np.array(mo_coeffs_list)
-
-            # Set occupations if available
-            if occupations:
-                self.wfn.occupations = np.array(occupations)
 
     def _molden_to_shell_type(self, molden_type: str) -> int:
         """Convert Molden shell type to internal representation."""
