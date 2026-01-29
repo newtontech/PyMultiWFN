@@ -1,10 +1,10 @@
 
 import numpy as np
-from typing import Tuple, Optional
+from typing import Dict, Optional
 
 from pymultiwfn.core.data import Wavefunction
 
-def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Tuple[np.ndarray, Optional[np.ndarray], Optional[np.ndarray]]:
+def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarray]:
     """
     Calculates the Mayer bond order matrix for a given wavefunction.
 
@@ -12,10 +12,10 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Tuple[np.ndarray, 
         wavefunction: A Wavefunction object containing density matrices and overlap matrix.
 
     Returns:
-        A tuple:
-        - A numpy array representing the total Mayer bond order matrix.
-        - A numpy array representing the alpha Mayer bond order matrix (if unrestricted), else None.
-        - A numpy array representing the beta Mayer bond order matrix (if unrestricted), else None.
+        Dictionary containing bond order matrices:
+        - 'total': Total Mayer bond order matrix
+        - 'alpha': Alpha Mayer bond order matrix (for unrestricted), None if restricted
+        - 'beta': Beta Mayer bond order matrix (for unrestricted), None if restricted
     """
     num_atoms = wavefunction.num_atoms
     num_basis = wavefunction.num_basis
@@ -103,4 +103,9 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Tuple[np.ndarray, 
             bond_order_matrix_alpha[i, i] = np.sum(bond_order_matrix_alpha[i, :])
             bond_order_matrix_beta[i, i] = np.sum(bond_order_matrix_beta[i, :])
 
-    return bond_order_matrix_total, bond_order_matrix_alpha, bond_order_matrix_beta
+    result = {'total': bond_order_matrix_total}
+    if wavefunction.is_unrestricted:
+        result['alpha'] = bond_order_matrix_alpha
+        result['beta'] = bond_order_matrix_beta
+
+    return result

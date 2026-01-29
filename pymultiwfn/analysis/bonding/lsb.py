@@ -10,8 +10,8 @@ from typing import Tuple, Optional, Dict, List
 from dataclasses import dataclass
 
 from pymultiwfn.core.data import Wavefunction
-from pymultiwfn.math.density import calculate_electron_density
-from pymultiwfn.math.basis import evaluate_basis_functions
+from pymultiwfn.math.density import calc_density as calculate_electron_density
+from pymultiwfn.math.basis import evaluate_basis as evaluate_basis_functions
 
 
 @dataclass
@@ -355,7 +355,3 @@ def print_lsb_results(result: LSBResult):
             total = np.sum(result.atomic_contributions[:, j, k])
             print(f"  {quant_name}: {total:.6e}")
         print()
-
-
-# Add LSB function to __all__ in bonding/__init__.py
-__all__ = ["calculate_lsb_analysis", "LSBResult", "print_lsb_results"]

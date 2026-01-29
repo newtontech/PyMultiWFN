@@ -49,6 +49,88 @@ pymultiwfn = [
   "math/fortran/*"
 ]
 
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-mock>=3.12",
+]
+
+[tool.pytest.ini_options]
+# Pytest configuration for PyMultiWFN
+minversion = "8.0"
+
+# Test discovery patterns
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Test paths
+testpaths = ["tests"]
+
+# Default options when running `pytest`
+addopts = [
+    # Verbose output
+    "-v",
+
+    # Show summary of all test outcomes
+    "-ra",
+
+    # Show local variables in tracebacks
+    "--showlocals",
+
+    # Strict markers
+    "--strict-markers",
+
+    # Warn about assertions that aren't being tested
+    "--strict-config",
+
+    # Coverage options (only when coverage is requested)
+    # Commented out by default - use: pytest --cov
+    # "--cov=pymultiwfn",
+    # "--cov-report=term-missing",
+    # "--cov-report=html",
+]
+
+# Markers for categorizing tests
+markers = [
+    "unit: Fast, isolated unit tests",
+    "integration: Integration tests that may require external resources",
+    "slow: Slow-running tests (can be skipped with -m 'not slow')",
+    "requires_data: Tests that require test data files",
+]
+
+# Filter warnings
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["pymultiwfn"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# Minimum coverage percentage
+precision = 2
+
 [project.scripts]
 pymultiwfn = "pymultiwfn.main:main"
 pymwfn = "pymultiwfn.main:main"

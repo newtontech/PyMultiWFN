@@ -97,19 +97,16 @@ class Wavefunction:
         """Alias for occupations attribute to maintain compatibility."""
         return self.occupations
 
-    def get_atomic_basis_indices(self) -> Dict[int, List[int]]:
-        """
-        Get mapping from atom indices to basis function indices.
-        Returns empty dict for now as this requires basis function analysis.
-        """
-        # For now, return simple mapping assuming 1 basis function per atom
-        # In reality, this would depend on the actual basis set
-        return {i: [i] for i in range(self.num_atoms)}
-
     def _infer_occupations(self):
         """Infers orbital occupations based on num_electrons, multiplicity and orbital energies."""
-        if self.occupations is not None and self.occupations_beta is not None:
-            return # Already set
+        # For restricted: occupations should be set, occupations_beta can be None
+        # For unrestricted: both occupations and occupations_beta should be set
+        if self.is_unrestricted:
+            if self.occupations is not None and self.occupations_beta is not None:
+                return # Already set
+        else:
+            if self.occupations is not None:
+                return # Already set
 
         # Determine alpha and beta electron counts based on multiplicity
         # num_electrons is total electrons
@@ -120,11 +117,11 @@ class Wavefunction:
         if self.coefficients is not None and self.energies is not None:
             nmo_alpha = self.coefficients.shape[0]
             self.occupations = np.zeros(nmo_alpha)
-            
+
             # Sort by energy to determine occupation
             # For restricted: total electrons / 2 are doubly occupied
             # For unrestricted: alpha_electrons are singly occupied in alpha MOs
-            
+
             if self.is_unrestricted:
                 # Sort by energy and fill
                 sorted_indices = np.argsort(self.energies)
@@ -157,8 +154,10 @@ class Wavefunction:
             # P_uv = sum_i occ_i * C_ui * C_vi
             # Here, C is (nmo, nbasis), so C_ui is coefficients[i, u]
             # Sum over i (MOs)
+            # Note: einsum notation 'oi,oj->ij' means:
+            #   o = MO index (summed over), i/j = basis function indices (output)
             self.Palpha = np.einsum(
-                'io,jo->ij',
+                'oi,oj->ij',
                 (self.coefficients * self.occupations[:, np.newaxis]), # (nmo, nbasis) * (nmo, 1)
                 self.coefficients
             )
@@ -168,7 +167,7 @@ class Wavefunction:
         # Beta density matrix
         if self.is_unrestricted and self.coefficients_beta is not None and self.occupations_beta is not None:
             self.Pbeta = np.einsum(
-                'io,jo->ij',
+                'oi,oj->ij',
                 (self.coefficients_beta * self.occupations_beta[:, np.newaxis]),
                 self.coefficients_beta
             )

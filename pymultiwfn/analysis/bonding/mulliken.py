@@ -1,23 +1,21 @@
 import numpy as np
 from pymultiwfn.core.data import Wavefunction
-from typing import Tuple, Optional
+from typing import Dict, Optional
 
 def calculate_mulliken_bond_order(
-    wavefunction: Wavefunction, 
-    overlap_matrix: np.ndarray
-) -> Tuple[np.ndarray, Optional[np.ndarray], Optional[np.ndarray]]:
+    wavefunction: Wavefunction
+) -> Dict[str, np.ndarray]:
     """
     Calculates the Mulliken bond order (Mulliken overlap population) matrix.
 
     Args:
         wavefunction: The Wavefunction object containing MO coefficients, occupations, etc.
-        overlap_matrix: The overlap matrix (S_uv).
 
     Returns:
-        A tuple (bnd_mattot, bnd_mata, bnd_matb)
-        bnd_mattot: Total Mulliken bond order matrix.
-        bnd_mata: Alpha Mulliken bond order matrix (None if restricted).
-        bnd_matb: Beta Mulliken bond order matrix (None if restricted).
+        Dictionary containing bond order matrices:
+        - 'total': Total Mulliken bond order matrix
+        - 'alpha': Alpha Mulliken bond order matrix (for unrestricted), None if restricted
+        - 'beta': Beta Mulliken bond order matrix (for unrestricted), None if restricted
     """
     if wavefunction.Ptot is None or wavefunction.Palpha is None or wavefunction.Pbeta is None:
         wavefunction.calculate_density_matrices()
@@ -33,7 +31,7 @@ def calculate_mulliken_bond_order(
 
     # --- Calculate total Mulliken bond order ---
     # In Fortran, this is PSmata = Sbas * Ptot (element-wise product)
-    PS_tot_element_wise = wavefunction.Ptot * overlap_matrix
+    PS_tot_element_wise = wavefunction.Ptot * wavefunction.overlap_matrix
 
     for i in range(num_atoms):
         bfs_i = atom_to_bfs_map.get(i, []) # Get list of bfs for atom i
@@ -68,8 +66,8 @@ def calculate_mulliken_bond_order(
         bnd_mata = np.zeros((num_atoms, num_atoms))
         bnd_matb = np.zeros((num_atoms, num_atoms))
 
-        PS_alpha_element_wise = wavefunction.Palpha * overlap_matrix
-        PS_beta_element_wise = wavefunction.Pbeta * overlap_matrix
+        PS_alpha_element_wise = wavefunction.Palpha * wavefunction.overlap_matrix
+        PS_beta_element_wise = wavefunction.Pbeta * wavefunction.overlap_matrix
 
         for i in range(num_atoms):
             bfs_i = atom_to_bfs_map.get(i, [])
@@ -102,5 +100,9 @@ def calculate_mulliken_bond_order(
         # Total Mulliken bond order for unrestricted case is sum of alpha and beta
         bnd_mattot = bnd_mata + bnd_matb
 
+    result = {'total': bnd_mattot}
+    if wavefunction.is_unrestricted:
+        result['alpha'] = bnd_mata
+        result['beta'] = bnd_matb
 
-    return bnd_mattot, bnd_mata, bnd_matb
+    return result
