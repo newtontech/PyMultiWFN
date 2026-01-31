@@ -53,7 +53,7 @@ class FeishuDocClient:
         
         headers = {
             "Content-Type": "application/json; charset=utf-8",
-        "Authorization": f"Bearer {self.app_secret}"
+            "Authorization": f"Bearer {self.app_secret}"
         }
         
         data = {
@@ -152,7 +152,7 @@ class FeishuDocClient:
         
         Args:
             document_id: 文档ID
-            obj_type: 对象类型（docx, mindnote, wiki等）
+            obj_type: 对象类型
             obj_basic: 是否返回基本信息
         
         Returns:
@@ -239,35 +239,6 @@ class FeishuDocClient:
         endpoint = f"/docx/v1/{obj_type}/{document_id}"
         
         return self._make_request("DELETE", endpoint)
-    
-    def search_documents(self, space_id: str, query: str, page_size: int = 50, 
-                      page_token: str = "") -> Dict[str, Any]:
-        """
-        搜索文档
-        
-        Args:
-            space_id: 云空间ID
-            query: 搜索关键词
-            page_size: 每页数量
-            page_token: 分页token
-        
-        Returns:
-            搜索响应
-        """
-        self._log(f"搜索文档 - space_id: {space_id}, query: {query}")
-        
-        endpoint = "/docx/v1/documents/search"
-        
-        data = {
-            "space_id": space_id,
-            "query": query,
-            "page_size": page_size
-        }
-        
-        if page_token:
-            data["page_token"] = page_token
-        
-        return self._make_request("POST", endpoint, data=data)
 
 
 def base64_encode_file(file_path: str) -> str:
@@ -316,7 +287,7 @@ def main():
     
     print()
     print("=" * 80)
-    print("  飞书文档集成")
+    print("  飞书文档集成 - Python SDK")
     print("=" * 80)
     print()
     print("功能:")
