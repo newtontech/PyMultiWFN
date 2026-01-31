@@ -1,0 +1,376 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.13, pytest-9.0.2, pluggy-1.6.0 -- /home/yhm/software/PyMultiWFN/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/yhm/software/PyMultiWFN
+configfile: pyproject.toml
+testpaths: tests
+plugins: mock-3.15.1, cov-7.0.0
+collecting ... collected 205 items
+
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_h2_single_bond FAILED [  0%]
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h2_triple_bond FAILED [  0%]
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h4_double_bond FAILED [  1%]
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_symmetry PASSED [  1%]
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_diagonal_elements FAILED [  2%]
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_unrestricted FAILED [  2%]
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_missing_overlap_matrix FAILED [  3%]
+tests/analysis/test_bonding.py::TestMullikenBondOrder::test_mulliken_h2_single_bond SKIPPED [  3%]
+tests/analysis/test_bonding.py::TestMullikenBondOrder::test_mulliken_vs_mayer SKIPPED [  4%]
+tests/analysis/test_bonding.py::TestMullikenBondOrder::test_mulliken_symmetry PASSED [  4%]
+tests/analysis/test_bonding.py::TestMullikenBondOrder::test_mulliken_unrestricted PASSED [  5%]
+tests/analysis/test_bonding.py::TestMulticenterBondOrder::test_multicenter_two_center FAILED [  5%]
+tests/analysis/test_bonding.py::TestMulticenterBondOrder::test_multicenter_symmetry FAILED [  6%]
+tests/analysis/test_bonding.py::TestMulticenterBondOrder::test_multicenter_averaged FAILED [  6%]
+tests/analysis/test_bonding.py::TestMulticenterBondOrder::test_multicenter_invalid_atoms PASSED [  7%]
+tests/analysis/test_bonding.py::TestMulticenterBondOrder::test_multicenter_nao_not_implemented PASSED [  7%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_orders_above_threshold FAILED [  8%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_orders_high_threshold FAILED [  8%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_orders_with_atom_names FAILED [  9%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_orders_invalid_matrix FAILED [  9%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_orders_negative_threshold FAILED [ 10%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_calculate_fragment_bond_order FAILED [ 10%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_calculate_fragment_bond_order_invalid_atom FAILED [ 11%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_order_statistics FAILED [ 11%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_compare_bond_orders_identical FAILED [ 12%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_compare_bond_orders_different_methods FAILED [ 12%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_compare_bond_orders_correlation FAILED [ 13%]
+tests/analysis/test_bonding.py::TestBondOrderUtilities::test_compare_bond_orders_shape_mismatch FAILED [ 13%]
+tests/analysis/test_bonding.py::TestEdgeCases::test_empty_wavefunction PASSED [ 14%]
+tests/analysis/test_bonding.py::TestEdgeCases::test_single_atom PASSED   [ 14%]
+tests/analysis/test_bonding.py::TestEdgeCases::test_non_bonded_atoms PASSED [ 15%]
+tests/analysis/test_bonding.py::TestEdgeCases::test_zero_density_matrix PASSED [ 15%]
+tests/analysis/test_bonding.py::TestIntegration::test_full_bond_analysis_workflow FAILED [ 16%]
+tests/analysis/test_bonding.py::TestIntegration::test_compare_different_methods FAILED [ 16%]
+tests/analysis/test_bonding.py::TestIntegration::test_mayer_vs_wiberg FAILED [ 17%]
+tests/analysis/test_bonding.py::TestParameterized::test_bond_orders_in_range[h2_wavefunction-expected_bond_range0] FAILED [ 17%]
+tests/analysis/test_bonding.py::TestParameterized::test_bond_orders_in_range[c2h2_wavefunction-expected_bond_range1] FAILED [ 18%]
+tests/analysis/test_bonding.py::TestParameterized::test_different_thresholds[0.01] FAILED [ 18%]
+tests/analysis/test_bonding.py::TestParameterized::test_different_thresholds[0.1] FAILED [ 19%]
+tests/analysis/test_bonding.py::TestParameterized::test_different_thresholds[0.5] FAILED [ 19%]
+tests/analysis/test_bonding.py::TestParameterized::test_different_thresholds[1.0] FAILED [ 20%]
+tests/analysis/test_bonding.py::TestParameterized::test_multicenter_types[0] FAILED [ 20%]
+tests/analysis/test_bonding.py::TestParameterized::test_multicenter_types[1] FAILED [ 20%]
+tests/analysis/test_bonding.py::TestParameterized::test_multicenter_types[2] FAILED [ 21%]
+tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_hydrogen_molecule FAILED [ 21%]
+tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_water_molecule FAILED [ 22%]
+tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_methyl_radical_spin FAILED [ 22%]
+tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_single_atom PASSED [ 23%]
+tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_charged_molecule FAILED [ 23%]
+tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_various_charges[2.0-0] PASSED [ 24%]
+tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_various_charges[1.0-1] FAILED [ 24%]
+tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_various_charges[3.0--1] FAILED [ 25%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_fuzzy_analyzer_initialization PASSED [ 25%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_becke_weights_calculation PASSED [ 26%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_hirshfeld_weights_calculation PASSED [ 26%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_atomic_overlap_matrix FAILED [ 27%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_delocalization_index FAILED [ 27%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_multipole_moments PASSED [ 28%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_atomic_properties PASSED [ 28%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_perform_fuzzy_analysis_di_li FAILED [ 29%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_perform_fuzzy_analysis_multipole PASSED [ 29%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_perform_fuzzy_analysis_atomic_properties PASSED [ 30%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_fragment_delocalization FAILED [ 30%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_invalid_partition_method PASSED [ 31%]
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_invalid_analysis_type PASSED [ 31%]
+tests/analysis/test_population.py::TestGeneralPopulationAnalysis::test_perform_population_analysis_placeholder PASSED [ 32%]
+tests/analysis/test_population.py::TestPopulationEdgeCases::test_empty_molecule PASSED [ 32%]
+tests/analysis/test_population.py::TestPopulationEdgeCases::test_large_molecule FAILED [ 33%]
+tests/analysis/test_population.py::TestPopulationEdgeCases::test_zero_overlap_matrix PASSED [ 33%]
+tests/analysis/test_population.py::TestPopulationEdgeCases::test_identity_overlap_matrix PASSED [ 34%]
+tests/analysis/test_population.py::TestChargeValidation::test_charge_reasonable_range_organic FAILED [ 34%]
+tests/analysis/test_population.py::TestChargeValidation::test_charge_conservation FAILED [ 35%]
+tests/analysis/test_population.py::TestChargeValidation::test_various_molecular_charges[-1] FAILED [ 35%]
+tests/analysis/test_population.py::TestChargeValidation::test_various_molecular_charges[0] PASSED [ 36%]
+tests/analysis/test_population.py::TestChargeValidation::test_various_molecular_charges[1] FAILED [ 36%]
+tests/analysis/test_population.py::TestChargeValidation::test_various_molecular_charges[2] PASSED [ 37%]
+tests/analysis/test_population.py::TestSpinPopulation::test_spin_density_doublet FAILED [ 37%]
+tests/analysis/test_population.py::TestSpinPopulation::test_no_spin_density_restricted PASSED [ 38%]
+tests/analysis/test_population.py::TestSpinPopulation::test_alpha_beta_population_consistency PASSED [ 38%]
+tests/core/test_data.py::TestAtom::test_atom_initialization PASSED       [ 39%]
+tests/core/test_data.py::TestAtom::test_atom_various_elements[H-1-0.0-0.0-0.0-1.0] PASSED [ 39%]
+tests/core/test_data.py::TestAtom::test_atom_various_elements[He-2-1.0-2.0-3.0-2.0] PASSED [ 40%]
+tests/core/test_data.py::TestAtom::test_atom_various_elements[Li-3--1.5-0.5-2.3-3.0] PASSED [ 40%]
+tests/core/test_data.py::TestAtom::test_atom_various_elements[C-6-0.0-0.0-0.0-4.0] PASSED [ 40%]
+tests/core/test_data.py::TestAtom::test_atom_coord_property PASSED       [ 41%]
+tests/core/test_data.py::TestAtom::test_atom_coord_mutation PASSED       [ 41%]
+tests/core/test_data.py::TestAtom::test_atom_various_coordinates[0.0-0.0-0.0] PASSED [ 42%]
+tests/core/test_data.py::TestAtom::test_atom_various_coordinates[1.5-2.3--0.7] PASSED [ 42%]
+tests/core/test_data.py::TestAtom::test_atom_various_coordinates[-1.0--2.0--3.0] PASSED [ 43%]
+tests/core/test_data.py::TestAtom::test_atom_various_coordinates[1e-10-1e-10-1e-10] PASSED [ 43%]
+tests/core/test_data.py::TestAtom::test_atom_with_ecp_charge PASSED      [ 44%]
+tests/core/test_data.py::TestShell::test_shell_initialization_s PASSED   [ 44%]
+tests/core/test_data.py::TestShell::test_shell_various_types[0-S] PASSED [ 45%]
+tests/core/test_data.py::TestShell::test_shell_various_types[1-P] PASSED [ 45%]
+tests/core/test_data.py::TestShell::test_shell_various_types[2-D] PASSED [ 46%]
+tests/core/test_data.py::TestShell::test_shell_various_types[3-F] PASSED [ 46%]
+tests/core/test_data.py::TestShell::test_shell_various_types[-1-SP] PASSED [ 47%]
+tests/core/test_data.py::TestShell::test_shell_sp_shape PASSED           [ 47%]
+tests/core/test_data.py::TestShell::test_shell_exponents_coefficients_length_match PASSED [ 48%]
+tests/core/test_data.py::TestShell::test_shell_center_idx PASSED         [ 48%]
+tests/core/test_data.py::TestShell::test_shell_multiple_primitives PASSED [ 49%]
+tests/core/test_data.py::TestWavefunctionInitialization::test_wavefunction_default_initialization PASSED [ 49%]
+tests/core/test_data.py::TestWavefunctionInitialization::test_wavefunction_custom_initialization PASSED [ 50%]
+tests/core/test_data.py::TestWavefunctionAtoms::test_num_atoms_property PASSED [ 50%]
+tests/core/test_data.py::TestWavefunctionAtoms::test_num_atoms_empty PASSED [ 51%]
+tests/core/test_data.py::TestWavefunctionAtoms::test_add_atom_basic PASSED [ 51%]
+tests/core/test_data.py::TestWavefunctionAtoms::test_add_atom_with_charge PASSED [ 52%]
+tests/core/test_data.py::TestWavefunctionAtoms::test_add_multiple_atoms PASSED [ 52%]
+tests/core/test_data.py::TestWavefunctionPropertyAliases::test_mo_energies_alias PASSED [ 53%]
+tests/core/test_data.py::TestWavefunctionPropertyAliases::test_mo_energies_none PASSED [ 53%]
+tests/core/test_data.py::TestWavefunctionPropertyAliases::test_mo_coefficients_alias PASSED [ 54%]
+tests/core/test_data.py::TestWavefunctionPropertyAliases::test_mo_coefficients_none PASSED [ 54%]
+tests/core/test_data.py::TestWavefunctionPropertyAliases::test_mo_occupations_alias PASSED [ 55%]
+tests/core/test_data.py::TestWavefunctionPropertyAliases::test_mo_occupations_none PASSED [ 55%]
+tests/core/test_data.py::TestWavefunctionOccupationInference::test_infer_occupations_restricted_closed_shell PASSED [ 56%]
+tests/core/test_data.py::TestWavefunctionOccupationInference::test_infer_occupations_unrestricted_open_shell PASSED [ 56%]
+tests/core/test_data.py::TestWavefunctionOccupationInference::test_infer_occupations_no_change_if_set PASSED [ 57%]
+tests/core/test_data.py::TestWavefunctionDensityMatrices::test_calculate_density_matrices_restricted PASSED [ 57%]
+tests/core/test_data.py::TestWavefunctionDensityMatrices::test_calculate_density_matrices_unrestricted PASSED [ 58%]
+tests/core/test_data.py::TestWavefunctionDensityMatrices::test_calculate_density_matrices_no_coefficients PASSED [ 58%]
+tests/core/test_data.py::TestWavefunctionDensityMatrices::test_calculate_density_matrices_zero_basis PASSED [ 59%]
+tests/core/test_data.py::TestWavefunctionOverlapMatrix::test_calculate_overlap_matrix_basic PASSED [ 59%]
+tests/core/test_data.py::TestWavefunctionOverlapMatrix::test_calculate_overlap_matrix_zero_basis PASSED [ 60%]
+tests/core/test_data.py::TestWavefunctionOverlapMatrix::test_calculate_overlap_matrix_identity PASSED [ 60%]
+tests/core/test_data.py::TestWavefunctionAtomicBasisMapping::test_get_atomic_basis_indices_empty PASSED [ 60%]
+tests/core/test_data.py::TestWavefunctionAtomicBasisMapping::test_get_atomic_basis_indices_s_shell PASSED [ 61%]
+tests/core/test_data.py::TestWavefunctionAtomicBasisMapping::test_get_atomic_basis_indices_p_shell PASSED [ 61%]
+tests/core/test_data.py::TestWavefunctionAtomicBasisMapping::test_get_atomic_basis_indices_d_shell PASSED [ 62%]
+tests/core/test_data.py::TestWavefunctionAtomicBasisMapping::test_get_atomic_basis_indices_sp_shell PASSED [ 62%]
+tests/core/test_data.py::TestWavefunctionAtomicBasisMapping::test_get_atomic_basis_indices_mixed_shells PASSED [ 63%]
+tests/core/test_data.py::TestWavefunctionAtomicBasisMapping::test_get_atomic_basis_indices_invalid_shell_type PASSED [ 63%]
+tests/core/test_data.py::TestEdgeCases::test_wavefunction_negative_electrons PASSED [ 64%]
+tests/core/test_data.py::TestEdgeCases::test_wavefunction_high_multiplicity PASSED [ 64%]
+tests/core/test_data.py::TestEdgeCases::test_atom_zero_coordinates PASSED [ 65%]
+tests/core/test_data.py::TestEdgeCases::test_atom_negative_coordinates PASSED [ 65%]
+tests/core/test_data.py::TestEdgeCases::test_shell_empty_arrays PASSED   [ 66%]
+tests/core/test_data.py::TestEdgeCases::test_wavefunction_large_system PASSED [ 66%]
+tests/core/test_data.py::TestEdgeCases::test_wavefunction_float_electrons PASSED [ 67%]
+tests/core/test_data.py::TestEdgeCases::test_atom_element_type[string] PASSED [ 67%]
+tests/core/test_data.py::TestEdgeCases::test_atom_element_type[None] PASSED [ 68%]
+tests/core/test_data.py::TestEdgeCases::test_atom_element_type[invalid_type2] PASSED [ 68%]
+tests/core/test_data.py::TestEdgeCases::test_atom_element_type[invalid_type3] PASSED [ 69%]
+tests/core/test_data.py::TestIntegration::test_water_molecule_workflow PASSED [ 69%]
+tests/core/test_data.py::TestIntegration::test_hydrogen_molecule_restricted PASSED [ 70%]
+tests/core/test_data.py::TestIntegration::test_hydrogen_atom_unrestricted PASSED [ 70%]
+tests/integration/test_file_loading.py::TestFileLoading::test_discover_test_data_structure PASSED [ 71%]
+tests/integration/test_file_loading.py::TestFileLoading::test_load_wfn_file SKIPPED [ 71%]
+tests/math/test_density.py::TestMakeDensityMatrix::test_single_occupied_orbital PASSED [ 72%]
+tests/math/test_density.py::TestMakeDensityMatrix::test_double_occupied_orbital PASSED [ 72%]
+tests/math/test_density.py::TestMakeDensityMatrix::test_multiple_occupied_orbitals PASSED [ 73%]
+tests/math/test_density.py::TestMakeDensityMatrix::test_mixed_coefficients PASSED [ 73%]
+tests/math/test_density.py::TestMakeDensityMatrix::test_no_occupied_orbitals PASSED [ 74%]
+tests/math/test_density.py::TestMakeDensityMatrix::test_very_small_occupations_filtered PASSED [ 74%]
+tests/math/test_density.py::TestContractDensity::test_single_basis_function PASSED [ 75%]
+tests/math/test_density.py::TestContractDensity::test_two_basis_functions_diagonal_P PASSED [ 75%]
+tests/math/test_density.py::TestContractDensity::test_two_basis_functions_off_diagonal_P PASSED [ 76%]
+tests/math/test_density.py::TestContractDensity::test_zero_basis_values PASSED [ 76%]
+tests/math/test_density.py::TestCalcDensity::test_density_at_origin_hydrogen PASSED [ 77%]
+tests/math/test_density.py::TestCalcDensity::test_density_positive_everywhere PASSED [ 77%]
+tests/math/test_density.py::TestCalcDensity::test_density_symmetry_h2 PASSED [ 78%]
+tests/math/test_density.py::TestCalcDensity::test_density_multiple_points PASSED [ 78%]
+tests/math/test_density.py::TestCalcDensity::test_density_unrestricted_vs_restricted PASSED [ 79%]
+tests/math/test_density.py::TestCalcDensity::test_density_two_orbital_system PASSED [ 79%]
+tests/math/test_density.py::TestDensityValidation::test_hydrogen_exponential_decay PASSED [ 80%]
+tests/math/test_density.py::TestDensityValidation::test_density_integrated_electrons PASSED [ 80%]
+tests/math/test_density.py::TestDensityValidation::test_density_max_at_nucleus PASSED [ 80%]
+tests/math/test_density.py::TestDensityEdgeCases::test_empty_coefficients PASSED [ 81%]
+tests/math/test_density.py::TestDensityEdgeCases::test_zero_occupations PASSED [ 81%]
+tests/math/test_density.py::TestDensityEdgeCases::test_very_large_distance PASSED [ 82%]
+tests/math/test_density.py::TestDensityEdgeCases::test_very_large_exponent PASSED [ 82%]
+tests/math/test_density.py::TestDensityEdgeCases::test_very_small_exponent PASSED [ 83%]
+tests/math/test_density.py::TestDensityEdgeCases::test_single_point_grid PASSED [ 83%]
+tests/math/test_density.py::TestDensityEdgeCases::test_coordinate_array_shape PASSED [ 84%]
+tests/math/test_density.py::TestDensityParametrized::test_density_magnitude_with_distance[0.0-expected_range0] PASSED [ 84%]
+tests/math/test_density.py::TestDensityParametrized::test_density_magnitude_with_distance[0.5-expected_range1] PASSED [ 85%]
+tests/math/test_density.py::TestDensityParametrized::test_density_magnitude_with_distance[1.0-expected_range2] PASSED [ 85%]
+tests/math/test_density.py::TestDensityParametrized::test_density_magnitude_with_distance[2.0-expected_range3] PASSED [ 86%]
+tests/math/test_density.py::TestDensityParametrized::test_density_scales_with_occupation[0.0] PASSED [ 86%]
+tests/math/test_density.py::TestDensityParametrized::test_density_scales_with_occupation[0.5] PASSED [ 87%]
+tests/math/test_density.py::TestDensityParametrized::test_density_scales_with_occupation[1.0] PASSED [ 87%]
+tests/math/test_density.py::TestDensityParametrized::test_density_scales_with_occupation[1.5] PASSED [ 88%]
+tests/math/test_density.py::TestDensityParametrized::test_density_scales_with_occupation[2.0] PASSED [ 88%]
+tests/math/test_density.py::TestDensityParametrized::test_density_different_electron_counts[1.0-1.0] PASSED [ 89%]
+tests/math/test_density.py::TestDensityParametrized::test_density_different_electron_counts[2.0-2.0] PASSED [ 89%]
+tests/math/test_density.py::TestDensityParametrized::test_density_different_electron_counts[3.0-3.0] PASSED [ 90%]
+tests/math/test_density.py::TestDensityParametrized::test_density_various_coordinates[0.0-0.0-0.0] PASSED [ 90%]
+tests/math/test_density.py::TestDensityParametrized::test_density_various_coordinates[1.0-0.0-0.0] PASSED [ 91%]
+tests/math/test_density.py::TestDensityParametrized::test_density_various_coordinates[0.0-1.0-0.0] PASSED [ 91%]
+tests/math/test_density.py::TestDensityParametrized::test_density_various_coordinates[0.0-0.0-1.0] PASSED [ 92%]
+tests/math/test_density.py::TestDensityParametrized::test_density_various_coordinates[1.0-1.0-1.0] PASSED [ 92%]
+tests/math/test_density.py::TestDensityParametrized::test_density_various_coordinates[-1.0--0.5-0.3] PASSED [ 93%]
+tests/math/test_density.py::TestDensityPerformance::test_large_grid_calculation PASSED [ 93%]
+tests/math/test_density.py::TestDensityPerformance::test_batch_consistency PASSED [ 94%]
+tests/unit/test_core_data.py::TestAtom::test_atom_creation PASSED        [ 94%]
+tests/unit/test_core_data.py::TestAtom::test_atom_coord_property PASSED  [ 95%]
+tests/unit/test_core_data.py::TestAtom::test_atom_coordinates PASSED     [ 95%]
+tests/unit/test_core_data.py::TestShell::test_shell_creation PASSED      [ 96%]
+tests/unit/test_core_data.py::TestShell::test_shell_exponents_are_numpy PASSED [ 96%]
+tests/unit/test_core_data.py::TestShell::test_shell_coefficients_are_numpy PASSED [ 97%]
+tests/unit/test_core_data.py::TestWavefunction::test_wavefunction_creation PASSED [ 97%]
+tests/unit/test_core_data.py::TestWavefunction::test_wavefunction_atoms PASSED [ 98%]
+tests/unit/test_core_data.py::TestWavefunction::test_empty_wavefunction PASSED [ 98%]
+tests/unit/test_io_loader.py::TestLoader::test_load_wavefunction_file_not_found PASSED [ 99%]
+tests/unit/test_io_loader.py::TestLoader::test_load_wavefunction_invalid_format PASSED [ 99%]
+tests/unit/test_io_loader.py::TestLoaderIntegration::test_load_real_wfn_file SKIPPED [100%]
+
+=============================== warnings summary ===============================
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_h2_single_bond
+  /home/yhm/software/PyMultiWFN/pymultiwfn/io/parsers/wfn.py:115: RuntimeWarning: Cannot parse header information from line: ['GAUSSIAN', '28', 'MOL', 'ORBITALS', '34', 'PRIMITIVES', '2', 'NUCLEI']
+    warnings.warn(f"Cannot parse header information from line: {header_line}", RuntimeWarning)
+
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_h2_single_bond
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h2_triple_bond
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h4_double_bond
+  /home/yhm/software/PyMultiWFN/pymultiwfn/io/parsers/wfn.py:236: RuntimeWarning: No MO coefficient section found in WFN file
+    warnings.warn("No MO coefficient section found in WFN file", RuntimeWarning)
+
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_h2_single_bond
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h2_triple_bond
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h4_double_bond
+  /home/yhm/software/PyMultiWFN/pymultiwfn/io/parsers/wfn.py:318: RuntimeWarning: No electron count was parsed from the WFN file
+    warnings.warn("No electron count was parsed from the WFN file", RuntimeWarning)
+
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_h2_single_bond
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h2_triple_bond
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h4_double_bond
+  /home/yhm/software/PyMultiWFN/pymultiwfn/io/parsers/wfn.py:321: RuntimeWarning: No basis shells were parsed from the WFN file
+    warnings.warn("No basis shells were parsed from the WFN file", RuntimeWarning)
+
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h2_triple_bond
+  /home/yhm/software/PyMultiWFN/pymultiwfn/io/parsers/wfn.py:115: RuntimeWarning: Cannot parse header information from line: ['GAUSSIAN', '7', 'MOL', 'ORBITALS', '70', 'PRIMITIVES', '4', 'NUCLEI']
+    warnings.warn(f"Cannot parse header information from line: {header_line}", RuntimeWarning)
+
+tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h4_double_bond
+  /home/yhm/software/PyMultiWFN/pymultiwfn/io/parsers/wfn.py:115: RuntimeWarning: Cannot parse header information from line: ['GAUSSIAN', '13', 'MOL', 'ORBITALS', '193', 'PRIMITIVES', '8', 'NUCLEI']
+    warnings.warn(f"Cannot parse header information from line: {header_line}", RuntimeWarning)
+
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_atomic_overlap_matrix
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_multipole_moments
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_atomic_properties
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_perform_fuzzy_analysis_multipole
+tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_perform_fuzzy_analysis_atomic_properties
+  /home/yhm/software/PyMultiWFN/pymultiwfn/analysis/population/fuzzy_atoms.py:200: RuntimeWarning: invalid value encountered in divide
+    mu = (w_i - w_j) / (w_i + w_j)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/analysis/test_bonding.py:288: Mulliken test requires overlap matrix
+SKIPPED [1] tests/analysis/test_bonding.py:313: Mulliken test requires overlap matrix
+SKIPPED [1] tests/integration/test_file_loading.py:23: No test data files available yet
+SKIPPED [1] tests/unit/test_io_loader.py:43: Test data file not available
+FAILED tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_h2_single_bond - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h2_triple_bond - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_c2h4_double_bond - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_diagonal_elements - AssertionError: Diagonal element 0.360000 should equal row sum 0.720000
+assert np.False_
+ +  where np.False_ = <function isclose at 0x7f03504382b0>(np.float64(0.36), np.float64(0.72), rtol=1e-10)
+ +    where <function isclose at 0x7f03504382b0> = np.isclose
+FAILED tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_unrestricted - AssertionError: Total bond order should equal alpha + beta
+assert False
+ +  where False = <function allclose at 0x7f03504381b0>(array([[0.25, 0.25],\n       [0.25, 0.25]]), (array([[0.32, 0.32],\n       [0.32, 0.32]]) + array([[0.02, 0.02],\n       [0.02, 0.02]])), rtol=0.1)
+ +    where <function allclose at 0x7f03504381b0> = np.allclose
+FAILED tests/analysis/test_bonding.py::TestMayerBondOrder::test_mayer_missing_overlap_matrix - AssertionError: Regex pattern did not match.
+  Expected regex: 'Overlap matrix is required'
+  Actual message: 'Overlap matrix (Sbas) is not available in the Wavefunction object.'
+FAILED tests/analysis/test_bonding.py::TestMulticenterBondOrder::test_multicenter_two_center - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestMulticenterBondOrder::test_multicenter_symmetry - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestMulticenterBondOrder::test_multicenter_averaged - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_orders_above_threshold - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_orders_high_threshold - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_orders_with_atom_names - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_orders_invalid_matrix - ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (2,) + inhomogeneous part.
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_orders_negative_threshold - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_calculate_fragment_bond_order - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_calculate_fragment_bond_order_invalid_atom - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_get_bond_order_statistics - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_compare_bond_orders_identical - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_compare_bond_orders_different_methods - TypeError: calculate_mulliken_bond_order() missing 1 required positional argument: 'overlap_matrix'
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_compare_bond_orders_correlation - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestBondOrderUtilities::test_compare_bond_orders_shape_mismatch - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestIntegration::test_full_bond_analysis_workflow - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestIntegration::test_compare_different_methods - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestIntegration::test_mayer_vs_wiberg - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestParameterized::test_bond_orders_in_range[h2_wavefunction-expected_bond_range0] - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestParameterized::test_bond_orders_in_range[c2h2_wavefunction-expected_bond_range1] - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestParameterized::test_different_thresholds[0.01] - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestParameterized::test_different_thresholds[0.1] - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestParameterized::test_different_thresholds[0.5] - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestParameterized::test_different_thresholds[1.0] - TypeError: tuple indices must be integers or slices, not str
+FAILED tests/analysis/test_bonding.py::TestParameterized::test_multicenter_types[0] - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestParameterized::test_multicenter_types[1] - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_bonding.py::TestParameterized::test_multicenter_types[2] - ValueError: Overlap matrix (Sbas) is not available in the Wavefunction object.
+FAILED tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_hydrogen_molecule - AssertionError: H atoms have unequal populations: 1.9999999999999996 vs 0.0
+assert np.float64(1.9999999999999996) < 1e-10
+ +  where np.float64(1.9999999999999996) = <ufunc 'absolute'>((np.float64(1.9999999999999996) - np.float64(0.0)))
+ +    where <ufunc 'absolute'> = np.abs
+FAILED tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_water_molecule - AssertionError: Total population 60.28162636179773 != total electrons 10.0
+assert np.float64(50.28162636179773) < 1e-10
+ +  where np.float64(50.28162636179773) = <ufunc 'absolute'>((np.float64(60.28162636179773) - 10.0))
+ +    where <ufunc 'absolute'> = np.abs
+ +    and   np.float64(60.28162636179773) = <function sum at 0x7f035040e4f0>(array([60.28162636,  0.        ,  0.        ]))
+ +      where <function sum at 0x7f035040e4f0> = np.sum
+FAILED tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_methyl_radical_spin - AssertionError: Total population 54.838347986360844 != total electrons 9.0
+assert np.float64(45.838347986360844) < 1e-10
+ +  where np.float64(45.838347986360844) = <ufunc 'absolute'>((np.float64(54.838347986360844) - 9.0))
+ +    where <ufunc 'absolute'> = np.abs
+ +    and   np.float64(54.838347986360844) = <function sum at 0x7f035040e4f0>(array([48.80399587,  6.03435212,  0.        ,  0.        ]))
+ +      where <function sum at 0x7f035040e4f0> = np.sum
+FAILED tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_charged_molecule - AssertionError: Total population 80.71427495039421 != total electrons 10.0
+assert np.float64(70.71427495039421) < 1e-10
+ +  where np.float64(70.71427495039421) = <ufunc 'absolute'>((np.float64(80.71427495039421) - 10.0))
+ +    where <ufunc 'absolute'> = np.abs
+ +    and   np.float64(80.71427495039421) = <function sum at 0x7f035040e4f0>(array([57.36941957, 23.34485538,  0.        ,  0.        ,  0.        ]))
+ +      where <function sum at 0x7f035040e4f0> = np.sum
+FAILED tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_various_charges[1.0-1] - AssertionError: Total population 0.0 != total electrons 1.0
+assert np.float64(1.0) < 1e-10
+ +  where np.float64(1.0) = <ufunc 'absolute'>((np.float64(0.0) - 1.0))
+ +    where <ufunc 'absolute'> = np.abs
+ +    and   np.float64(0.0) = <function sum at 0x7f035040e4f0>(array([0., 0.]))
+ +      where <function sum at 0x7f035040e4f0> = np.sum
+FAILED tests/analysis/test_population.py::TestMullikenPopulation::test_mulliken_various_charges[3.0--1] - AssertionError: Total population 1.9999999999999996 != total electrons 3.0
+assert np.float64(1.0000000000000004) < 1e-10
+ +  where np.float64(1.0000000000000004) = <ufunc 'absolute'>((np.float64(1.9999999999999996) - 3.0))
+ +    where <ufunc 'absolute'> = np.abs
+ +    and   np.float64(1.9999999999999996) = <function sum at 0x7f035040e4f0>(array([2., 0.]))
+ +      where <function sum at 0x7f035040e4f0> = np.sum
+FAILED tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_atomic_overlap_matrix - AssertionError: AOM for atom_1 is not symmetric
+assert False
+ +  where False = <function allclose at 0x7f03504381b0>(array([[nan, nan],\n       [nan, nan]]), array([[nan, nan],\n       [nan, nan]]))
+ +    where <function allclose at 0x7f03504381b0> = np.allclose
+ +    and   array([[nan, nan],\n       [nan, nan]]) = array([[nan, nan],\n       [nan, nan]]).T
+FAILED tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_delocalization_index - AttributeError: 'Wavefunction' object has no attribute 'n_mos'
+FAILED tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_perform_fuzzy_analysis_di_li - AttributeError: 'Wavefunction' object has no attribute 'n_mos'
+FAILED tests/analysis/test_population.py::TestFuzzyAtomsPopulation::test_fragment_delocalization - AttributeError: 'Wavefunction' object has no attribute 'n_mos'
+FAILED tests/analysis/test_population.py::TestPopulationEdgeCases::test_large_molecule - AssertionError: assert np.float64(157.21099274008705) < 1e-10
+ +  where np.float64(157.21099274008705) = <ufunc 'absolute'>((np.float64(177.21099274008705) - 20.0))
+ +    where <ufunc 'absolute'> = np.abs
+ +    and   np.float64(177.21099274008705) = <function sum at 0x7f035040e4f0>(array([21.00692355, 19.23416189, 32.94918884,  9.78829598, 14.8296411 ,\n       15.38489941,  5.56218072, 32.69571809,  3.60497646, 22.15500671]))
+ +      where <function sum at 0x7f035040e4f0> = np.sum
+FAILED tests/analysis/test_population.py::TestChargeValidation::test_charge_reasonable_range_organic - AssertionError: Charges outside reasonable range: [-52.28162636   1.           1.        ]
+assert np.False_
+ +  where np.False_ = <function all at 0x7f035040e8f0>(array([52.28162636,  1.        ,  1.        ]) < 3.0)
+ +    where <function all at 0x7f035040e8f0> = np.all
+ +    and   array([52.28162636,  1.        ,  1.        ]) = <ufunc 'absolute'>(array([-52.28162636,   1.        ,   1.        ]))
+ +      where <ufunc 'absolute'> = np.abs
+FAILED tests/analysis/test_population.py::TestChargeValidation::test_charge_conservation - AssertionError: Sum of atomic charges -69.71427495039421 != molecular charge 1
+assert np.float64(70.71427495039421) < 0.01
+ +  where np.float64(70.71427495039421) = <ufunc 'absolute'>((np.float64(-69.71427495039421) - 1))
+ +    where <ufunc 'absolute'> = np.abs
+ +    and   1 = Wavefunction(atoms=[Atom(element='N', index=7, x=0.0, y=0.0, z=0.0, charge=7.0), Atom(element='H', index=1, x=1.889726, y=0.0, z=0.0, charge=1.0), Atom(element='H', index=1, x=-0.6299086666666667, y=np.float64(1.7816507589127062), z=0.0, charge=1.0), Atom(element='H', index=1, x=-0.6299086666666667, y=np.float64(-0.8908253794563531), z=np.float64(1.542954817890228), charge=1.0), Atom(element='H', index=1, x=-0.6299086666666667, y=np.float64(-0.8908253794563531), z=np.float64(-1.542954817890228), charge=1.0)], num_electrons=10.0, charge=1, multiplicity=1, shells=[Shell(type=0, center_idx=0, exponents=array([3.]), coefficients=array([[1.]])), Shell(type=1, center_idx=0, exponents=array([3.]), coefficients=array([[1.]])), Shell(type=0, center_idx=1, exponents=array([1.]), coefficients=array([[1.]])), Shell(type=0, center_idx=2, exponents=array([1.]), coefficients=array([[1.]])), Shell(type=0, center_idx=3, exponents=array([1.]), coefficients=array([[1.]])), Shell(type=0, center_idx=4, exponents=array([1.]), coefficients=array([[1.]]))], num_basis=8, num_atomic_orbitals=0, num_primitives=0, num_shells=6, coefficients=array([[-7.50614717e-01,  1.31635732e+00,  1.24614003e+00,\n        -1.60491574e+00, -1.46814368e+00, -1.71507046e+00,\n         1.85878369e+00,  8.75879763e-02],\n       [-5.23221964e-02,  5.55471637e-01, -9.63403694e-01,\n        -1.80321465e-01, -1.18340916e+00,  6.05445921e-01,\n        -9.51650553e-01,  3.60856060e-01],\n       [ 1.06061026e+00, -1.17152178e-01,  8.25664851e-01,\n        -1.20981355e+00, -1.19050362e+00,  2.19871821e-01,\n        -2.12919130e-01, -1.41149914e+00],\n       [-4.82981016e-01,  1.20176208e+00, -7.05803033e-01,\n         2.51813547e-02, -3.91128155e-01,  1.93139124e-01,\n         3.49290932e-01,  5.91188382e-01],\n       [ 5.20409870e-01,  8.25222389e-01,  4.26203507e-01,\n         1.95640026e-01, -5.14112178e-01, -3.07368882e+00,\n        -3.95159070e-01, -7.95399184e-01],\n       [-7.03201512e-01, -1.73739268e+00,  7.50808258e-01,\n        -1.86395314e+00,  4.18510984e-01, -2.35333837e-01,\n         4.32107174e-01,  8.70291930e-01],\n       [ 2.00862219e+00,  1.37177091e+00,  1.05859789e+00,\n         1.44533756e+00,  4.88232904e-02,  9.03295203e-02,\n        -4.80256813e-01,  3.00662736e-01],\n       [ 1.11297983e+00, -1.93150462e-02, -8.07598399e-04,\n        -6.38530234e-01,  1.59468337e+00,  1.86129868e-02,\n         5.61408670e-01, -1.98476822e-01]]), energies=array([-1.5       , -1.14285714, -0.78571429, -0.42857143, -0.07142857,\n        0.28571429,  0.64285714,  1.        ]), occupations=array([2., 2., 2., 2., 2., 0., 0., 0.]), is_unrestricted=False, coefficients_beta=None, energies_beta=None, occupations_beta=None, Palpha=array([[29.96899914, -2.35787159,  5.74310554,  3.93712004, 12.26996902,\n         5.67300905, -3.59080938, -2.36811498],\n       [-2.35787159,  8.14965345,  1.07477716,  3.65795765, -2.3564881 ,\n        -4.1008331 , -0.12230771, -4.86964787],\n       [ 5.74310554,  1.07477716, 13.57459378, -3.33398489,  3.42713158,\n         0.92453209,  1.46944943,  0.44153544],\n       [ 3.93712004,  3.65795765, -3.33398489,  5.6761732 , -1.11267682,\n        -3.73773055, -0.04800239, -2.23528434],\n       [12.26996902, -2.3564881 ,  3.42713158, -1.11267682, 23.34485538,\n        -4.39830848,  5.11830469, -1.00606778],\n       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,\n         0.        ,  0.        ,  0.        ],\n       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,\n         0.        ,  0.        ,  0.        ],\n       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,\n         0.        ,  0.        ,  0.        ]]), Pbeta=array([[0., 0., 0., 0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 0., 0., 0., 0.]]), Ptot=array([[29.96899914, -2.35787159,  5.74310554,  3.93712004, 12.26996902,\n         5.67300905, -3.59080938, -2.36811498],\n       [-2.35787159,  8.14965345,  1.07477716,  3.65795765, -2.3564881 ,\n        -4.1008331 , -0.12230771, -4.86964787],\n       [ 5.74310554,  1.07477716, 13.57459378, -3.33398489,  3.42713158,\n         0.92453209,  1.46944943,  0.44153544],\n       [ 3.93712004,  3.65795765, -3.33398489,  5.6761732 , -1.11267682,\n        -3.73773055, -0.04800239, -2.23528434],\n       [12.26996902, -2.3564881 ,  3.42713158, -1.11267682, 23.34485538,\n        -4.39830848,  5.11830469, -1.00606778],\n       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,\n         0.        ,  0.        ,  0.        ],\n       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,\n         0.        ,  0.        ,  0.        ],\n       [ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,\n         0.        ,  0.        ,  0.        ]]), overlap_matrix=array([[1., 0., 0., 0., 0., 0., 0., 0.],\n       [0., 1., 0., 0., 0., 0., 0., 0.],\n       [0., 0., 1., 0., 0., 0., 0., 0.],\n       [0., 0., 0., 1., 0., 0., 0., 0.],\n       [0., 0., 0., 0., 1., 0., 0., 0.],\n       [0., 0., 0., 0., 0., 1., 0., 0.],\n       [0., 0., 0., 0., 0., 0., 1., 0.],\n       [0., 0., 0., 0., 0., 0., 0., 1.]]), title='', method='', basis_set_name='').charge
+FAILED tests/analysis/test_population.py::TestChargeValidation::test_various_molecular_charges[-1] - AssertionError: assert np.float64(1.0000000000000004) < 1e-10
+ +  where np.float64(1.0000000000000004) = <ufunc 'absolute'>((np.float64(1.9999999999999996) - 3.0))
+ +    where <ufunc 'absolute'> = np.abs
+ +    and   np.float64(1.9999999999999996) = <function sum at 0x7f035040e4f0>(array([2., 0.]))
+ +      where <function sum at 0x7f035040e4f0> = np.sum
+ +    and   3.0 = Wavefunction(atoms=[Atom(element='H', index=1, x=0.0, y=0.0, z=0.0, charge=1.0), Atom(element='H', index=1, x=1.4, y=0.0, z=0.0, charge=1.0)], num_electrons=3.0, charge=-1, multiplicity=1, shells=[Shell(type=0, center_idx=0, exponents=array([1.]), coefficients=array([[1.]])), Shell(type=0, center_idx=1, exponents=array([1.]), coefficients=array([[1.]]))], num_basis=2, num_atomic_orbitals=0, num_primitives=0, num_shells=2, coefficients=array([[ 0.70710678,  0.70710678],\n       [ 0.70710678, -0.70710678]]), energies=array([-0.5,  0.5]), occupations=array([2., 0.]), is_unrestricted=False, coefficients_beta=None, energies_beta=None, occupations_beta=None, Palpha=array([[2., 0.],\n       [0., 0.]]), Pbeta=array([[0., 0.],\n       [0., 0.]]), Ptot=array([[2., 0.],\n       [0., 0.]]), overlap_matrix=array([[1., 0.],\n       [0., 1.]]), title='', method='', basis_set_name='').num_electrons
+FAILED tests/analysis/test_population.py::TestChargeValidation::test_various_molecular_charges[1] - AssertionError: assert np.float64(1.0) < 1e-10
+ +  where np.float64(1.0) = <ufunc 'absolute'>((np.float64(0.0) - 1.0))
+ +    where <ufunc 'absolute'> = np.abs
+ +    and   np.float64(0.0) = <function sum at 0x7f035040e4f0>(array([0., 0.]))
+ +      where <function sum at 0x7f035040e4f0> = np.sum
+ +    and   1.0 = Wavefunction(atoms=[Atom(element='H', index=1, x=0.0, y=0.0, z=0.0, charge=1.0), Atom(element='H', index=1, x=1.4, y=0.0, z=0.0, charge=1.0)], num_electrons=1.0, charge=1, multiplicity=1, shells=[Shell(type=0, center_idx=0, exponents=array([1.]), coefficients=array([[1.]])), Shell(type=0, center_idx=1, exponents=array([1.]), coefficients=array([[1.]]))], num_basis=2, num_atomic_orbitals=0, num_primitives=0, num_shells=2, coefficients=array([[ 0.70710678,  0.70710678],\n       [ 0.70710678, -0.70710678]]), energies=array([-0.5,  0.5]), occupations=array([0., 0.]), is_unrestricted=False, coefficients_beta=None, energies_beta=None, occupations_beta=None, Palpha=array([[0., 0.],\n       [0., 0.]]), Pbeta=array([[0., 0.],\n       [0., 0.]]), Ptot=array([[0., 0.],\n       [0., 0.]]), overlap_matrix=array([[1., 0.],\n       [0., 1.]]), title='', method='', basis_set_name='').num_electrons
+FAILED tests/analysis/test_population.py::TestSpinPopulation::test_spin_density_doublet - AssertionError: Total spin density 5.443278375436879 != 1.0 for doublet
+assert np.float64(4.443278375436879) < 0.1
+ +  where np.float64(4.443278375436879) = <ufunc 'absolute'>((np.float64(5.443278375436879) - 1.0))
+ +    where <ufunc 'absolute'> = np.abs
+=========== 49 failed, 152 passed, 4 skipped, 17 warnings in 42.47s ============
