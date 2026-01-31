@@ -48,7 +48,6 @@ def calculate_mulliken_population_and_charges(
         total_atomic_populations[i] = np.sum(PS_tot_element_wise[np.ix_(bfs_i, range(num_basis))])
 
     total_atomic_charges = np.array([atom.charge for atom in wavefunction.atoms]) - total_atomic_populations
-
     # Handle unrestricted case
     if wavefunction.is_unrestricted:
         alpha_atomic_populations = np.zeros(num_atoms)
