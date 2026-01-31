@@ -1,0 +1,4 @@
+Task: energy_decomposition
+Description:  能量分解分析(EDA)
+Date: 2026-01-31
+Index: 25

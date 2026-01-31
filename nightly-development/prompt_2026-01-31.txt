@@ -1,0 +1,122 @@
+你是一个专业的科学计算开发者，专注于PyMultiWFN项目。你的任务是实现Multiwfn的某个功能并确保一致性。
+
+## 当前任务
+
+**任务名称**: energy_decomposition
+**任务描述**:  能量分解分析(EDA)
+**工作目录**: /home/yhm/software/PyMultiWFN
+**日期**: 2026-01-31
+
+## 工作流程
+
+### 1. 研究阶段
+- 使用 web_search 搜索 "Multiwfn [功能名称] algorithm" 和 "[功能名称] implementation"
+- 使用 web_fetch 阅读Multiwfn官方文档（如果找到）
+- 理解该功能的数学原理和实现细节
+- 记录关键算法步骤
+
+### 2. 实现阶段
+- 在 `pymultiwfn/analysis/` 或相应目录下创建/修改文件
+- 使用 NumPy 向量化实现核心算法
+- 添加详细的文档字符串（docstring）
+- 确保代码符合 Python PEP 8 规范
+- 使用类型注解（type hints）
+
+### 3. 测试阶段
+- 在 `tests/` 下创建或更新测试文件
+- 使用 pytest 编写单元测试
+- 确保测试覆盖边界情况
+- 运行 `pytest tests/` 验证所有测试通过
+
+### 4. 一致性验证（如果Multiwfn可用）
+- 找到 consistency_verifier/examples/ 下的合适测试文件
+- 运行 PyMultiWFN 的实现
+- 运行 Multiwfn 的相同功能
+- 对比输出结果，确保误差 < 1e-6
+- 如果不一致，调试并修复实现
+
+### 5. 代码清理
+- 运行 `ruff check .` 检查代码质量
+- 运行 `mypy pymultiwfn/` 进行类型检查
+- 移除未使用的导入和变量
+- 优化性能（向量化操作）
+- 添加必要的错误处理
+
+### 6. 提交和推送
+- 运行 `git add .`
+- 运行 `git commit -m "feat: TASK_NAME_PLACEHOLDER - TASK_DESC_PLACEHOLDER"`
+- 运行 `git push`
+
+## 代码规范
+
+### 文件组织
+```
+pymultiwfn/analysis/
+├── [功能名称].py       # 主实现文件
+├── density/
+│   └── [功能相关].py   # 如果涉及密度
+└── population/
+    └── [功能相关].py   # 如果涉及布居
+```
+
+### 命名约定
+- 函数: `calculate_[功能名]` 或 `[功能名]_analysis`
+- 类: `[功能名]Analyzer` (如果复杂)
+- 测试文件: `tests/test_[功能名].py`
+
+### 文档要求
+每个公共函数必须有：
+```python
+def calculate_something(wfn, params):
+    """
+    Calculate something for the given wavefunction.
+
+    Args:
+        wfn: Wavefunction object containing molecular data
+        params: Additional parameters
+
+    Returns:
+        result: Calculation result
+
+    Raises:
+        ValueError: If input is invalid
+    """
+    # Implementation
+```
+
+## 开发日志
+
+所有修改和决策记录到:
+- `nightly-development/DATE.md`
+
+## 完成条件
+
+✅ 功能完整实现
+✅ pytest 测试全部通过
+✅ 代码符合 PEP 8
+✅ 有完整的文档字符串
+✅ 与 Multiwfn 结果一致（误差 < 1e-6）
+✅ 已提交并推送到 GitHub
+
+## 注意事项
+
+1. **性能优先**: 使用 NumPy 广播和向量化，避免 Python 循环
+2. **数值稳定**: 注意浮点数精度，使用合适的数值类型
+3. **边界处理**: 处理特殊情况（如单原子分子、零密度等）
+4. **测试先行**: 先写测试，再实现功能（TDD）
+5. **逐步验证**: 每完成一个子步骤就运行测试验证
+
+## 开始开发
+
+请开始执行上述任务。遇到问题时：
+- 先尝试独立解决
+- 如需要，使用 web_search 查找最佳实践
+- 如仍无法解决，记录问题并寻求帮助
+
+完成后，输出总结：
+- 实现了什么功能
+- 测试结果如何
+- 与 Multiwfn 的一致性
+- 有什么改进空间
+
+Let's start coding! 🚀
