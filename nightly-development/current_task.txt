@@ -1,4 +1,5 @@
-Task: energy_decomposition
-Description:  能量分解分析(EDA)
+Task: orbital_coefficients
+Description:  轨道系数提取和分析
 Date: 2026-01-31
-Index: 25
+Index: 8
+Mode: ralph-loop (pytest + git)
