@@ -163,6 +163,7 @@ class WFNLoader:
         )
 
         atoms_found = 0
+        total_nuclear_charge = 0.0
         for i in range(atom_start, len(self.lines)):
             line = self.lines[i].strip()
             if not line or line.upper().startswith(('CENTRE ASSIGNMENTS', 'TYPE ASSIGNMENTS', 'EXPONENTS', 'MO', 'END DATA')):
@@ -182,6 +183,7 @@ class WFNLoader:
                     # Add atom
                     self.wfn.add_atom(element, atomic_num, x, y, z, charge)
                     atoms_found += 1
+                    total_nuclear_charge += charge
                 except (ValueError, IndexError) as e:
                     warnings.warn(f"Error parsing atom line '{line}': {e}", RuntimeWarning)
                     continue
@@ -190,6 +192,14 @@ class WFNLoader:
             warnings.warn("No atoms found in WFN file", RuntimeWarning)
         else:
             self.metadata['atoms_parsed'] = atoms_found
+
+        # Calculate electron count from nuclear charges and molecular charge
+        # For WFN files, the header doesn't contain electron count directly
+        # We calculate: num_electrons = total_nuclear_charge - molecular_charge
+        # If molecular charge is not specified (default 0), then num_electrons = total_nuclear_charge
+        if total_nuclear_charge > 0:
+            self.wfn.num_electrons = total_nuclear_charge - self.wfn.charge
+            self.metadata['electrons_calculated_from_atoms'] = True
 
     def _get_atomic_number(self, element_symbol: str) -> int:
         """Get atomic number from element symbol."""
