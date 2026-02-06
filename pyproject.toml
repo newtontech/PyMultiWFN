@@ -1,38 +1,40 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[build-system.requires]
+build-editable = "pymultiwfn"
 
 [project]
 name = "pymultiwfn"
 version = "0.1.2"
-description = "Python-first refactor of the Multiwfn wavefunction analysis program"
+description = "Python-first refactor of Multiwfn wavefunction analysis program"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [
-  {name = "PyMultiWFN Team"}
+    {name = "PyMultiWFN Team"}
 ]
 keywords = ["quantum-chemistry", "wavefunction", "analysis", "multiwfn", "computational-chemistry"]
 classifiers = [
-  "Development Status :: 3 - Alpha",
-  "Intended Audience :: Science/Research",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Topic :: Scientific/Engineering :: Chemistry",
-  "Topic :: Scientific/Engineering :: Physics",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
+
 dependencies = [
-  "numpy>=1.21",
-  "scipy>=1.7",
-  "matplotlib>=3.5",
-  "numba>=0.55",
-  "PyQt5>=5.15",
-  "plotly>=5.0",
-  "pyvista>=0.35"
+    "numpy>=1.21",
+    "scipy>=1.7",
+    "matplotlib>=3.5",
+    "numba>=0.55",
+    "PyQt5>=5.15",
+    "plotly>=5.0",
+    "pyvista>=0.35"
 ]
 
 [project.urls]
@@ -40,13 +42,16 @@ dependencies = [
 "Bug Tracker" = "https://github.com/pymultiwfn/pymultiwfn/issues"
 "Documentation" = "https://pymultiwfn.github.io/docs"
 
+[project.scripts]
+pymultiwfn = "pymultiwfn.main:main"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["pymultiwfn*"]
 
 [tool.setuptools.package-data]
 pymultiwfn = [
-  "math/fortran/*"
+    "math/fortran/*"
 ]
 
 [dependency-groups]
@@ -55,82 +60,3 @@ dev = [
     "pytest-cov>=5.0",
     "pytest-mock>=3.12",
 ]
-
-[tool.pytest.ini_options]
-# Pytest configuration for PyMultiWFN
-minversion = "8.0"
-
-# Test discovery patterns
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-
-# Test paths
-testpaths = ["tests"]
-
-# Default options when running `pytest`
-addopts = [
-    # Verbose output
-    "-v",
-
-    # Show summary of all test outcomes
-    "-ra",
-
-    # Show local variables in tracebacks
-    "--showlocals",
-
-    # Strict markers
-    "--strict-markers",
-
-    # Warn about assertions that aren't being tested
-    "--strict-config",
-
-    # Coverage options (only when coverage is requested)
-    # Commented out by default - use: pytest --cov
-    # "--cov=pymultiwfn",
-    # "--cov-report=term-missing",
-    # "--cov-report=html",
-]
-
-# Markers for categorizing tests
-markers = [
-    "unit: Fast, isolated unit tests",
-    "integration: Integration tests that may require external resources",
-    "slow: Slow-running tests (can be skipped with -m 'not slow')",
-    "requires_data: Tests that require test data files",
-]
-
-# Filter warnings
-filterwarnings = [
-    "ignore::DeprecationWarning",
-    "ignore::PendingDeprecationWarning",
-]
-
-# Coverage configuration
-[tool.coverage.run]
-source = ["pymultiwfn"]
-omit = [
-    "*/tests/*",
-    "*/test_*.py",
-    "*/__pycache__/*",
-    "*/site-packages/*",
-]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-]
-
-# Minimum coverage percentage
-precision = 2
-
-[project.scripts]
-pymultiwfn = "pymultiwfn.main:main"
-pymwfn = "pymultiwfn.main:main"
