@@ -1,5 +1,5 @@
-Task: bond_critical_points
-Description:  键临界点分析
-Date: 2026-02-06
-Index: 14
+Task: density_gradient
+Description:  电子密度梯度计算 (∇ρ)
+Date: 2026-02-07
+Index: 
 Mode: ralph-loop (pytest + git)

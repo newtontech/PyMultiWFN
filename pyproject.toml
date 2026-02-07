@@ -2,9 +2,6 @@
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
-[build-system.requires]
-build-editable = "pymultiwfn"
-
 [project]
 name = "pymultiwfn"
 version = "0.1.2"
