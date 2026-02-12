@@ -1,5 +1,5 @@
-Task: grid_analysis
-Description:  网格分析工具（格点生成、密度映射）
-Date: 2026-02-10
-Index: 16
+Task: laplacian
+Description:  拉普拉斯算子计算 (∇²ρ)
+Date: 2026-02-12
+Index: 1
 Mode: ralph-loop (pytest + git)
