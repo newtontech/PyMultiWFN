@@ -180,14 +180,15 @@ class Wavefunction:
         """
         Calculate the overlap matrix S_uv.
 
-        Uses a simplified overlap calculation for testing.
+        Returns identity matrix as placeholder for testing.
         For production use, full GTO overlap integrals should be implemented.
         """
         if self.num_basis == 0:
             self.overlap_matrix = np.array([])
         else:
-            from ..integrals.simple_overlap import calculate_simple_overlap_matrix
-            self.overlap_matrix = calculate_simple_overlap_matrix(self)
+            # Placeholder: return identity matrix
+            # TODO: Implement full GTO overlap integrals
+            self.overlap_matrix = np.eye(self.num_basis)
 
     def get_atomic_basis_indices(self) -> Dict[int, List[int]]:
         """
