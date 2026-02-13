@@ -99,14 +99,10 @@ class Wavefunction:
 
     def _infer_occupations(self):
         """Infers orbital occupations based on num_electrons, multiplicity and orbital energies."""
-        # For restricted: occupations should be set, occupations_beta can be None
-        # For unrestricted: both occupations and occupations_beta should be set
-        if self.is_unrestricted:
-            if self.occupations is not None and self.occupations_beta is not None:
-                return # Already set
-        else:
-            if self.occupations is not None:
-                return # Already set
+        # Only skip if both occupations AND occupations_beta are set (unrestricted case)
+        # For restricted: always recalculate to ensure consistency
+        if self.is_unrestricted and self.occupations is not None and self.occupations_beta is not None:
+            return # Already set for unrestricted
 
         # Determine alpha and beta electron counts based on multiplicity
         # num_electrons is total electrons
