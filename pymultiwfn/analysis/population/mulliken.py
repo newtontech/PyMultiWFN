@@ -38,14 +38,18 @@ def calculate_mulliken_population_and_charges(
     PS_tot_element_wise = wavefunction.Ptot * overlap_matrix
 
     # Calculate total atomic populations
+    # Mulliken population: q_i = sum_mu (PS)_mu_mu where mu belongs to atom i
+    # This is the diagonal of the PS matrix for each atomic basis function
+    
     for i in range(num_atoms):
         bfs_i = atom_to_bfs_map.get(i, [])
         if not bfs_i:
             continue
         
-        # Sum over P_mu_nu * S_mu_nu where mu belongs to atom i, and nu belongs to any atom
-        # This corresponds to summing the block (bfs_i, all_bfs) of the PS matrix
-        total_atomic_populations[i] = np.sum(PS_tot_element_wise[np.ix_(bfs_i, range(num_basis))])
+        # Extract diagonal elements corresponding to atom i's basis functions
+        atom_ps_block = PS_tot_element_wise[bfs_i, :][:, bfs_i]
+        # Sum only the diagonal of this atom's block
+        total_atomic_populations[i] = np.sum(np.diag(atom_ps_block))
 
     total_atomic_charges = np.array([atom.charge for atom in wavefunction.atoms]) - total_atomic_populations
     # Handle unrestricted case
@@ -56,14 +60,20 @@ def calculate_mulliken_population_and_charges(
         PS_alpha_element_wise = wavefunction.Palpha * overlap_matrix
         PS_beta_element_wise = wavefunction.Pbeta * overlap_matrix
 
+        # Mulliken population: q_i = sum_mu (PS)_mu_mu where mu belongs to atom i
         for i in range(num_atoms):
             bfs_i = atom_to_bfs_map.get(i, [])
             if not bfs_i:
                 continue
 
-            alpha_atomic_populations[i] = np.sum(PS_alpha_element_wise[np.ix_(bfs_i, range(num_basis))])
-            beta_atomic_populations[i] = np.sum(PS_beta_element_wise[np.ix_(bfs_i, range(num_basis))])
-        
+            # Extract diagonal elements corresponding to atom i's basis functions
+            atom_ps_alpha_block = PS_alpha_element_wise[bfs_i, :][:, bfs_i]
+            atom_ps_beta_block = PS_beta_element_wise[bfs_i, :][:, bfs_i]
+
+            # Sum only the diagonal of this atom's block
+            alpha_atomic_populations[i] = np.sum(np.diag(atom_ps_alpha_block))
+            beta_atomic_populations[i] = np.sum(np.diag(atom_ps_beta_block))
+
         spin_densities = alpha_atomic_populations - beta_atomic_populations
 
     return (total_atomic_populations, total_atomic_charges, 
