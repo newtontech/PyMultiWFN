@@ -272,7 +272,7 @@ class TestMayerBondOrder:
         """
         minimal_wavefunction.overlap_matrix = None
 
-        with pytest.raises(ValueError, match="Overlap matrix is required"):
+        with pytest.raises(ValueError, match="Overlap matrix.*not available"):
             calculate_mayer_bond_order(minimal_wavefunction)
 
 
