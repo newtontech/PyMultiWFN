@@ -1,5 +1,5 @@
-Task: laplacian
-Description:  拉普拉斯算子计算 (∇²ρ)
-Date: 2026-02-12
-Index: 1
+Task: mulliken_charges
+Description:  Mulliken原子电荷计算
+Date: 2026-02-13
+Index: 2
 Mode: ralph-loop (pytest + git)
