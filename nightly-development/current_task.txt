@@ -1,5 +1,5 @@
-Task: hirshfeld_charges
-Description:  Hirshfeld原子电荷计算
-Date: 2026-02-15
-Index: 4
+Task: homo_lumo
+Description:  分子轨道分析（HOMO/LUMO能量和系数）
+Date: 2026-02-16
+Index: 5
 Mode: ralph-loop (pytest + git)
