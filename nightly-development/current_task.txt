@@ -1,5 +1,5 @@
-Task: homo_lumo
-Description:  分子轨道分析（HOMO/LUMO能量和系数）
-Date: 2026-02-16
-Index: 5
+Task: density_gradient
+Description:  电子密度梯度计算 (∇ρ)
+Date: 2026-02-17
+Index: 
 Mode: ralph-loop (pytest + git)
