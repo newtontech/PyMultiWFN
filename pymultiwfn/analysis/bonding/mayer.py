@@ -47,7 +47,8 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarr
             ps_ji = PS_total[np.ix_(basis_fns_j, basis_fns_i)]
 
             # Perform the sum for Mayer bond order
-            accum = np.sum(ps_ij * ps_ji)
+            # BO_ij = trace(PS_ij @ PS_ji) = sum_pq (PS)_pq (PS)_qp
+            accum = np.trace(ps_ij @ ps_ji)
             bond_order_matrix_total[i, j] = accum
             bond_order_matrix_total[j, i] = accum
     
@@ -74,13 +75,15 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarr
 
                 ps_alpha_ij = PS_alpha[np.ix_(basis_fns_i, basis_fns_j)]
                 ps_alpha_ji = PS_alpha[np.ix_(basis_fns_j, basis_fns_i)]
-                accum_alpha = np.sum(ps_alpha_ij * ps_alpha_ji)
+                # BO_ij = trace(PS_alpha_ij @ PS_alpha_ji)
+                accum_alpha = np.trace(ps_alpha_ij @ ps_alpha_ji)
                 bond_order_matrix_alpha[i, j] = accum_alpha
                 bond_order_matrix_alpha[j, i] = accum_alpha
 
                 ps_beta_ij = PS_beta[np.ix_(basis_fns_i, basis_fns_j)]
                 ps_beta_ji = PS_beta[np.ix_(basis_fns_j, basis_fns_i)]
-                accum_beta = np.sum(ps_beta_ij * ps_beta_ji)
+                # BO_ij = trace(PS_beta_ij @ PS_beta_ji)
+                accum_beta = np.trace(ps_beta_ij @ ps_beta_ji)
                 bond_order_matrix_beta[i, j] = accum_beta
                 bond_order_matrix_beta[j, i] = accum_beta
         
@@ -100,8 +103,8 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarr
 
         # Fill diagonal elements for alpha and beta valences
         for i in range(num_atoms):
-            bond_order_matrix_alpha[i, i] = np.sum(bond_order_matrix_alpha[i, :])
-            bond_order_matrix_beta[i, i] = np.sum(bond_order_matrix_beta[i, :])
+            bond_order_matrix_alpha[i, i] = 2.0 * np.sum(bond_order_matrix_alpha[i, i+1:])
+            bond_order_matrix_beta[i, i] = 2.0 * np.sum(bond_order_matrix_beta[i, i+1:])
 
     result = {'total': bond_order_matrix_total}
     if wavefunction.is_unrestricted:
