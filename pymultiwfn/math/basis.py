@@ -87,8 +87,40 @@ def evaluate_basis(wfn: Wavefunction, coords: np.ndarray) -> np.ndarray:
             phi[:, basis_idx+5] = yz * radial
             basis_idx += 6
             
-        # TODO: Implement F, G, H and Spherical/Cartesian support
-        
+        elif shell.type == 3: # F shell (Cartesian 10)
+            # Cartesian F: XXX, YYY, ZZZ, XXY, XXZ, YYZ, YZZ, XYY, XZZ, XYZ
+            # Gaussian order: XXX, YYY, ZZZ, XXY, XXZ, YYZ, YZZ, XYY, XZZ, XYZ
+            radial = _eval_contraction(shell.exponents, shell.coefficients, r2)
+
+            x = r_vec[:, 0]
+            y = r_vec[:, 1]
+            z = r_vec[:, 2]
+
+            xxx = x * x * x
+            yyy = y * y * y
+            zzz = z * z * z
+            xxy = x * x * y
+            xxz = x * x * z
+            yyz = y * y * z
+            yzz = y * z * z
+            xyy = x * y * y
+            xzz = x * z * z
+            xyz = x * y * z
+
+            phi[:, basis_idx]   = xxx * radial
+            phi[:, basis_idx+1] = yyy * radial
+            phi[:, basis_idx+2] = zzz * radial
+            phi[:, basis_idx+3] = xxy * radial
+            phi[:, basis_idx+4] = xxz * radial
+            phi[:, basis_idx+5] = yyz * radial
+            phi[:, basis_idx+6] = yzz * radial
+            phi[:, basis_idx+7] = xyy * radial
+            phi[:, basis_idx+8] = xzz * radial
+            phi[:, basis_idx+9] = xyz * radial
+            basis_idx += 10
+
+        # TODO: Implement G, H and Spherical/Cartesian support
+
     return phi
 
 def _eval_contraction(exps, coeffs, r2):
