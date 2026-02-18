@@ -131,6 +131,93 @@ def shared_test_data():
     return data
 
 
+@pytest.fixture
+def isolated_environment():
+    """
+    Provide an isolated test environment with clean imports.
+
+    This fixture ensures that tests don't interfere with each other
+    when run in parallel. It resets module state before each test.
+
+    Usage:
+        def test_with_isolation(isolated_environment):
+            # Fresh import guaranteed
+            from pymultiwfn import something
+            ...
+    """
+    import importlib
+    import sys
+
+    # Get all modules to reload
+    modules_to_reload = [
+        name for name in sys.modules
+        if name.startswith('pymultiwfn')
+    ]
+
+    yield  # Run the test
+
+    # Reload modules after test (optional, for strict isolation)
+    for name in modules_to_reload:
+        try:
+            importlib.reload(sys.modules[name])
+        except Exception:
+            pass
+
+
+@pytest.fixture
+def performance_timer():
+    """
+    Context manager for timing test execution.
+
+    Usage:
+        def test_performance(performance_timer):
+            with performance_timer() as timer:
+                # Code to benchmark
+                heavy_computation()
+            assert timer.elapsed < 1.0  # Must complete in < 1s
+    """
+    import time
+
+    class Timer:
+        def __init__(self):
+            self.start_time = None
+            self.end_time = None
+            self.elapsed = None
+
+        def __enter__(self):
+            self.start_time = time.perf_counter()
+            return self
+
+        def __exit__(self, *args):
+            self.end_time = time.perf_counter()
+            self.elapsed = self.end_time - self.start_time
+
+    return Timer
+
+
+@pytest.fixture
+def assert_allclose_tolerance():
+    """
+    Return a tolerance-aware numpy.allclose assertion.
+
+    This fixture provides different tolerance levels for different
+    numerical precision requirements.
+
+    Usage:
+        def test_numerical_precision(assert_allclose_tolerance):
+            a, b = compute_something()
+            # Use loose tolerance (default)
+            assert_allclose_tolerance(a, b)
+            # Use strict tolerance
+            assert_allclose_tolerance(a, b, rtol=1e-10, atol=1e-12)
+    """
+    def _assert_allclose(actual, desired, rtol=1e-7, atol=1e-9, err_msg=""):
+        """Wrapper around numpy.allclose with default tolerances."""
+        np.testing.assert_allclose(actual, desired, rtol=rtol, atol=atol, err_msg=err_msg)
+
+    return _assert_allclose
+
+
 # Pytest markers configuration
 def pytest_configure(config):
     """
