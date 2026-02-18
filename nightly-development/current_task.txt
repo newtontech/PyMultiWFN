@@ -1,5 +1,5 @@
 Task: density_gradient
 Description:  电子密度梯度计算 (∇ρ)
-Date: 2026-02-17
+Date: 2026-02-18
 Index: 
 Mode: ralph-loop (pytest + git)
