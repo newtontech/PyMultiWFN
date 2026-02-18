@@ -56,4 +56,61 @@ dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
     "pytest-mock>=3.12",
+    "pytest-xdist>=3.0",  # Parallel testing
+    "pytest-timeout>=2.0",  # Test timeout
+    "pytest-rerunfailures>=13.0",  # Rerun flaky tests
 ]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Test discovery and collection
+addopts = "-v -l -ra -W default --strict-markers"
+
+# Parallel testing and coverage (can be overridden on command line)
+# Example: pytest --cov=pymultiwfn -n auto
+#          pytest --no-cov -n 4
+#          pytest -m "not slow"  # Skip slow tests
+
+# Markers for test categorization
+markers = [
+    "unit: Unit tests (fast, isolated)",
+    "integration: Integration tests requiring external resources",
+    "slow: Slow-running tests",
+    "requires_data: Tests requiring test data files",
+    "benchmark: Performance benchmarking tests",
+    "expensive: Tests that require significant computational resources",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["pymultiwfn"]
+branch = true
+parallel = true
+
+[tool.coverage.paths]
+source = [
+    "pymultiwfn",
+    "*/site-packages/pymultiwfn",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# Test timeout configuration
+[tool.pytest_timeout]
+timeout = 600
+method = "thread"
