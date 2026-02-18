@@ -463,11 +463,12 @@ class WFNLoader:
 
     def _shell_num_functions(self, shell_type: int) -> int:
         """Return number of basis functions for a given shell type."""
+        # Use Cartesian coordinates (consistent with evaluate_basis)
         func_counts = {
             -1: 4,  # SP (1 S + 3 P)
             0: 1,   # S
             1: 3,   # P
-            2: 5,   # D (spherical)
-            3: 7,   # F (spherical)
+            2: 6,   # D (Cartesian: xx, yy, zz, xy, xz, yz)
+            3: 10,  # F (Cartesian: 10 functions)
         }
         return func_counts.get(shell_type, 1)

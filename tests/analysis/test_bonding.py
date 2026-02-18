@@ -248,8 +248,8 @@ class TestMayerBondOrder:
         result = calculate_mayer_bond_order(c2h2_wavefunction)
         bond_matrix_total = result['total']
 
-        # For C2H2 (atoms: H1-C1-C2-H2), C-C is between atoms 1 and 2
-        c_c_bond_order = bond_matrix_total[1, 2]
+        # For C2H2 (atoms: C1-H1-C2-H2), C-C is between atoms 0 and 2
+        c_c_bond_order = bond_matrix_total[0, 2]
 
         # Triple bond should be > 2.5
         assert c_c_bond_order > 2.5, \

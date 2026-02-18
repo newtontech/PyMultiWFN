@@ -46,39 +46,42 @@ def evaluate_basis(wfn: Wavefunction, coords: np.ndarray) -> np.ndarray:
             radial = _eval_contraction(shell.exponents, shell.coefficients, r2)
             phi[:, basis_idx] = radial
             basis_idx += 1
-            
+
         elif shell.type == 1: # P shell
             radial = _eval_contraction(shell.exponents, shell.coefficients, r2)
             phi[:, basis_idx]   = r_vec[:, 0] * radial # X
             phi[:, basis_idx+1] = r_vec[:, 1] * radial # Y
             phi[:, basis_idx+2] = r_vec[:, 2] * radial # Z
             basis_idx += 3
-            
+
         elif shell.type == -1: # SP shell
+            # SP shell uses the same contraction coefficients for both S and P
+            # The coefficients array has shape (1, n_primitives)
+            coeffs = shell.coefficients[0]  # Get the single row of coefficients
+
             # S component
-            radial_s = _eval_contraction(shell.exponents, shell.coefficients[0], r2)
+            radial_s = _eval_contraction(shell.exponents, coeffs, r2)
             phi[:, basis_idx] = radial_s
             basis_idx += 1
-            
+
             # P component
-            radial_p = _eval_contraction(shell.exponents, shell.coefficients[1], r2)
+            radial_p = _eval_contraction(shell.exponents, coeffs, r2)
             phi[:, basis_idx]   = r_vec[:, 0] * radial_p # X
             phi[:, basis_idx+1] = r_vec[:, 1] * radial_p # Y
             phi[:, basis_idx+2] = r_vec[:, 2] * radial_p # Z
             basis_idx += 3
-            
-        elif shell.type == 2: # D shell
-            # Cartesian D: XX, YY, ZZ, XY, XZ, YZ (Order matters! Check Multiwfn/Gaussian order)
-            # Gaussian order: XX, YY, ZZ, XY, XZ, YZ
+
+        elif shell.type == 2: # D shell (Cartesian 6 functions)
+            # Cartesian D: XX, YY, ZZ, XY, XZ, YZ
             radial = _eval_contraction(shell.exponents, shell.coefficients, r2)
-            
+
             xx = r_vec[:, 0] * r_vec[:, 0]
             yy = r_vec[:, 1] * r_vec[:, 1]
             zz = r_vec[:, 2] * r_vec[:, 2]
             xy = r_vec[:, 0] * r_vec[:, 1]
             xz = r_vec[:, 0] * r_vec[:, 2]
             yz = r_vec[:, 1] * r_vec[:, 2]
-            
+
             phi[:, basis_idx]   = xx * radial
             phi[:, basis_idx+1] = yy * radial
             phi[:, basis_idx+2] = zz * radial
@@ -86,10 +89,9 @@ def evaluate_basis(wfn: Wavefunction, coords: np.ndarray) -> np.ndarray:
             phi[:, basis_idx+4] = xz * radial
             phi[:, basis_idx+5] = yz * radial
             basis_idx += 6
-            
-        elif shell.type == 3: # F shell (Cartesian 10)
+
+        elif shell.type == 3: # F shell (Cartesian 10 functions)
             # Cartesian F: XXX, YYY, ZZZ, XXY, XXZ, YYZ, YZZ, XYY, XZZ, XYZ
-            # Gaussian order: XXX, YYY, ZZZ, XXY, XXZ, YYZ, YZZ, XYY, XZZ, XYZ
             radial = _eval_contraction(shell.exponents, shell.coefficients, r2)
 
             x = r_vec[:, 0]
@@ -126,7 +128,18 @@ def evaluate_basis(wfn: Wavefunction, coords: np.ndarray) -> np.ndarray:
 def _eval_contraction(exps, coeffs, r2):
     """
     Evaluates the radial contraction: sum_k c_k * exp(-alpha_k * r^2)
+
+    Args:
+        exps: Array of exponents (n_primitives,)
+        coeffs: Array of contraction coefficients (n_primitives,) or (1, n_primitives)
+        r2: Array of squared distances (n_points,)
+
+    Returns:
+        res: Array of contracted values (n_points,)
     """
+    # Ensure coeffs is 1D
+    coeffs = np.asarray(coeffs).flatten()
+
     # Add numerical stability checks
     res = np.zeros_like(r2)
     for a, c in zip(exps, coeffs):
