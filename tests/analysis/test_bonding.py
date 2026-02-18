@@ -287,17 +287,20 @@ class TestMayerBondOrder:
 
     def test_mayer_diagonal_elements(self, minimal_wavefunction):
         """
-        Test that diagonal elements equal sum of row elements (Mayer valence).
+        Test that diagonal elements equal sum of off-diagonal elements (Mayer valence).
+
+        Mayer valence is the sum of bond orders to other atoms, excluding the diagonal itself.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
         bond_matrix_total = result['total']
 
         for i in range(bond_matrix_total.shape[0]):
             diagonal_val = bond_matrix_total[i, i]
-            row_sum = np.sum(bond_matrix_total[i, :])
+            # Mayer valence = sum of off-diagonal elements (excluding diagonal)
+            mayer_valence = np.sum(bond_matrix_total[i, :]) - diagonal_val
 
-            assert np.isclose(diagonal_val, row_sum, rtol=1e-10), \
-                f"Diagonal element {diagonal_val:.6f} should equal row sum {row_sum:.6f}"
+            assert np.isclose(diagonal_val, mayer_valence, rtol=1e-10), \
+                f"Diagonal element {diagonal_val:.6f} should equal Mayer valence {mayer_valence:.6f}"
 
     def test_mayer_unrestricted(self, unrestricted_wavefunction):
         """
@@ -335,18 +338,16 @@ class TestMayerBondOrder:
 class TestMullikenBondOrder:
     """Test Mulliken bond order calculations."""
 
-    def test_mulliken_h2_single_bond(self, h2_wavefunction):
+    def test_mulliken_h2_single_bond(self, h2_mock_wavefunction):
         """
         Test that H2 molecule has Mulliken bond order ~1.0.
 
         Mulliken bond order for H2 single bond should be close to 1.0.
-        """
-        # Mulliken requires overlap matrix
-        # We'll get it from the wavefunction
-        if h2_wavefunction.overlap_matrix is None:
-            pytest.skip("Mulliken test requires overlap matrix")
 
-        result = calculate_mulliken_bond_order(h2_wavefunction)
+        NOTE: Uses mock wavefunction because WFN files don't contain overlap matrix.
+        WFN parser sets overlap to identity, which gives incorrect bond orders.
+        """
+        result = calculate_mulliken_bond_order(h2_mock_wavefunction)
         bond_matrix_total = result['total']
 
         # H2 has 2 atoms
@@ -359,18 +360,17 @@ class TestMullikenBondOrder:
         assert 0.7 <= h_h_bond_order <= 1.3, \
             f"H-H Mulliken bond order {h_h_bond_order:.3f} should be ~1.0"
 
-    def test_mulliken_vs_mayer(self, h2_wavefunction):
+    def test_mulliken_vs_mayer(self, h2_mock_wavefunction):
         """
         Compare Mulliken and Mayer bond orders for H2.
 
         They should be similar but not necessarily identical due to
         different formulations.
-        """
-        if h2_wavefunction.overlap_matrix is None:
-            pytest.skip("Mulliken test requires overlap matrix")
 
-        mayer_result = calculate_mayer_bond_order(h2_wavefunction)
-        mulliken_result = calculate_mulliken_bond_order(h2_wavefunction)
+        NOTE: Uses mock wavefunction because WFN files don't contain overlap matrix.
+        """
+        mayer_result = calculate_mayer_bond_order(h2_mock_wavefunction)
+        mulliken_result = calculate_mulliken_bond_order(h2_mock_wavefunction)
 
         mayer_bo = mayer_result['total'][0, 1]
         mulliken_bo = mulliken_result['total'][0, 1]
@@ -420,7 +420,8 @@ class TestMulticenterBondOrder:
 
         For 2 atoms, multicenter should give similar result to Mayer bond order.
         """
-        mayer_bond_total, _, _ = calculate_mayer_bond_order(h2_wavefunction)
+        mayer_result = calculate_mayer_bond_order(h2_wavefunction)
+        mayer_bond_total = mayer_result['total']
         mayer_bo = mayer_bond_total[0, 1]
 
         mcbo_total, mcbo_alpha, mcbo_beta = calculate_multicenter_bond_order(
@@ -557,7 +558,8 @@ class TestBondOrderUtilities:
         """
         Test that invalid matrix raises ValueError.
         """
-        invalid_matrix = np.array([[1, 2], [3, 4, 5]])  # Not square
+        # Create a non-square matrix using object dtype
+        invalid_matrix = np.array([[1, 2], [3, 4, 5]], dtype=object)
 
         with pytest.raises(ValueError, match="must be a square"):
             get_bond_orders_above_threshold(invalid_matrix, threshold=0.1)
@@ -871,7 +873,8 @@ class TestParameterized:
         if wfn is None:  # Fixture was skipped
             pytest.skip(f"Fixture {molecule_fixture} not available")
 
-        bond_matrix_total, _, _ = calculate_mayer_bond_order(wfn)
+        mayer_result = calculate_mayer_bond_order(wfn)
+        bond_matrix_total = mayer_result['total']
         bond_matrix = bond_matrix_total
 
         # Find maximum bond (usually the main bond)

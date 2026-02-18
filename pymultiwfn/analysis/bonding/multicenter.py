@@ -198,6 +198,12 @@ def calculate_multicenter_bond_order(
         - The alpha MCBO value (if unrestricted and applicable), else None.
         - The beta MCBO value (if unrestricted and applicable), else None.
     """
+    # Validate atom_indices
+    num_atoms = wavefunction.num_atoms
+    for idx in atom_indices:
+        if not (0 <= idx < num_atoms):
+            raise ValueError(f"Atom index {idx} is out of range. Must be in [0, {num_atoms-1}]")
+
     if is_nao_basis:
         # For NAO basis, we expect DMNAO, DMNAOa, DMNAOb to be available
         # Need to ensure Wavefunction parser has loaded these.

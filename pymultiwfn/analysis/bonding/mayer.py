@@ -106,9 +106,16 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarr
             bond_order_matrix_alpha[i, i] = 2.0 * np.sum(bond_order_matrix_alpha[i, i+1:])
             bond_order_matrix_beta[i, i] = 2.0 * np.sum(bond_order_matrix_beta[i, i+1:])
 
-    result = {'total': bond_order_matrix_total}
+    result = {}
+
     if wavefunction.is_unrestricted:
+        # For unrestricted case, total = alpha + beta
+        # (to avoid cross-term issues when calculating from Ptot)
+        result['total'] = bond_order_matrix_alpha + bond_order_matrix_beta
         result['alpha'] = bond_order_matrix_alpha
         result['beta'] = bond_order_matrix_beta
+    else:
+        # For restricted case, use the calculated total
+        result['total'] = bond_order_matrix_total
 
     return result
