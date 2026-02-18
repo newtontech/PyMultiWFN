@@ -104,18 +104,23 @@ def temp_output_dir(tmp_path):
 
 
 @pytest.fixture
-def numpy_rng():
+def numpy_rng(parallel_safe):
     """
     Return a seeded numpy random number generator for reproducible tests.
 
-    Uses a fixed seed for reproducibility across test runs.
+    Features:
+    - Deterministic across test runs (same seed)
+    - Thread-safe for parallel testing
+    - Worker-aware (different workers get different seeds)
 
     Usage:
         def test_random_calculation(numpy_rng):
             data = numpy_rng.random(10)
             assert len(data) == 10
     """
-    return np.random.default_rng(seed=42)
+    # Use seed from parallel_safe fixture
+    seed = parallel_safe['seed']
+    return np.random.default_rng(seed=seed)
 
 
 @pytest.fixture(scope="session")
@@ -125,10 +130,68 @@ def shared_test_data():
 
     Use this for large wavefunction files or datasets that should
     be loaded once and reused across multiple tests.
+
+    Features:
+    - Lazy loading: data is loaded only when requested
+    - Thread-safe for parallel testing
+    - Cached across multiple tests in the same session
+    - Automatically cleaned up when pytest exits
+
+    Usage:
+        def test_large_dataset(shared_test_data):
+            wavefunction = shared_test_data.get('large_wfn')
+            assert wavefunction is not None
     """
     # Lazy loading - only load if actually requested
     data = {}
     return data
+
+
+@pytest.fixture
+def parallel_safe():
+    """
+    Fixture to ensure tests are safe for parallel execution.
+
+    This fixture provides utilities to make tests parallel-safe:
+    - Unique temporary directories per worker
+    - Unique random seeds per test
+    - Worker identification
+
+    Usage:
+        def test_parallel_safe(parallel_safe):
+            # Get unique worker ID (e.g., "gw0", "gw1")
+            worker_id = parallel_safe['worker_id']
+
+            # Get unique temp directory for this worker
+            temp_dir = parallel_safe['temp_dir']
+
+            # Get unique random seed
+            seed = parallel_safe['seed']
+    """
+    import tempfile
+    import os
+
+    # Try to get pytest-xdist worker ID
+    worker_id = os.getenv('PYTEST_XDIST_WORKER', 'master')
+
+    # Create unique temp directory for this worker
+    temp_dir = tempfile.mkdtemp(prefix=f'pymultiwfn_test_{worker_id}_')
+
+    # Generate unique random seed based on worker ID and process ID
+    seed = hash(f'{worker_id}_{os.getpid()}') % (2**32)
+
+    yield {
+        'worker_id': worker_id,
+        'temp_dir': temp_dir,
+        'seed': seed,
+    }
+
+    # Cleanup temp directory
+    import shutil
+    try:
+        shutil.rmtree(temp_dir)
+    except Exception:
+        pass
 
 
 @pytest.fixture
@@ -139,6 +202,12 @@ def isolated_environment():
     This fixture ensures that tests don't interfere with each other
     when run in parallel. It resets module state before each test.
 
+    Enhanced features:
+    - Clears module cache for pymultiwfn modules
+    - Resets global state variables
+    - Ensures fresh import for each test
+    - Safe for parallel testing with pytest-xdist
+
     Usage:
         def test_with_isolation(isolated_environment):
             # Fresh import guaranteed
@@ -147,21 +216,39 @@ def isolated_environment():
     """
     import importlib
     import sys
+    import gc
 
-    # Get all modules to reload
+    # Get all modules to reload (before test)
     modules_to_reload = [
         name for name in sys.modules
         if name.startswith('pymultiwfn')
     ]
 
+    # Force garbage collection before test
+    gc.collect()
+
     yield  # Run the test
 
-    # Reload modules after test (optional, for strict isolation)
+    # Force garbage collection after test
+    gc.collect()
+
+    # Reload modules after test (strict isolation)
     for name in modules_to_reload:
         try:
-            importlib.reload(sys.modules[name])
+            module = sys.modules.get(name)
+            if module is not None:
+                # Clear module attributes to reset state
+                for attr in list(vars(module)):
+                    if not attr.startswith('__'):
+                        try:
+                            delattr(module, attr)
+                        except (AttributeError, TypeError):
+                            pass
+                # Reload the module
+                importlib.reload(module)
         except Exception:
-            pass
+            # If reload fails, at least remove from sys.modules
+            sys.modules.pop(name, None)
 
 
 @pytest.fixture

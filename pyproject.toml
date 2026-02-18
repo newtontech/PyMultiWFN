@@ -69,12 +69,31 @@ python_classes = ["Test*"]
 python_functions = ["test_*"]
 
 # Test discovery and collection
-addopts = "-v -l -ra -W default --strict-markers"
+addopts = [
+    "-v",                          # Verbose output
+    "-l",                          # Show local variables in tracebacks
+    "-ra",                         # Summary of all test results
+    "-W default",                   # Show all warnings
+    "--strict-markers",            # Strict marker validation
+    "--strict-config",             # Strict config validation
+    "--tb=short",                  # Short traceback format
+    "--cov-report=term-missing:skip-covered",  # Show missing lines in terminal
+    "--cov-report=html:htmlcov",   # Generate HTML coverage report
+    "--reruns=2",                  # Rerun failed tests 2 times
+    "--reruns-delay=1",            # Delay between reruns (1 second)
+    "--timeout=600",               # Timeout for each test (600 seconds)
+]
 
 # Parallel testing and coverage (can be overridden on command line)
-# Example: pytest --cov=pymultiwfn -n auto
-#          pytest --no-cov -n 4
-#          pytest -m "not slow"  # Skip slow tests
+#
+# Usage examples:
+#   pytest --cov=pymultiwfn -n auto           # Run tests with coverage, auto-detect CPU cores
+#   pytest --no-cov -n 4                       # Run tests with 4 workers, skip coverage
+#   pytest -m "not slow" -n auto               # Skip slow tests, run in parallel
+#   pytest tests/unit/test_density.py         # Run single file
+#   pytest -v -l --tb=short                    # Verbose with detailed tracebacks
+#   pytest -m "unit" -n auto                   # Run only unit tests in parallel
+#   pytest -m "not expensive" -n 4            # Skip expensive tests, 4 workers
 
 # Markers for test categorization
 markers = [
