@@ -193,37 +193,61 @@ class Wavefunction:
         Returns:
             Dict[int, List[int]]: {atom_idx: [bf_idx1, bf_idx2, ...]}
         """
-        atom_to_bfs = {i: [] for i in range(self.num_atoms)}
+        # Check if we have centre_assignments from WFN file
+        if hasattr(self, '_centre_assignments') and self._centre_assignments is not None:
+            # Use centre_assignments directly (most accurate method)
+            centre_assignments = self._centre_assignments
 
-        bf_idx_counter = 0
-        for shell in self.shells:
-            # Determine number of basis functions in this shell
-            # S=1, P=3, D=5, F=7 (for pure angular momentum)
-            # SP shell (type -1) counts as 1 S and 3 P => 4 functions
-            l_value = shell.type # 0 for S, 1 for P, 2 for D, ...
+            # Create atom to basis functions mapping
+            atom_to_bfs = {i: [] for i in range(self.num_atoms)}
 
-            num_bfs_in_shell = 0
-            if l_value == -1: # SP shell
-                num_bfs_in_shell = 4 # 1 s-type + 3 p-type
-            elif l_value >= 0: # S, P, D, F, ...
-                num_bfs_in_shell = 2 * l_value + 1
-            else:
-                raise ValueError(f"Unknown shell type: {l_value}")
+            # Assign each basis function to its atom
+            # Only use the first num_basis entries (centre_assignments may have more for primitives)
+            for bf_idx in range(min(self.num_basis, len(centre_assignments))):
+                atom_idx = centre_assignments[bf_idx]
+                if 0 <= atom_idx < self.num_atoms:
+                    atom_to_bfs[atom_idx].append(bf_idx)
 
-            # Assign basis function indices to the atom
-            for _ in range(num_bfs_in_shell):
+            # Verify that total basis functions match
+            total_bfs_assigned = sum(len(bfs) for bfs in atom_to_bfs.values())
+            if total_bfs_assigned != self.num_basis:
+                print(f"Warning: Mismatch in total basis functions assigned ({total_bfs_assigned}) "
+                      f"vs expected ({self.num_basis}). This may indicate a parsing issue.")
+
+            return atom_to_bfs
+        else:
+            # Fallback to old shell-based method (for wavefunctions not from WFN files)
+            atom_to_bfs = {i: [] for i in range(self.num_atoms)}
+
+            bf_idx_counter = 0
+            for shell in self.shells:
+                # Determine number of basis functions in this shell
+                # S=1, P=3, D=5, F=7 (for pure angular momentum)
+                # SP shell (type -1) counts as 1 S and 3 P => 4 functions
+                l_value = shell.type # 0 for S, 1 for P, 2 for D, ...
+
+                num_bfs_in_shell = 0
+                if l_value == -1: # SP shell
+                    num_bfs_in_shell = 4 # 1 s-type + 3 p-type
+                elif l_value >= 0: # S, P, D, F, ...
+                    num_bfs_in_shell = 2 * l_value + 1
+                else:
+                    raise ValueError(f"Unknown shell type: {l_value}")
+
+                # Assign basis function indices to the atom
                 if shell.center_idx < self.num_atoms: # Ensure atom index is valid
-                    atom_to_bfs[shell.center_idx].append(bf_idx_counter)
-                bf_idx_counter += 1
+                    for _ in range(num_bfs_in_shell):
+                        atom_to_bfs[shell.center_idx].append(bf_idx_counter)
+                        bf_idx_counter += 1
 
-        # Verify that total basis functions match
-        total_bfs_assigned = sum(len(bfs) for bfs in atom_to_bfs.values())
-        if total_bfs_assigned != self.num_basis:
-            # This can happen if FCHK has basis functions not assigned to an atom, or issue in parsing.
-            # For now, just a warning.
-            print(f"Warning: Mismatch in total basis functions assigned ({total_bfs_assigned}) "
-                  f"vs expected ({self.num_basis}). This may indicate a parsing issue or "
-                  f"basis functions not associated with a specific atom (e.g., ghost atoms).")
+            # Verify that total basis functions match
+            total_bfs_assigned = sum(len(bfs) for bfs in atom_to_bfs.values())
+            if total_bfs_assigned != self.num_basis:
+                # This can happen if FCHK has basis functions not assigned to an atom, or issue in parsing.
+                # For now, just a warning.
+                print(f"Warning: Mismatch in total basis functions assigned ({total_bfs_assigned}) "
+                      f"vs expected ({self.num_basis}). This may indicate a parsing issue or "
+                      f"basis functions not associated with a specific atom (e.g., ghost atoms).")
 
-        return atom_to_bfs
+            return atom_to_bfs
   

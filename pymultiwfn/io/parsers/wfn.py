@@ -451,6 +451,10 @@ class WFNLoader:
                 )
                 self.wfn.shells.append(shell)
 
+        # Store centre_assignments in the wavefunction for accurate basis function indexing
+        # This is critical for get_atomic_basis_indices() to work correctly
+        self.wfn._centre_assignments = centre_assignments
+
         # Recalculate num_basis from shells (more accurate than from assignments)
         self.wfn.num_basis = sum(self._shell_num_functions(shell.type) for shell in self.wfn.shells)
 
