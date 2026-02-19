@@ -294,8 +294,8 @@ class TestRunner:
         """Run a single test case on both systems and compare results."""
         
         print(f"\n{BLUE}{'='*60}")
-        print(f"{BLUE}Running Test Case: {test_case.name}{NC}")
-        print(f"{BLUE}Test File: {test_case.test_file_name}")
+
+
         print(f"{BLUE}{'='*60}")
         
         try:
@@ -324,7 +324,7 @@ class TestRunner:
             self._print_results(test_case, status, diff)
             
         except Exception as e:
-            print(f"{RED}[ERROR]{NC} Test failed: {str(e)}")
+
             test_case.status = "error"
             test_case.diff = {"error": str(e)}
     
@@ -417,20 +417,20 @@ class TestRunner:
         """Run all test cases and return summary."""
         
         print(f"\n{BLUE}{'='*60}")
-        print(f"{BLUE}Running Test Suite: {len(test_cases)} test cases{NC}")
+
         print(f"{BLUE}{'='*60}")
         
         result = TestResult()
         result.start_time = datetime.now()
         
         for i, test_case in enumerate(test_cases, 1):
-            print(f"\n{BLUE}[{i+1}/{len(test_cases)}]{NC} Test Case: {test_case.name}")
+
             self.run_test_case(test_case)
         
         result.end_time = datetime.now()
         
         print(f"\n{BLUE}{'='*60}")
-        print(f"{BLUE}Test Suite Summary{NC}")
+
         print(f"{BLUE}{'='*60}")
         print(f"{BLUE}{'='*60}")
         print(result.get_summary())
@@ -484,10 +484,10 @@ def get_test_cases() -> List[TestCase]:
     test_files = list(TEST_FILES_DIR.glob("*.wfn"))
     
     if not test_files:
-        print(f"{YELLOW}[!]{NC} No test files found in {TEST_FILES_DIR}")
+
         return []
     
-    print(f"{GREEN}[✓]{NC} Found {len(test_files)} test files")
+
     print(f"{BLUE}{'='*60}")
     
     test_cases = []
@@ -552,7 +552,7 @@ def main():
     """Main entry point for the test system."""
     
     print(f"{BLUE}{'='*60}")
-    print(f"{BLUE}PyMultiWFN vs Multiwfn_noGUI - Comprehensive Test System v3.0{NC}")
+
     print(f"{BLUE}{'='*60}")
     print(f"{BLUE}{'='*60}")
     print(f"Version: 3.0")
@@ -578,7 +578,7 @@ def main():
         test_cases = get_test_cases()
         
         if not test_cases:
-            print(f"{YELLOW}[!]{NC} No test cases to run")
+
             return 0
         
         # Run all tests
@@ -588,7 +588,7 @@ def main():
         print(f"\n{GREEN}{'='*60}")
         print(f"{BLUE}Final Summary:{NC}")
         print(f"{BLUE}{'='*60}")
-        print(f"{GREEN}Total Tests: {result.summary['total']}{NC}")
+
         print(f"{GREEN}Passed: {result.summary['passed']}{NC}")
         print(f"{RED}Failed: {result.summary['failed']}{NC}")
         if result.summary['warnings'] > 0:
@@ -602,7 +602,7 @@ def main():
             return 0
     
     except KeyboardInterrupt:
-        print(f"\n{YELLOW}[INTERRUPTED]{NC} Test cancelled by user")
+
         return 2
     except Exception as e:
         print(f"\n{RED}[FATAL ERROR]{NC} {str(e)}")
