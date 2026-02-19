@@ -97,6 +97,11 @@ class Wavefunction:
         """Alias for occupations attribute to maintain compatibility."""
         return self.occupations
 
+    @property
+    def n_mos(self) -> int:
+        """Alias for num_basis (number of molecular orbitals/basis functions)."""
+        return self.num_basis
+
     def _infer_occupations(self):
         """Infers orbital occupations based on num_electrons, multiplicity and orbital energies."""
         # Only skip if both occupations AND occupations_beta are set (unrestricted case)
