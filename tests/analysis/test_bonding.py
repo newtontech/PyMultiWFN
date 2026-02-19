@@ -663,11 +663,16 @@ class TestBondOrderUtilities:
         assert 'rmsd' in comparison
         assert comparison['rmsd'] >= 0, "RMSD should be non-negative"
 
-    def test_compare_bond_orders_correlation(self, minimal_wavefunction):
+    def test_compare_bond_orders_correlation(self, c2h2_wavefunction):
         """
         Test correlation comparison method.
+
+        Note: Uses c2h2_wavefunction (4 atoms, 4x4 matrix) instead of
+        minimal_wavefunction (2 atoms, 2x2 matrix) because correlation
+        coefficient requires multiple data points to be calculated.
+        With only 1 off-diagonal element (2x2 matrix), correlation is NaN.
         """
-        result = calculate_mayer_bond_order(minimal_wavefunction)
+        result = calculate_mayer_bond_order(c2h2_wavefunction)
         bond_matrix = result['total']
 
         # Add small perturbation

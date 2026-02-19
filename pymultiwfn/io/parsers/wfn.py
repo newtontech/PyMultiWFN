@@ -455,8 +455,11 @@ class WFNLoader:
         # This is critical for get_atomic_basis_indices() to work correctly
         self.wfn._centre_assignments = centre_assignments
 
-        # Recalculate num_basis from shells (more accurate than from assignments)
-        self.wfn.num_basis = sum(self._shell_num_functions(shell.type) for shell in self.wfn.shells)
+        # DON'T recalculate num_basis from shells - use the value from WFN file
+        # The num_basis from WFN file (based on centre_assignments) is the authoritative value
+        # Recalculating from shells can cause mismatches because shell grouping may not match
+        # the actual number of basis functions in the WFN file
+        # self.wfn.num_basis = sum(self._shell_num_functions(shell.type) for shell in self.wfn.shells)
 
         # Set overlap matrix to identity as fallback (with correct size)
         if self.wfn.num_basis > 0:
