@@ -50,10 +50,13 @@ def calculate_overlap_matrix(
         ValueError: If wavefunction has no basis functions
         NotImplementedError: If unsupported angular momentum is encountered
     """
-    if wfn.num_basis == 0:
+    # Extract all basis functions
+    basis_functions = _extract_basis_functions(wfn)
+    
+    if not basis_functions:
         return np.array([])
 
-    nbasis = wfn.num_basis
+    nbasis = len(basis_functions)
     overlap_matrix = np.zeros((nbasis, nbasis))
 
     # Get all basis function parameters
@@ -121,7 +124,8 @@ def _extract_basis_functions(wfn: Wavefunction) -> List[dict]:
         shell_type = shell.type
         atom_idx = shell.center_idx
         atom = wfn.atoms[atom_idx]
-        coords = atom.coord
+        # Convert numpy array to tuple for caching
+        coords = tuple(atom.coord)
 
         # Get shell information
         if shell_type not in shell_info:
@@ -131,10 +135,18 @@ def _extract_basis_functions(wfn: Wavefunction) -> List[dict]:
 
         # For SP shell, need special handling
         if shell_type == -1:  # SP shell
-            # SP shell has 2 contraction coefficient sets:
-            # row 0 for S, row 1 for P
-            s_coeffs = shell.coefficients[0, :]
-            p_coeffs = shell.coefficients[1, :]
+            # SP shell coefficients can be in two formats:
+            # 1. (2, n_primitives) - row 0 for S, row 1 for P
+            # 2. (1, n_primitives) - single set for both S and P (common in WFN files)
+            if shell.coefficients.shape[0] == 2:
+                # Two separate coefficient sets
+                s_coeffs = shell.coefficients[0, :]
+                p_coeffs = shell.coefficients[1, :]
+            else:
+                # Single coefficient set for both S and P
+                coeffs = shell.coefficients.flatten()
+                s_coeffs = coeffs
+                p_coeffs = coeffs
 
             # Add S function
             basis_functions.append({

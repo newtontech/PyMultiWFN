@@ -12,6 +12,7 @@ import warnings
 from typing import List, Optional, Dict, Any
 from pymultiwfn.core.data import Wavefunction, Shell
 from pymultiwfn.core.definitions import ELEMENT_NAMES
+from pymultiwfn.integrals import calculate_overlap_matrix
 
 class WFNLoader:
     """
@@ -461,9 +462,14 @@ class WFNLoader:
         # the actual number of basis functions in the WFN file
         # self.wfn.num_basis = sum(self._shell_num_functions(shell.type) for shell in self.wfn.shells)
 
-        # Set overlap matrix to identity as fallback (with correct size)
+        # Calculate overlap matrix from basis set information
         if self.wfn.num_basis > 0:
-            self.wfn.overlap_matrix = np.eye(self.wfn.num_basis)
+            try:
+                self.wfn.overlap_matrix = calculate_overlap_matrix(self.wfn, use_cache=True, verbose=False)
+            except Exception as e:
+                # Fallback to identity matrix if calculation fails
+                warnings.warn(f"Failed to calculate overlap matrix: {e}. Using identity matrix as fallback.")
+                self.wfn.overlap_matrix = np.eye(self.wfn.num_basis)
 
         # Parse MO coefficients
         self._parse_mo_coefficients_wfn()
