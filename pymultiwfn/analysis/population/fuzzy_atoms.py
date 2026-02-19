@@ -191,13 +191,31 @@ class FuzzyAtomsAnalyzer:
 
         # Normalize weights
         total_weights = np.sum(weights, axis=0)
-        weights = weights / total_weights[np.newaxis, :]
+
+        # Handle zero total weights to avoid NaN
+        # If total_weights is zero, use equal distribution
+        mask = total_weights > 1e-12
+        weights[:, mask] = weights[:, mask] / total_weights[np.newaxis, mask]
+
+        # For points with zero total weight, use equal distribution
+        n_atoms = len(self.wavefunction.atoms)
+        weights[:, ~mask] = 1.0 / n_atoms
 
         return weights
 
     def _becke_step_function(self, w_i: np.ndarray, w_j: np.ndarray) -> np.ndarray:
         """Becke step function for iterative refinement."""
-        mu = (w_i - w_j) / (w_i + w_j)
+        # Avoid division by zero
+        sum_weights = w_i + w_j
+        mask = sum_weights > 1e-12
+
+        # Calculate mu only for valid points
+        mu = np.zeros_like(w_i)
+        mu[mask] = (w_i[mask] - w_j[mask]) / sum_weights[mask]
+
+        # For zero sum, use zero mu
+        mu[~mask] = 0.0
+
         return 1.5 * mu - 0.5 * mu**3
 
     def _hirshfeld_weights(self, points: np.ndarray) -> np.ndarray:
