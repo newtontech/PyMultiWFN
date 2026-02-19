@@ -63,8 +63,9 @@ def calculate_mayer_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
             ps_ij = PS_total[np.ix_(bfs_i, bfs_j)]
             ps_ji = PS_total[np.ix_(bfs_j, bfs_i)]
 
-            # Vectorized calculation: sum of element-wise products
-            accum = np.sum(ps_ij * ps_ji)
+            # Mayer bond order formula: trace(ps_ij @ ps_ji)
+            # This is equivalent to sum_{a in A} sum_{b in B} (PS)_{ab} (PS)_{ba}
+            accum = np.trace(ps_ij @ ps_ji)
             bnd_total[i, j] = accum
             bnd_total[j, i] = accum  # Symmetric matrix
 
@@ -95,14 +96,14 @@ def calculate_mayer_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
                 if not bfs_j:
                     continue
 
-                # Vectorized calculations for alpha and beta
+                # Mayer bond order formula for alpha and beta
                 ps_alpha_ij = PS_alpha[np.ix_(bfs_i, bfs_j)]
                 ps_alpha_ji = PS_alpha[np.ix_(bfs_j, bfs_i)]
-                accum_alpha = np.sum(ps_alpha_ij * ps_alpha_ji)
+                accum_alpha = np.trace(ps_alpha_ij @ ps_alpha_ji)
 
                 ps_beta_ij = PS_beta[np.ix_(bfs_i, bfs_j)]
                 ps_beta_ji = PS_beta[np.ix_(bfs_j, bfs_i)]
-                accum_beta = np.sum(ps_beta_ij * ps_beta_ji)
+                accum_beta = np.trace(ps_beta_ij @ ps_beta_ji)
 
                 bnd_alpha[i, j] = accum_alpha
                 bnd_alpha[j, i] = accum_alpha

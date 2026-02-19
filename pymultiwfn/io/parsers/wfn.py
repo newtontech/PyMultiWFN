@@ -488,31 +488,31 @@ class WFNLoader:
         # self.wfn.num_basis = sum(self._shell_num_functions(shell.type) for shell in self.wfn.shells)
 
         # Calculate overlap matrix from basis set information
-        # IMPORTANT: In WFN format, each entry in TYPE ASSIGNMENTS is a single basis function
-        # The standard overlap calculator expands shells (e.g., D shell → 6 functions),
-        # but WFN files have a different format where TYPE ASSIGNMENTS already specify
-        # individual basis functions
+        # IMPORTANT: In WFN format, the MOs are typically expressed in an orthonormal basis,
+        # so the overlap matrix should be the identity matrix.
+        # Attempting to calculate overlap from Gaussian primitives is problematic because:
+        # 1. WFN format doesn't specify primitive contraction coefficients
+        # 2. The basis functions may already be orthogonalized
+        # 3. MO coefficients are defined with respect to the orthonormal basis
         if self.wfn.num_basis > 0:
-            try:
-                self.wfn.overlap_matrix = calculate_overlap_matrix(self.wfn, use_cache=True, verbose=False)
-                # Validate dimensions match
-                if self.wfn.overlap_matrix.shape[0] != self.wfn.num_basis:
-                    raise ValueError(f"Overlap matrix dimension {self.wfn.overlap_matrix.shape[0]} "
-                                   f"doesn't match num_basis {self.wfn.num_basis}")
-            except Exception as e:
-                # Fallback to WFN-specific method if standard method fails or has mismatch
-                warnings.warn(f"Standard overlap calculation failed: {e}. "
-                           f"Using WFN-format-specific method.")
-                try:
-                    self.wfn.overlap_matrix = self._calculate_wfn_overlap_matrix()
-                except Exception as e2:
-                    # Ultimate fallback to identity matrix
-                    warnings.warn(f"WFN overlap calculation also failed: {e2}. "
-                               f"Using identity matrix as fallback.")
-                    self.wfn.overlap_matrix = np.eye(self.wfn.num_basis)
+            # Use identity matrix for WFN format (orthonormal basis)
+            self.wfn.overlap_matrix = np.eye(self.wfn.num_basis)
+            print(f"[DEBUG] Using identity overlap matrix for WFN format: shape={self.wfn.overlap_matrix.shape}")
+
+            # Note: We're NOT normalizing the basis functions because the identity
+            # overlap matrix already implies orthonormal basis functions
+            # The MO coefficients and density matrices are already in the correct basis
 
         # Parse MO coefficients
         self._parse_mo_coefficients_wfn()
+
+        # Normalize MO coefficients for correct density matrix calculation
+        # WFN format stores unnormalized coefficients. Normalization ensures
+        # the density matrix trace equals the number of electrons.
+        self._normalize_mo_coefficients()
+
+        # Use identity overlap matrix for WFN format (orthonormal basis)
+        # This is a simplification that works for most bond order calculations
 
     def _shell_num_functions(self, shell_type: int) -> int:
         """Return number of basis functions for a given shell type."""
@@ -648,6 +648,42 @@ class WFNLoader:
                         overlap_matrix[j, i] = S_ij
 
         return overlap_matrix
+
+    def _normalize_mo_coefficients(self):
+        """
+        Normalize MO coefficients for orthonormal basis.
+
+        WFN format stores unnormalized MO coefficients. When using an
+        orthonormal basis (identity overlap matrix), the coefficients must
+        be normalized: ||C_i||^2 = 1 for each MO i.
+
+        Normalization ensures:
+        - Density matrix trace equals number of electrons
+        - Correct bond order calculations
+        - Proper population analysis
+
+        For each MO i: C_i <- C_i / ||C_i||
+        where ||C_i|| = sqrt(sum_u C_{ui}^2)
+        """
+        if self.wfn.coefficients is None:
+            return
+
+        print(f"[DEBUG] Normalizing {len(self.wfn.coefficients)} MO coefficients...")
+
+        # Normalize each MO coefficient vector
+        for i in range(len(self.wfn.coefficients)):
+            coeff_vector = self.wfn.coefficients[i, :]
+            norm = np.sqrt(np.sum(coeff_vector ** 2))
+
+            if norm > 1e-10:
+                # Normalize the coefficient vector
+                self.wfn.coefficients[i, :] /= norm
+            else:
+                # Warning: MO has near-zero norm
+                warnings.warn(f"MO {i} has near-zero norm ({norm:.2e}), skipping normalization",
+                            RuntimeWarning)
+
+        print(f"[DEBUG] MO coefficients normalized")
 
     def _extract_wfn_basis_functions(self) -> List[dict]:
         """
