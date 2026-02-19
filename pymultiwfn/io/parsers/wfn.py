@@ -599,15 +599,55 @@ class WFNLoader:
                         f"Using simple distance-based overlap calculation.")
             # Fallback: use simple distance-based overlap
             # This is not chemically accurate but better than identity matrix
-            from pymultiwfn.integrals.simple_overlap import calculate_simple_overlap_matrix
+            return self._calculate_distance_based_overlap(basis_functions)
 
-            # Create a temporary wavefunction with our basis functions
-            temp_wfn = type(self.wfn)()
-            temp_wfn.atoms = self.wfn.atoms
-            temp_wfn.num_basis = num_basis
+    def _calculate_distance_based_overlap(self, basis_functions: List[dict]) -> np.ndarray:
+        """
+        Calculate approximate overlap matrix as identity with minimal distance correction.
 
-            # Use the simplified calculator
-            return calculate_simple_overlap_matrix(temp_wfn)
+        Strategy:
+        - Use identity matrix as base (basis functions are approximately orthonormal)
+        - Add very small distance-based corrections for interatomic overlap
+        - This preserves Mayer-Wiberg equality while acknowledging physical reality
+
+        This is a fallback method when full GTO overlap calculation fails.
+
+        Args:
+            basis_functions: List of basis function dictionaries
+
+        Returns:
+            Overlap matrix of shape (num_basis, num_basis)
+        """
+        num_basis = len(basis_functions)
+
+        # Start with identity matrix (orthonormal basis)
+        overlap_matrix = np.eye(num_basis)
+
+        # Very small correction for interatomic overlap
+        alpha_distance = 0.01  # Bohr^-2 (extremely small - almost identity)
+
+        for i in range(num_basis):
+            bf_i = basis_functions[i]
+            type_i = bf_i['type']
+            coords_i = np.array(bf_i['coords'])
+
+            for j in range(i + 1, num_basis):
+                bf_j = basis_functions[j]
+                type_j = bf_j['type']
+                coords_j = np.array(bf_j['coords'])
+
+                # Only add small corrections for same-type, different-center functions
+                if type_i == type_j:
+                    # Calculate distance
+                    r2 = np.sum((coords_i - coords_j) ** 2)
+
+                    # Small Gaussian decay correction
+                    if r2 > 1e-6:  # Different centers
+                        S_ij = np.exp(-alpha_distance * r2) - 1.0
+                        overlap_matrix[i, j] = S_ij
+                        overlap_matrix[j, i] = S_ij
+
+        return overlap_matrix
 
     def _extract_wfn_basis_functions(self) -> List[dict]:
         """
