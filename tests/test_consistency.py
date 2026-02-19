@@ -162,10 +162,10 @@ class TestConsistencyGradient:
             coefficients=np.array([[1.0]])
         )
 
-        from pymultiwfn.math.gradient import calc_gradient
+        from pymultiwfn.math.gradient import calc_density_gradient
 
         coords = np.array([[0.0, 0.0, 0.0]])
-        gradient = calc_gradient(wfn, coords)
+        gradient = calc_density_gradient(wfn, coords)
 
         # Gradient should be zero at nucleus (for s-orbital)
         np.testing.assert_allclose(gradient, np.zeros((1, 3)), atol=1e-10)
@@ -174,7 +174,7 @@ class TestConsistencyGradient:
         """Test that analytical gradient matches numerical gradient."""
         from pymultiwfn.core.data import Atom, Shell, Wavefunction
         from pymultiwfn.math.density import calc_density
-        from pymultiwfn.math.gradient import calc_gradient
+        from pymultiwfn.math.gradient import calc_density_gradient
 
         atom = Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)
         shell = Shell(
@@ -200,7 +200,7 @@ class TestConsistencyGradient:
         coords = np.array([[1.0, 0.5, -0.3]])
 
         # Calculate analytical gradient
-        grad_analytical = calc_gradient(wfn, coords)
+        grad_analytical = calc_density_gradient(wfn, coords)
 
         # Calculate numerical gradient
         h = 1e-5
