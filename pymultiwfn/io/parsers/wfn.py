@@ -653,13 +653,19 @@ class WFNLoader:
         """
         Extract basis functions from WFN-format data.
 
-        This method extracts basis functions directly from the WFN file's
+        This method extracts basis functions directly from WFN file's
         CENTRE ASSIGNMENTS, TYPE ASSIGNMENTS, and EXPONENTS, creating
         one basis function per entry.
 
         For WFN format:
-        - Each entry in TYPE ASSIGNMENTS is a basis function
-        - Type values: 1=S, 2=P, 3=SP, 4=D, 5=5D, 6=6D, 7=F, 8=5F, 9=6F, 10=F
+        - Each entry in TYPE ASSIGNMENTS is a single basis function
+        - Type values represent specific basis function components:
+          - Type 1 = S
+          - Type 2 = Px
+          - Type 3 = Py
+          - Type 4 = Pz
+          - Type 5-10 = D components (xx, yy, zz, xy, xz, yz)
+          - Type 11-20 = F components
         - Each basis function has its own exponent and centre
 
         Returns:
@@ -678,21 +684,52 @@ class WFNLoader:
 
         basis_functions = []
 
-        # Map WFN shell types to our internal shell types
-        # WFN: 1=S, 2=P, 3=SP, 4=D, 5=5D, 6=6D, 7=F, 8=5F, 9=6F, 10=F
-        # Our: S=0, P=1, SP=-1, D=2, F=3
-        wfn_to_internal_type = {
+        # Map WFN types directly to overlap calculation 'type' field
+        # In overlap.py, type field uses:
+        # - 0 = S
+        # - 1 = Px, 2 = Py, 3 = Pz
+        # - 4 = D_xx, 5 = D_yy, 6 = D_zz, 7 = D_xy, 8 = D_xz, 9 = D_yz
+        # - 10-19 = F components
+        wfn_type_to_overlap_type = {
+            1: 0,   # S
+            2: 1,   # Px
+            3: 2,   # Py
+            4: 3,   # Pz
+            5: 4,   # D_xx
+            6: 5,   # D_yy
+            7: 6,   # D_zz
+            8: 7,   # D_xy
+            9: 8,   # D_xz
+            10: 9,  # D_yz
+            11: 10, # F_xxx
+            12: 11, # F_yyy
+            13: 12, # F_zzz
+            14: 13, # F_xxy
+            15: 14, # F_xxz
+            16: 15, # F_xyy
+            17: 16, # F_yyz
+            18: 17, # F_xzz
+            19: 18, # F_yzz
+            20: 19, # F_xyz
+        }
+
+        # Map WFN types to shell types (for grouping)
+        # - S = 0, P = 1, D = 2, F = 3
+        wfn_type_to_shell_type = {
             1: 0,   # S
             2: 1,   # P
-            3: -1,  # SP
-            4: 2,   # D
-            5: 2,   # 5D (treat as D)
-            6: 2,   # 6D (treat as D)
-            7: 3,   # F
-            8: 3,   # 5F (treat as F)
-            9: 3,   # 6F (treat as F)
-            10: 3,  # F
+            3: 1,   # P
+            4: 1,   # P
+            5: 2,   # D
+            6: 2,   # D
+            7: 2,   # D
+            8: 2,   # D
+            9: 2,   # D
+            10: 2,  # D
         }
+        # Add F types (11-20) to shell type mapping
+        for wfn_type in range(11, 21):
+            wfn_type_to_shell_type[wfn_type] = 3  # F
 
         # Counter for generating unique basis function indices
         bf_idx = 0
@@ -704,89 +741,24 @@ class WFNLoader:
 
             atom = self.wfn.atoms[centre_idx]
             coords = tuple(atom.coord)
-            internal_type = wfn_to_internal_type.get(wfn_type, wfn_type - 1)
 
-            # Create basis function based on type
-            if wfn_type == 1:  # S
-                basis_functions.append({
-                    'type': 0,  # S
-                    'center': centre_idx,
-                    'coords': coords,
-                    'exponents': np.array([exp]),
-                    'coefficients': np.array([1.0]),
-                    'shell_type': 0,
-                    'shell_idx': i,
-                    'bf_idx': bf_idx,
-                })
-                bf_idx += 1
+            # Map WFN type to overlap calculation type
+            overlap_type = wfn_type_to_overlap_type.get(wfn_type, wfn_type - 1)
+            shell_type = wfn_type_to_shell_type.get(wfn_type, 0)
 
-            elif wfn_type == 2:  # P
-                # P shell has 3 components: Px, Py, Pz
-                # But in WFN format, each TYPE=2 entry might represent
-                # ONE specific component. Since we don't know which,
-                # we'll assume it's Px (type 1) for consistency
-                basis_functions.append({
-                    'type': 1,  # Px
-                    'center': centre_idx,
-                    'coords': coords,
-                    'exponents': np.array([exp]),
-                    'coefficients': np.array([1.0]),
-                    'shell_type': 1,
-                    'shell_idx': i,
-                    'bf_idx': bf_idx,
-                })
-                bf_idx += 1
-
-            elif wfn_type == 3:  # SP
-                # SP shell has 4 components: S + Px + Py + Pz
-                # In WFN format, TYPE=3 might represent one of these
-                # For simplicity, treat as S component
-                basis_functions.append({
-                    'type': 0,  # S component of SP shell
-                    'center': centre_idx,
-                    'coords': coords,
-                    'exponents': np.array([exp]),
-                    'coefficients': np.array([1.0]),
-                    'shell_type': -1,
-                    'shell_idx': i,
-                    'bf_idx': bf_idx,
-                })
-                bf_idx += 1
-
-            elif wfn_type in [4, 5, 6]:  # D (various types)
-                # D shell has 6 components: xx, yy, zz, xy, xz, yz
-                # Treat as xx component (type 4) for consistency
-                basis_functions.append({
-                    'type': 4,  # D_xx
-                    'center': centre_idx,
-                    'coords': coords,
-                    'exponents': np.array([exp]),
-                    'coefficients': np.array([1.0]),
-                    'shell_type': 2,
-                    'shell_idx': i,
-                    'bf_idx': bf_idx,
-                })
-                bf_idx += 1
-
-            elif wfn_type in [7, 8, 9, 10]:  # F (various types)
-                # F shell has 10 components
-                # Treat as xxx component (type 10) for consistency
-                basis_functions.append({
-                    'type': 10,  # F_xxx
-                    'center': centre_idx,
-                    'coords': coords,
-                    'exponents': np.array([exp]),
-                    'coefficients': np.array([1.0]),
-                    'shell_type': 3,
-                    'shell_idx': i,
-                    'bf_idx': bf_idx,
-                })
-                bf_idx += 1
-
-            else:
-                # Unknown type, skip or raise error
-                warnings.warn(f"Unknown WFN type {wfn_type} at index {i}. Skipping.")
-                continue
+            # Create basis function dictionary
+            basis_functions.append({
+                'type': overlap_type,
+                'center': centre_idx,
+                'coords': coords,
+                'exponents': np.array([exp]),
+                'coefficients': np.array([1.0]),
+                'shell_type': shell_type,
+                'shell_idx': i,
+                'bf_idx': bf_idx,
+            })
+            bf_idx += 1
 
         return basis_functions
+
 
