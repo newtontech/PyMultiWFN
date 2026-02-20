@@ -1,7 +1,6 @@
 import numpy as np
-from typing import List, Dict, Tuple, Optional, Any
+from typing import List, Dict, Any
 from itertools import combinations
-from pymultiwfn.core.data import Wavefunction
 
 
 def search_adndp_candidates(

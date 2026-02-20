@@ -9,7 +9,7 @@ Molden format variants from different quantum chemistry programs.
 import re
 import numpy as np
 import warnings
-from typing import List, Optional, Dict, Any, Tuple
+from typing import List, Dict, Any
 from pymultiwfn.core.data import Wavefunction, Shell
 from pymultiwfn.core.definitions import ELEMENT_NAMES
 

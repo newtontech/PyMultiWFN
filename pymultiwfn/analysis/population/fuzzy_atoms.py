@@ -13,7 +13,7 @@ Based on the original Multiwfn fuzzy.f90 Fortran implementation.
 """
 
 import numpy as np
-from typing import Dict, List, Tuple, Optional, Union
+from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 
 from pymultiwfn.core.data import Wavefunction

@@ -9,9 +9,8 @@ the original Fortran mathematical routines from Multiwfn.
 
 import numpy as np
 import scipy.special
-from scipy import integrate, optimize, interpolate
-from typing import Tuple, Optional, Union, Callable
-import warnings
+from scipy import interpolate
+from typing import Tuple, Union, Callable
 
 # Physical constants and conversion factors
 PI = np.pi

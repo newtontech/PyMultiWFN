@@ -6,9 +6,7 @@ including loading, saving, and format conversion for various quantum chemistry f
 """
 
 import os
-import warnings
-from typing import Dict, Any, Optional, List
-from pathlib import Path
+from typing import Dict, Any, Optional
 
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.io import load, get_supported_formats, validate_file

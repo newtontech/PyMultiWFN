@@ -4,7 +4,7 @@ Defines Atom, BasisSet, and Wavefunction classes.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict
 import numpy as np
 
 

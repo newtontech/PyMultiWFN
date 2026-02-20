@@ -7,6 +7,5 @@ and analysis results.
 """
 
 from .main_gui import MultiwfnGUI
-from .widgets import *
 
 __all__ = ["MultiwfnGUI"]

@@ -3,7 +3,6 @@ Parser for Gaussian Cube files (.cub, .cube).
 Cube format is used for volumetric data such as electron density, electrostatic potential, etc.
 """
 
-import re
 import numpy as np
 from pymultiwfn.core.data import Wavefunction
 

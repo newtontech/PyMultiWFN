@@ -1,6 +1,6 @@
 import numpy as np
-from typing import List, Dict, Tuple, Any, Optional
-from scipy.linalg import eigh, fractional_matrix_power
+from typing import List, Dict, Tuple, Any
+from scipy.linalg import eigh
 
 from pymultiwfn.core.data import Wavefunction
 

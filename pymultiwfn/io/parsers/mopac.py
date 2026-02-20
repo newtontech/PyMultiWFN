@@ -3,7 +3,6 @@ Parser for MOPAC input files (.mop, .MOP).
 MOPAC is a semi-empirical quantum chemistry program.
 """
 
-import numpy as np
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
 

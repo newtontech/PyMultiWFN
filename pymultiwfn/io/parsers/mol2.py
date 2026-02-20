@@ -3,7 +3,6 @@ Parser for Tripos Mol2 files (.mol2).
 Mol2 format is a chemical file format developed by Tripos Inc.
 """
 
-import numpy as np
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
 

@@ -6,7 +6,6 @@ for testing purposes when the full implementation is not available.
 """
 
 import numpy as np
-from typing import List, Tuple
 from ..core.data import Wavefunction
 
 

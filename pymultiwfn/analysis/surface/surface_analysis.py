@@ -9,7 +9,7 @@ improved Marching Tetrahedra algorithm", J. Mol. Graph. Model., 38, 314-323 (201
 """
 
 import numpy as np
-from typing import List, Tuple, Optional, Dict, Any, Union
+from typing import List, Tuple, Optional, Dict, Any
 from enum import Enum
 from dataclasses import dataclass
 

@@ -7,13 +7,10 @@ including isosurfaces, orbital plots, and related properties.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import plotly.graph_objects as go
-import plotly.express as px
-from typing import List, Dict, Tuple, Optional, Union
+from typing import Dict, Tuple, Optional
 
-from ..core.data import Wavefunction, Atom
-from ..math.basis import evaluate_basis
+from ..core.data import Wavefunction
 
 
 class OrbitalVisualizer:

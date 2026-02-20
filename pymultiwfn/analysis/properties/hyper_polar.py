@@ -9,10 +9,8 @@ This module implements various (hyper)polarizability analyses including:
 """
 
 import numpy as np
-from typing import List, Dict, Tuple, Optional, Union
+from typing import List, Dict, Optional, Union
 import re
-from pathlib import Path
-import itertools
 
 from ...core.data import Wavefunction
 

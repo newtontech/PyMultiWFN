@@ -9,7 +9,7 @@ improved Marching Tetrahedra algorithm", J. Mol. Graph. Model., 38, 314-323 (201
 """
 
 import numpy as np
-from typing import Tuple, List, Optional
+from typing import Tuple, Optional
 from dataclasses import dataclass
 
 # Tetrahedron vertex configurations for cubic cell decomposition

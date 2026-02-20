@@ -4,14 +4,12 @@ GUI Widgets for PyMultiWFN
 This module contains various GUI widgets used in the main interface.
 """
 
-import numpy as np
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
     QSlider,
     QLabel,
-    QSpinBox,
     QDoubleSpinBox,
     QPushButton,
     QComboBox,
@@ -20,10 +18,8 @@ from PyQt5.QtWidgets import (
     QGridLayout,
     QProgressBar,
     QFileDialog,
-    QMessageBox,
 )
 from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QFont
 
 
 class OrbitalSelector(QWidget):

@@ -3,10 +3,7 @@ Parser for GAMESS input files (.gms, .dat).
 GAMESS (General Atomic and Molecular Electronic Structure System) input format.
 """
 
-import re
-import numpy as np
 from pymultiwfn.core.data import Wavefunction
-from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
 
 
 class GMSLoader:

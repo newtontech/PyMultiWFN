@@ -4,7 +4,6 @@ Fixed WFN parser that correctly stores centre_assignments for basis function ind
 
 from pymultiwfn.io.parsers.wfn import WFNLoader
 from pymultiwfn.core.data import Wavefunction
-import numpy as np
 
 
 class WFNLoaderFixed(WFNLoader):

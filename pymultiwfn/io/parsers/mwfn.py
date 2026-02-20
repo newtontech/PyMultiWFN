@@ -3,10 +3,7 @@ Parser for Multiwfn format files (.mwfn).
 MWFN format is Multiwfn's native format.
 """
 
-import re
-import numpy as np
-from pymultiwfn.core.data import Wavefunction, Shell
-from pymultiwfn.core.definitions import ELEMENT_NAMES
+from pymultiwfn.core.data import Wavefunction
 
 
 class MWFNLoader:
@@ -54,4 +51,3 @@ class MWFNLoader:
 
         # For now, create a minimal implementation
         # Full implementation would need to know the exact MWFN format specification
-        pass

@@ -3,9 +3,7 @@ Parser for Turbomole coordinate files.
 Turbomole is a quantum chemistry program package.
 """
 
-import numpy as np
 from pymultiwfn.core.data import Wavefunction
-from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
 
 
 class TurbomoleLoader:

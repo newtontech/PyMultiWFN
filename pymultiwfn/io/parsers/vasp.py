@@ -50,7 +50,6 @@ class POSCARLoader(VASPParser):
 
             # Parse atom types and positions (simplified)
             # Full implementation would handle all POSCAR variants
-            pass
 
         return self.wfn
 

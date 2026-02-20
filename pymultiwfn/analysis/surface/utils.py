@@ -6,9 +6,8 @@ including mathematical operations, data processing, and visualization helpers.
 """
 
 import numpy as np
-from typing import Tuple, List, Optional, Dict, Any, Union
+from typing import Tuple, List, Optional, Dict
 from scipy.spatial import cKDTree
-from scipy.interpolate import RegularGridInterpolator
 
 from .surface_analysis import SurfaceData
 

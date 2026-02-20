@@ -4,7 +4,7 @@ Vectorized implementation of Gaussian Type Orbitals (GTO) evaluation.
 """
 
 import numpy as np
-from pymultiwfn.core.data import Wavefunction, Shell
+from pymultiwfn.core.data import Wavefunction
 
 
 def evaluate_basis(wfn: Wavefunction, coords: np.ndarray) -> np.ndarray:

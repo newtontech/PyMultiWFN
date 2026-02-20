@@ -7,10 +7,9 @@ and charge transfer analysis.
 """
 
 import numpy as np
-from typing import List, Optional, Dict, Tuple, Union, Any
+from typing import List, Optional, Dict, Tuple
 from dataclasses import dataclass, field
 from enum import Enum
-import warnings
 import re
 
 from ...core.data import Wavefunction
@@ -328,7 +327,6 @@ class ExcitationLoader:
         """Extract MO transitions from ORCA output (simplified)."""
         # Simplified ORCA transition extraction
         # Full implementation would parse the "SINGLE EXCITATIONS" section
-        pass
 
 
 class ExcitationAnalyzer:

@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List, Tuple, Optional, Dict, Any
+from typing import List, Dict, Any
 
 from pymultiwfn.core.data import Wavefunction
 from .mayer import calculate_mayer_bond_order  # To reuse Mayer BO calculation

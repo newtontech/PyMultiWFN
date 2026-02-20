@@ -98,7 +98,6 @@ def _evaluate_basis_gradient_all(wfn: Wavefunction, coords: np.ndarray) -> np.nd
                   grad_phi[:, 1, :] = dφ/dy
                   grad_phi[:, 2, :] = dφ/dz
     """
-    from pymultiwfn.math.basis import evaluate_basis
 
     n_points = coords.shape[0]
     n_basis = wfn.num_basis
@@ -239,7 +238,6 @@ def _evaluate_basis_laplacian_all(wfn: Wavefunction, coords: np.ndarray) -> np.n
     Returns:
         lap_phi: (N_points, N_basis) array of Laplacian values.
     """
-    from pymultiwfn.math.basis import evaluate_basis
 
     n_points = coords.shape[0]
     n_basis = wfn.num_basis

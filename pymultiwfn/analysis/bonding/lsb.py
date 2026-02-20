@@ -6,12 +6,11 @@ using real-space functions and fuzzy atomic partitioning methods.
 """
 
 import numpy as np
-from typing import Tuple, Optional, Dict, List
+from typing import Tuple, List
 from dataclasses import dataclass
 
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.math.density import calc_density as calculate_electron_density
-from pymultiwfn.math.basis import evaluate_basis as evaluate_basis_functions
 
 
 @dataclass

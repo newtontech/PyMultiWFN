@@ -13,12 +13,12 @@ broadening functions (Gaussian, Lorentzian, Pseudo-Voigt) and fragment definitio
 """
 
 import numpy as np
-from typing import List, Tuple, Optional, Dict, Union, Callable
+from typing import List, Optional, Dict, Union
 from enum import Enum
 from dataclasses import dataclass, field
 
 from pymultiwfn.core.data import Wavefunction
-from pymultiwfn.core.constants import BOHR_TO_ANGSTROM, AU_TO_EV
+from pymultiwfn.core.constants import AU_TO_EV
 
 
 class BroadeningFunction(Enum):

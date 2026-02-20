@@ -24,7 +24,7 @@ Future enhancements:
 import numpy as np
 from typing import Tuple, List, Dict
 from functools import lru_cache
-from ..core.data import Wavefunction, Shell, Atom
+from ..core.data import Wavefunction
 
 # Cache for primitive overlap calculations
 _cache_max_size = 256

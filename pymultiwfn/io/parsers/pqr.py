@@ -3,7 +3,6 @@ Parser for PQR files (.pqr, .PQR).
 PQR format is similar to PDB but includes partial charges and radii.
 """
 
-import numpy as np
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
 

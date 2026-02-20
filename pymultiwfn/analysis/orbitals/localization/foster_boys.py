@@ -3,7 +3,7 @@ Foster-Boys orbital localization.
 """
 
 import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List
 from pymultiwfn.core.data import Wavefunction
 
 

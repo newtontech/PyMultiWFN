@@ -7,7 +7,6 @@ replicating the functionality of the original GUI.f90 from Multiwfn.
 
 import sys
 import os
-import numpy as np
 from PyQt5.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -15,8 +14,6 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QSplitter,
-    QMenuBar,
-    QMenu,
     QAction,
     QToolBar,
     QStatusBar,
@@ -27,8 +24,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QFileDialog,
 )
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QThread
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtCore import Qt, pyqtSignal, QThread
 
 # PyMultiWFN imports
 from ..molecular import MolecularVisualizer
@@ -44,7 +40,6 @@ from .widgets import (
 )
 
 # Core imports
-from ...core.data import Wavefunction
 from ...io.loader import load_wavefunction
 
 
@@ -567,7 +562,6 @@ class MultiwfnGUI(QMainWindow):
     def on_view_changed(self, view_params):
         """Handle view parameter changes"""
         # Update view for all visualizations
-        pass
 
     def visualize_molecule(self):
         """Visualize molecular structure"""

@@ -3,7 +3,7 @@ Becke population analysis for orbital composition.
 """
 
 import numpy as np
-from typing import Dict, List, Optional
+from typing import Dict
 from pymultiwfn.core.data import Wavefunction
 
 

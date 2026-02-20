@@ -3,9 +3,7 @@ Parser for MDL Mol files (.mol, .sdf).
 MDL Mol format is a chemical file format for storing molecular information.
 """
 
-import numpy as np
 from pymultiwfn.core.data import Wavefunction
-from pymultiwfn.core.definitions import ELEMENT_NAMES
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
 
 

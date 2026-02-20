@@ -8,14 +8,12 @@ features from Multiwfn's GUI and display modules.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import plotly.graph_objects as go
-import plotly.express as px
-from typing import List, Dict, Tuple, Optional, Union
+from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
 
-from ..core.data import Wavefunction, Atom
+from ..core.data import Wavefunction
 from ..config import Config
 
 

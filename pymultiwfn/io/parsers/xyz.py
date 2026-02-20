@@ -3,8 +3,6 @@ Parser for XYZ coordinate files (.xyz, .XYZ).
 XYZ format is a simple text format for molecular coordinates.
 """
 
-import re
-import numpy as np
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.core.definitions import ELEMENT_NAMES
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR

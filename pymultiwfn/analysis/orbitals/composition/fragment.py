@@ -3,7 +3,7 @@ Fragment analysis for orbital composition.
 """
 
 import numpy as np
-from typing import Dict, List, Optional, Union
+from typing import Dict, List
 from pymultiwfn.core.data import Wavefunction
 
 

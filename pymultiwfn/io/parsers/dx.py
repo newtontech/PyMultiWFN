@@ -3,7 +3,6 @@ Parser for OpenDX format files (.dx).
 OpenDX format is used for volumetric data visualization.
 """
 
-import re
 import numpy as np
 from pymultiwfn.core.data import Wavefunction
 

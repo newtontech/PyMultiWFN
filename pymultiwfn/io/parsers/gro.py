@@ -3,9 +3,8 @@ Parser for GROMACS coordinate files (.gro).
 GRO format is used by GROMACS molecular dynamics software.
 """
 
-import numpy as np
 from pymultiwfn.core.data import Wavefunction
-from pymultiwfn.core.constants import ANGSTROM_TO_BOHR, NM_TO_BOHR
+from pymultiwfn.core.constants import NM_TO_BOHR
 
 
 class GROLoader:

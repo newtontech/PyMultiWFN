@@ -8,8 +8,6 @@ Optimized with:
 """
 
 import numpy as np
-import functools
-from typing import Optional
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.math.basis import evaluate_basis
 

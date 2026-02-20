@@ -9,9 +9,8 @@ related formats with comprehensive error handling.
 import re
 import numpy as np
 import warnings
-from typing import List, Optional, Dict, Any
-from pymultiwfn.core.data import Wavefunction, Shell
-from pymultiwfn.core.definitions import ELEMENT_NAMES
+from typing import Dict, Any
+from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
 
 

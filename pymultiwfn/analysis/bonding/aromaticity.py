@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List, Dict, Any, Tuple, Optional
+from typing import List
 from pymultiwfn.core.data import Wavefunction
 
 # Reference parameters for HOMA

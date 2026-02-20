@@ -3,9 +3,8 @@ Hirshfeld population analysis for orbital composition.
 """
 
 import numpy as np
-from typing import Dict, List, Optional, Tuple
+from typing import Dict
 from pymultiwfn.core.data import Wavefunction
-from pymultiwfn.math.density import calc_density
 
 
 class HirshfeldAnalyzer:

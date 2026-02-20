@@ -3,8 +3,6 @@ Parser for Gaussian input files (.gjf, .com).
 Gaussian input format for quantum chemistry calculations.
 """
 
-import re
-import numpy as np
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.core.definitions import ELEMENT_NAMES
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR

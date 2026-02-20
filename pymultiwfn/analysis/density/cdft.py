@@ -12,7 +12,7 @@ This module implements various CDFT analysis methods including:
 """
 
 import numpy as np
-from typing import Dict, List, Tuple, Optional, Union
+from typing import Dict, List, Optional
 from ...core.data import Wavefunction
 from ...math.density import calc_density
 from ...math.basis import eval_basis_functions

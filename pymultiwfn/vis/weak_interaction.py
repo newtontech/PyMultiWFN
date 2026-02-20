@@ -13,13 +13,12 @@ References:
 """
 
 import numpy as np
-from typing import List, Tuple, Optional, Dict, Union
+from typing import List, Tuple, Optional, Dict
 from dataclasses import dataclass
 from enum import Enum
 
 from ..core.data import Wavefunction
 from ..math.density import calc_density
-from ..math.basis import evaluate_basis
 from ..config import Config
 
 

@@ -1,6 +1,6 @@
 import numpy as np
 from pymultiwfn.core.data import Wavefunction
-from typing import Tuple, Optional, Dict
+from typing import Tuple, Optional
 
 
 def calculate_mulliken_population_and_charges(
