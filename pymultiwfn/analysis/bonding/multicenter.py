@@ -82,7 +82,6 @@ def calculate_multicenter_bond_order_do(
     # Fortran atom indices are 1-based, Python are 0-based.
     # Fortran (iatm, jatm, katm) correspond to indices in atom_indices list.
 
-    current_mat = ps_matrix  # This will alternate between mat_a and mat_b conceptually
     previous_mat = ps_matrix  # Used for the first iteration
 
     # Iterate nbndcen - 2 times (from 1 to nbndcen-2 in Fortran's icontract)

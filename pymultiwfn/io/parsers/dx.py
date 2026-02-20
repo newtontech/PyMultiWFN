@@ -60,7 +60,6 @@ class DXLoader:
     def _parse_grid_data(self, lines, start_idx):
         """Parse volumetric grid data from DX file."""
         grid_data = []
-        points = []
 
         # Skip grid position lines and find actual data
         line_idx = start_idx

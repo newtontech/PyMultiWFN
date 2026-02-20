@@ -65,7 +65,6 @@ class MOL2Loader:
 
             try:
                 # Mol2 format: atom_id atom_name x y z atom_type [...]
-                atom_id = int(parts[0])
                 atom_name = parts[1]
                 x = float(parts[2]) * ANGSTROM_TO_BOHR
                 y = float(parts[3]) * ANGSTROM_TO_BOHR

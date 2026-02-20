@@ -72,7 +72,7 @@ class ORCALoader:
                     num_atoms = int(lines[i].strip().split()[0])
                     i += 1
                 except (ValueError, IndexError):
-                    num_atoms = None
+                    pass
 
                 # Read coordinate lines
                 while i < len(lines):

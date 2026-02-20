@@ -156,7 +156,6 @@ def _evaluate_basis_gradient_all(wfn: Wavefunction, coords: np.ndarray) -> np.nd
         # SP shell (type=-1)
         elif shell.type == -1:
             # S component
-            radial_s = _eval_contraction(shell.exponents, shell.coefficients[0], r2)
             grad_radial_s = _eval_contraction_gradient(
                 shell.exponents, shell.coefficients[0], r2, r_vec
             )
@@ -493,7 +492,6 @@ def _contract_laplacian(
     n_points = phi.shape[0]
 
     # Compute P * lap_phi (N_basis, N_points)
-    P_lap = P @ lap_phi.T
 
     # First term: Σ_ij P_ij ∇²φ_i φ_j
     term1 = np.einsum("ij,ji->i", P, lap_phi.T * phi.T)

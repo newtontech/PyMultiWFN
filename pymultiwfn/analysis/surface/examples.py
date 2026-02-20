@@ -304,10 +304,6 @@ def run_all_examples():
 
     try:
         # Run examples
-        water_surface = example_water_molecule()
-        hirshfeld_surface = example_hirshfeld_surface()
-        mapped_surface = example_surface_property_mapping()
-        comparison_results = example_surface_comparison()
         vertices, triangles = example_direct_isosurface_extraction()
 
         print("\n" + "=" * 50)

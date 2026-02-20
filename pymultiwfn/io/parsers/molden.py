@@ -137,7 +137,6 @@ class MoldenLoader:
                 # Try different atom formats
                 if parts[0].isdigit() and len(parts) >= 6:
                     # Format: index element_symbol atomic_number x y z
-                    index = int(parts[0])
                     element = parts[1]
                     atomic_num = int(float(parts[2]))
                     x, y, z_coord = float(parts[3]), float(parts[4]), float(parts[5])

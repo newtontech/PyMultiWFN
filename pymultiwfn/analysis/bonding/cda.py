@@ -31,8 +31,6 @@ def calculate_cda(
         raise ValueError("At least two fragments are required for CDA.")
 
     frag1_idx, frag2_idx = fragment_indices
-    frag1 = fragments[frag1_idx]
-    frag2 = fragments[frag2_idx]
 
     # Check basis set consistency
     total_basis_fragments = sum(f.num_basis for f in fragments)

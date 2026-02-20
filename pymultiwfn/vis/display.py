@@ -189,7 +189,6 @@ class Plotter:
             x, y = x[mask], y[mask]
 
         # Create scatter plot with density coloring
-        scatter = ax.scatter(x, y, c=color, alpha=alpha, s=1, rasterized=True)
 
         # Set labels with TeX support if provided
         if xlabel_tex:

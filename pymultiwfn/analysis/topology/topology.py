@@ -81,7 +81,6 @@ class TopologyAnalyzer:
         print(
             f"Finding critical points within {grid_points.shape[0]} grid points (placeholder)..."
         )
-        gradients = self._calculate_electron_density_gradient(grid_points)
 
         # Placeholder for actual critical point finding logic
         # This would involve iterating through grid points, checking gradient magnitude,

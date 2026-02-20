@@ -143,7 +143,6 @@ class ExcitationLoader:
         for match in state_matches:
             state_num = int(match[0])
             symmetry = match[1].strip()
-            energy_au = float(match[2])
             energy_ev = float(match[3])
             oscillator_strength = float(match[5])
 
@@ -398,10 +397,6 @@ class ExcitationAnalyzer:
 
         # Calculate dipole integrals (simplified - should use precomputed integrals)
         # This is a placeholder implementation
-        nbasis = self.wavefunction.num_basis
-        dipole_x = np.zeros((nbasis, nbasis))
-        dipole_y = np.zeros((nbasis, nbasis))
-        dipole_z = np.zeros((nbasis, nbasis))
 
         # In a full implementation, these would be the dipole integral matrices
         # For now, use a simple approximation

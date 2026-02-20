@@ -154,8 +154,6 @@ def calculate_orbital_perturbed_mayer_bond_order(
 
     wavefunction.calculate_density_matrices()  # Ensure density matrices and occupations are inferred
 
-    num_basis = wavefunction.num_basis
-    atomic_basis_indices = wavefunction.get_atomic_basis_indices()
 
     # Calculate the unperturbed Mayer bond order (total, alpha, beta)
     (

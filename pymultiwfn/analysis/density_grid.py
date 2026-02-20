@@ -56,7 +56,6 @@ def compute_density_grid(wfn, grid_points: np.ndarray) -> np.ndarray:
         Electron density values at each grid point.
     """
     # Evaluate basis functions on the grid
-    phi = evaluate_basis(wfn, grid_points)
     # Compute density using the density module
     rho = calc_density(wfn, grid_points)
     return rho

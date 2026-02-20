@@ -270,8 +270,6 @@ class FuzzyAtomsAnalyzer:
         Returns:
             Array of shape (n_atoms, n_points) containing atomic weights
         """
-        n_atoms = len(self.wavefunction.atoms)
-        n_points = points.shape[0]
 
         if self.config.partition_method == "becke":
             return self._becke_weights(points)
@@ -419,7 +417,6 @@ class FuzzyAtomsAnalyzer:
             mo_indices = list(range(self.wavefunction.n_mos))
 
         n_mos = len(mo_indices)
-        n_atoms = len(self.wavefunction.atoms)
 
         # Generate integration grid
         grid_points, grid_weights = self._generate_integration_grid()

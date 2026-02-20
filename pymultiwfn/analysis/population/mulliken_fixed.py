@@ -36,7 +36,6 @@ def calculate_mulliken_population_and_charges(
         wavefunction.calculate_density_matrices()
 
     num_atoms = wavefunction.num_atoms
-    num_basis = wavefunction.num_basis
 
     atom_to_bfs_map = wavefunction.get_atomic_basis_indices()
 

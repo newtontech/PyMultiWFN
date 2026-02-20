@@ -255,9 +255,6 @@ class CIFLoader:
         gamma = self.wfn.crystal_info.get("gamma", 90.0)
 
         # Convert angles to radians
-        alpha_rad = np.radians(alpha)
-        beta_rad = np.radians(beta)
-        gamma_rad = np.radians(gamma)
 
         # Build transformation matrix (simplified for orthogonal cells)
         # For proper crystallographic conversion, this would need more complex matrix math

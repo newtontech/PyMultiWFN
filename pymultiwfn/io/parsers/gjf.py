@@ -61,7 +61,6 @@ class GJFLoader:
             try:
                 charge_mult = clean_lines[coord_start - 1].split()
                 if len(charge_mult) >= 2:
-                    charge = int(charge_mult[0])
                     self.wfn.multiplicity = int(charge_mult[1])
                     # Adjust electron count
                     self.wfn.num_electrons = None  # Will be calculated from atoms

@@ -428,7 +428,6 @@ class MolecularVisualizer:
 
         # Create heatmap
         fig, ax = plt.subplots(figsize=(10, 8))
-        im = ax.imshow(distance_matrix, cmap="viridis")
 
         # Set ticks and labels
         ax.set_xticks(np.arange(n_atoms))
@@ -442,7 +441,7 @@ class MolecularVisualizer:
         # Loop over data dimensions and create text annotations
         for i in range(n_atoms):
             for j in range(n_atoms):
-                text = ax.text(
+                ax.text(
                     j,
                     i,
                     f"{distance_matrix[i, j]:.2f}",

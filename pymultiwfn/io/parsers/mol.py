@@ -44,7 +44,6 @@ class MOLLoader:
 
         try:
             num_atoms = int(counts_line[0:3])
-            num_bonds = int(counts_line[3:6])
         except ValueError:
             raise ValueError("Cannot parse atom and bond counts from MOL file")
 

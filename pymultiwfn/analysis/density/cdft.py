@@ -168,7 +168,6 @@ def calculate_condensed_fukui_functions(
     q_Np = calculate_hirshfeld_charges(wfn_Np)
     q_Nm = calculate_hirshfeld_charges(wfn_Nm)
 
-    n_atoms = len(q_N)
 
     # Calculate condensed Fukui functions
     f_minus = (q_Nm - q_N) / degeneracy_m

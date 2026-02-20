@@ -18,7 +18,6 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarr
         - 'beta': Beta Mayer bond order matrix (for unrestricted), None if restricted
     """
     num_atoms = wavefunction.num_atoms
-    num_basis = wavefunction.num_basis
 
     if wavefunction.overlap_matrix is None:
         raise ValueError(

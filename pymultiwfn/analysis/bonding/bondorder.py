@@ -530,7 +530,6 @@ def calculate_fuzzy_bond_order(
     from ..population.fuzzy_atoms import calculate_fuzzy_population
 
     # Calculate fuzzy atomic populations
-    fuzzy_pops = calculate_fuzzy_population(wfn)
 
     if method.lower() == "mayer":
         bond_results = calculate_mayer_bond_order(wfn)
