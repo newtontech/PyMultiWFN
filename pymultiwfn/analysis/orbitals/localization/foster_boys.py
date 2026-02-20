@@ -25,13 +25,20 @@ class FosterBoysLocalizer:
         self.wfn = wavefunction
 
         if self.wfn.coefficients is None:
-            raise ValueError("MO coefficients are required for Foster-Boys localization")
+            raise ValueError(
+                "MO coefficients are required for Foster-Boys localization"
+            )
 
         # Note: In practice, dipole moment integrals would be needed
         # For now, we'll use a simplified approach
 
-    def localize_orbitals(self, orbital_indices: List[int], max_iterations: int = 100,
-                         convergence_threshold: float = 1e-8, is_beta: bool = False) -> Dict:
+    def localize_orbitals(
+        self,
+        orbital_indices: List[int],
+        max_iterations: int = 100,
+        convergence_threshold: float = 1e-8,
+        is_beta: bool = False,
+    ) -> Dict:
         """
         Localize a set of molecular orbitals using Foster-Boys method.
 
@@ -108,10 +115,10 @@ class FosterBoysLocalizer:
             full_coefficients[local_idx, :] = C_local[idx, :]
 
         return {
-            'localized_coefficients': full_coefficients,
-            'transformation_matrix': U,
-            'iterations': iteration + 1,
-            'converged': converged
+            "localized_coefficients": full_coefficients,
+            "transformation_matrix": U,
+            "iterations": iteration + 1,
+            "converged": converged,
         }
 
     def _calculate_rotation_angle(self, C_i: np.ndarray, C_j: np.ndarray) -> float:
@@ -158,7 +165,7 @@ class FosterBoysLocalizer:
                 n_functions = shell.get_n_functions()
 
                 # Use squared coefficients as weights
-                weights = C[basis_idx:basis_idx + n_functions]**2
+                weights = C[basis_idx : basis_idx + n_functions] ** 2
                 total_weight += np.sum(weights)
 
                 # Add weighted atomic position

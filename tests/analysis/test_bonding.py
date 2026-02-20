@@ -31,6 +31,7 @@ try:
         get_bond_order_statistics,
         compare_bond_orders,
     )
+
     BONDORDER_UTILS_AVAILABLE = True
 except ImportError:
     BONDORDER_UTILS_AVAILABLE = False
@@ -39,6 +40,7 @@ except ImportError:
 # ============================================================================
 # FIXTURES
 # ============================================================================
+
 
 @pytest.fixture
 def test_data_dir():
@@ -170,7 +172,7 @@ def h2_mock_wavefunction():
     b = 0.5
 
     wfn.Palpha = np.array([[a, b], [b, a]]) / 2.0  # Divide by 2 for alpha
-    wfn.Pbeta = np.array([[a, b], [b, a]]) / 2.0   # Divide by 2 for beta
+    wfn.Pbeta = np.array([[a, b], [b, a]]) / 2.0  # Divide by 2 for beta
     wfn.Ptot = wfn.Palpha + wfn.Pbeta  # Should be [[1.0, 0.5], [0.5, 1.0]]
 
     # Update atomic basis indices (1 basis per atom)
@@ -212,6 +214,7 @@ def unrestricted_wavefunction():
 # MAYER BOND ORDER TESTS
 # ============================================================================
 
+
 class TestMayerBondOrder:
     """Test Mayer bond order calculations."""
 
@@ -226,7 +229,7 @@ class TestMayerBondOrder:
         WFN parser sets overlap to identity, which gives incorrect bond orders.
         """
         result = calculate_mayer_bond_order(h2_mock_wavefunction)
-        bond_matrix_total = result['total']
+        bond_matrix_total = result["total"]
 
         # H2 has 2 atoms
         assert bond_matrix_total.shape == (2, 2), "Bond matrix should be 2x2 for H2"
@@ -235,8 +238,9 @@ class TestMayerBondOrder:
         h_h_bond_order = bond_matrix_total[0, 1]
 
         # Should be close to 1.0 (single bond)
-        assert 0.8 <= h_h_bond_order <= 1.2, \
-            f"H-H bond order {h_h_bond_order:.3f} should be ~1.0 for single bond"
+        assert (
+            0.8 <= h_h_bond_order <= 1.2
+        ), f"H-H bond order {h_h_bond_order:.3f} should be ~1.0 for single bond"
 
     def test_mayer_c2h2_triple_bond(self, c2h2_wavefunction):
         """
@@ -246,14 +250,15 @@ class TestMayerBondOrder:
         Mayer bond orders can differ slightly from formal bond orders.
         """
         result = calculate_mayer_bond_order(c2h2_wavefunction)
-        bond_matrix_total = result['total']
+        bond_matrix_total = result["total"]
 
         # For C2H2 (atoms: C1-H1-C2-H2), C-C is between atoms 0 and 2
         c_c_bond_order = bond_matrix_total[0, 2]
 
         # Triple bond should be > 2.5
-        assert c_c_bond_order > 2.5, \
-            f"C-C bond order {c_c_bond_order:.3f} should indicate triple bond (>2.5)"
+        assert (
+            c_c_bond_order > 2.5
+        ), f"C-C bond order {c_c_bond_order:.3f} should indicate triple bond (>2.5)"
 
     def test_mayer_c2h4_double_bond(self, c2h4_wavefunction):
         """
@@ -263,7 +268,7 @@ class TestMayerBondOrder:
         """
         result = calculate_mayer_bond_order(c2h4_wavefunction)
 
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         # For C2H4 (atoms: H2-H1-C1-C2-H3-H4), C-C is between atoms 2 and 3
         # Actually need to check atom ordering, but typically C-C is central
@@ -273,18 +278,20 @@ class TestMayerBondOrder:
 
         # Double bond should be ~2.0 (allowing for basis set and substitution effects)
         # Note: The test file contains an F substituent, which may affect the C-C bond order
-        assert 1.0 <= c_c_bond_order <= 2.0, \
-            f"C-C bond order {c_c_bond_order:.3f} should indicate double bond"
+        assert (
+            1.0 <= c_c_bond_order <= 2.0
+        ), f"C-C bond order {c_c_bond_order:.3f} should indicate double bond"
 
     def test_mayer_symmetry(self, minimal_wavefunction):
         """
         Test that bond order matrix is symmetric.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix_total = result['total']
+        bond_matrix_total = result["total"]
 
-        assert np.allclose(bond_matrix_total, bond_matrix_total.T, rtol=1e-10), \
-            "Bond order matrix should be symmetric"
+        assert np.allclose(
+            bond_matrix_total, bond_matrix_total.T, rtol=1e-10
+        ), "Bond order matrix should be symmetric"
 
     def test_mayer_diagonal_elements(self, minimal_wavefunction):
         """
@@ -293,15 +300,16 @@ class TestMayerBondOrder:
         Mayer valence is the sum of bond orders to other atoms, excluding the diagonal itself.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix_total = result['total']
+        bond_matrix_total = result["total"]
 
         for i in range(bond_matrix_total.shape[0]):
             diagonal_val = bond_matrix_total[i, i]
             # Mayer valence = sum of off-diagonal elements (excluding diagonal)
             mayer_valence = np.sum(bond_matrix_total[i, :]) - diagonal_val
 
-            assert np.isclose(diagonal_val, mayer_valence, rtol=1e-10), \
-                f"Diagonal element {diagonal_val:.6f} should equal Mayer valence {mayer_valence:.6f}"
+            assert np.isclose(
+                diagonal_val, mayer_valence, rtol=1e-10
+            ), f"Diagonal element {diagonal_val:.6f} should equal Mayer valence {mayer_valence:.6f}"
 
     def test_mayer_unrestricted(self, unrestricted_wavefunction):
         """
@@ -310,17 +318,22 @@ class TestMayerBondOrder:
         Should return alpha, beta, and total bond orders.
         """
         result = calculate_mayer_bond_order(unrestricted_wavefunction)
-        bond_matrix_total = result['total']
-        bond_matrix_alpha = result['alpha']
-        bond_matrix_beta = result['beta']
+        bond_matrix_total = result["total"]
+        bond_matrix_alpha = result["alpha"]
+        bond_matrix_beta = result["beta"]
 
-        assert bond_matrix_alpha is not None, "Should have alpha bond order for unrestricted"
-        assert bond_matrix_beta is not None, "Should have beta bond order for unrestricted"
+        assert (
+            bond_matrix_alpha is not None
+        ), "Should have alpha bond order for unrestricted"
+        assert (
+            bond_matrix_beta is not None
+        ), "Should have beta bond order for unrestricted"
 
         # Note: alpha and beta are scaled by 2 in the implementation
         # So total ≈ alpha + beta
-        assert np.allclose(bond_matrix_total, bond_matrix_alpha + bond_matrix_beta, rtol=0.1), \
-            "Total bond order should equal alpha + beta"
+        assert np.allclose(
+            bond_matrix_total, bond_matrix_alpha + bond_matrix_beta, rtol=0.1
+        ), "Total bond order should equal alpha + beta"
 
     def test_mayer_missing_overlap_matrix(self, minimal_wavefunction):
         """
@@ -336,6 +349,7 @@ class TestMayerBondOrder:
 # MULLIKEN BOND ORDER TESTS
 # ============================================================================
 
+
 class TestMullikenBondOrder:
     """Test Mulliken bond order calculations."""
 
@@ -349,7 +363,7 @@ class TestMullikenBondOrder:
         WFN parser sets overlap to identity, which gives incorrect bond orders.
         """
         result = calculate_mulliken_bond_order(h2_mock_wavefunction)
-        bond_matrix_total = result['total']
+        bond_matrix_total = result["total"]
 
         # H2 has 2 atoms
         assert bond_matrix_total.shape == (2, 2), "Bond matrix should be 2x2 for H2"
@@ -358,8 +372,9 @@ class TestMullikenBondOrder:
         h_h_bond_order = bond_matrix_total[0, 1]
 
         # Should be close to 1.0 (single bond)
-        assert 0.7 <= h_h_bond_order <= 1.3, \
-            f"H-H Mulliken bond order {h_h_bond_order:.3f} should be ~1.0"
+        assert (
+            0.7 <= h_h_bond_order <= 1.3
+        ), f"H-H Mulliken bond order {h_h_bond_order:.3f} should be ~1.0"
 
     def test_mulliken_vs_mayer(self, h2_mock_wavefunction):
         """
@@ -373,44 +388,48 @@ class TestMullikenBondOrder:
         mayer_result = calculate_mayer_bond_order(h2_mock_wavefunction)
         mulliken_result = calculate_mulliken_bond_order(h2_mock_wavefunction)
 
-        mayer_bo = mayer_result['total'][0, 1]
-        mulliken_bo = mulliken_result['total'][0, 1]
+        mayer_bo = mayer_result["total"][0, 1]
+        mulliken_bo = mulliken_result["total"][0, 1]
 
         # They should be within 30% of each other
-        ratio = mayer_bo / mulliken_bo if mulliken_bo != 0 else float('inf')
-        assert 0.7 <= ratio <= 1.3, \
-            f"Mayer ({mayer_bo:.3f}) and Mulliken ({mulliken_bo:.3f}) should be similar"
+        ratio = mayer_bo / mulliken_bo if mulliken_bo != 0 else float("inf")
+        assert (
+            0.7 <= ratio <= 1.3
+        ), f"Mayer ({mayer_bo:.3f}) and Mulliken ({mulliken_bo:.3f}) should be similar"
 
     def test_mulliken_symmetry(self, minimal_wavefunction):
         """
         Test that Mulliken bond order matrix is symmetric.
         """
         result = calculate_mulliken_bond_order(minimal_wavefunction)
-        bond_matrix_total = result['total']
+        bond_matrix_total = result["total"]
 
-        assert np.allclose(bond_matrix_total, bond_matrix_total.T, rtol=1e-10), \
-            "Mulliken bond order matrix should be symmetric"
+        assert np.allclose(
+            bond_matrix_total, bond_matrix_total.T, rtol=1e-10
+        ), "Mulliken bond order matrix should be symmetric"
 
     def test_mulliken_unrestricted(self, unrestricted_wavefunction):
         """
         Test Mulliken bond order for unrestricted wavefunction.
         """
         result = calculate_mulliken_bond_order(unrestricted_wavefunction)
-        bond_matrix_total = result['total']
-        bond_matrix_alpha = result['alpha']
-        bond_matrix_beta = result['beta']
+        bond_matrix_total = result["total"]
+        bond_matrix_alpha = result["alpha"]
+        bond_matrix_beta = result["beta"]
 
         assert bond_matrix_alpha is not None
         assert bond_matrix_beta is not None
 
         # Total should equal alpha + beta
-        assert np.allclose(bond_matrix_total, bond_matrix_alpha + bond_matrix_beta, rtol=1e-10), \
-            "Total should equal alpha + beta for Mulliken"
+        assert np.allclose(
+            bond_matrix_total, bond_matrix_alpha + bond_matrix_beta, rtol=1e-10
+        ), "Total should equal alpha + beta for Mulliken"
 
 
 # ============================================================================
 # MULTICENTER BOND ORDER TESTS
 # ============================================================================
+
 
 class TestMulticenterBondOrder:
     """Test multicenter bond order calculations."""
@@ -422,58 +441,51 @@ class TestMulticenterBondOrder:
         For 2 atoms, multicenter should give similar result to Mayer bond order.
         """
         mayer_result = calculate_mayer_bond_order(h2_wavefunction)
-        mayer_bond_total = mayer_result['total']
+        mayer_bond_total = mayer_result["total"]
         mayer_bo = mayer_bond_total[0, 1]
 
         mcbo_total, mcbo_alpha, mcbo_beta = calculate_multicenter_bond_order(
-            h2_wavefunction,
-            atom_indices=[0, 1],
-            mcbo_type=0
+            h2_wavefunction, atom_indices=[0, 1], mcbo_type=0
         )
 
         # Should be similar to Mayer bond order
-        assert np.isclose(mcbo_total, mayer_bo, rtol=0.2), \
-            f"2-center MCBO ({mcbo_total:.3f}) should match Mayer BO ({mayer_bo:.3f})"
+        assert np.isclose(
+            mcbo_total, mayer_bo, rtol=0.2
+        ), f"2-center MCBO ({mcbo_total:.3f}) should match Mayer BO ({mayer_bo:.3f})"
 
     def test_multicenter_symmetry(self, h2_wavefunction):
         """
         Test that forward and reverse orders give same result when averaged.
         """
         forward_mcbo, _, _ = calculate_multicenter_bond_order(
-            h2_wavefunction,
-            atom_indices=[0, 1],
-            mcbo_type=0
+            h2_wavefunction, atom_indices=[0, 1], mcbo_type=0
         )
 
         reverse_mcbo, _, _ = calculate_multicenter_bond_order(
-            h2_wavefunction,
-            atom_indices=[1, 0],
-            mcbo_type=0
+            h2_wavefunction, atom_indices=[1, 0], mcbo_type=0
         )
 
         # Forward and reverse should be equal for symmetric H2
-        assert np.isclose(forward_mcbo, reverse_mcbo, rtol=1e-10), \
-            "Forward and reverse MCBO should be equal for symmetric system"
+        assert np.isclose(
+            forward_mcbo, reverse_mcbo, rtol=1e-10
+        ), "Forward and reverse MCBO should be equal for symmetric system"
 
     def test_multicenter_averaged(self, h2_wavefunction):
         """
         Test averaged MCBO (mcbo_type=1).
         """
         mcbo_avg, _, _ = calculate_multicenter_bond_order(
-            h2_wavefunction,
-            atom_indices=[0, 1],
-            mcbo_type=1
+            h2_wavefunction, atom_indices=[0, 1], mcbo_type=1
         )
 
         mcbo_forward, _, _ = calculate_multicenter_bond_order(
-            h2_wavefunction,
-            atom_indices=[0, 1],
-            mcbo_type=0
+            h2_wavefunction, atom_indices=[0, 1], mcbo_type=0
         )
 
         # Averaged should equal forward for symmetric H2
-        assert np.isclose(mcbo_avg, mcbo_forward, rtol=1e-10), \
-            "Averaged MCBO should equal forward MCBO for symmetric system"
+        assert np.isclose(
+            mcbo_avg, mcbo_forward, rtol=1e-10
+        ), "Averaged MCBO should equal forward MCBO for symmetric system"
 
     def test_multicenter_invalid_atoms(self, h2_wavefunction):
         """
@@ -483,7 +495,7 @@ class TestMulticenterBondOrder:
             calculate_multicenter_bond_order(
                 h2_wavefunction,
                 atom_indices=[0, 5],  # Atom 5 doesn't exist
-                mcbo_type=0
+                mcbo_type=0,
             )
 
     def test_multicenter_nao_not_implemented(self, h2_wavefunction):
@@ -492,9 +504,7 @@ class TestMulticenterBondOrder:
         """
         with pytest.raises(NotImplementedError, match="NAO basis"):
             calculate_multicenter_bond_order(
-                h2_wavefunction,
-                atom_indices=[0, 1],
-                is_nao_basis=True
+                h2_wavefunction, atom_indices=[0, 1], is_nao_basis=True
             )
 
 
@@ -502,7 +512,10 @@ class TestMulticenterBondOrder:
 # UTILITY FUNCTIONS TESTS
 # ============================================================================
 
-@pytest.mark.skipif(not BONDORDER_UTILS_AVAILABLE, reason="Bondorder utilities not available")
+
+@pytest.mark.skipif(
+    not BONDORDER_UTILS_AVAILABLE, reason="Bondorder utilities not available"
+)
 class TestBondOrderUtilities:
     """Test utility functions for bond order analysis."""
 
@@ -511,7 +524,7 @@ class TestBondOrderUtilities:
         Test filtering bonds by threshold.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         # Get bonds with threshold 0.1
         bonds = get_bond_orders_above_threshold(bond_matrix, threshold=0.1)
@@ -524,7 +537,9 @@ class TestBondOrderUtilities:
             assert len(bond) == 3, "Each bond should be a 3-tuple"
             assert isinstance(bond[0], int), "First element should be atom index"
             assert isinstance(bond[1], int), "Second element should be atom index"
-            assert isinstance(bond[2], (float, np.floating)), "Third should be bond order value"
+            assert isinstance(
+                bond[2], (float, np.floating)
+            ), "Third should be bond order value"
             assert abs(bond[2]) >= 0.1, f"Bond order {bond[2]} should meet threshold"
 
     def test_get_bond_orders_high_threshold(self, minimal_wavefunction):
@@ -532,7 +547,7 @@ class TestBondOrderUtilities:
         Test with high threshold that excludes all bonds.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         bonds = get_bond_orders_above_threshold(bond_matrix, threshold=100.0)
 
@@ -543,13 +558,11 @@ class TestBondOrderUtilities:
         Test with atom names provided.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         atom_names = ["H1", "H2"]
         bonds = get_bond_orders_above_threshold(
-            bond_matrix,
-            threshold=0.1,
-            atom_names=atom_names
+            bond_matrix, threshold=0.1, atom_names=atom_names
         )
 
         # Should work without errors
@@ -570,7 +583,7 @@ class TestBondOrderUtilities:
         Test that negative threshold raises ValueError.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         with pytest.raises(ValueError, match="threshold must be non-negative"):
             get_bond_orders_above_threshold(bond_matrix, threshold=-0.1)
@@ -580,34 +593,31 @@ class TestBondOrderUtilities:
         Test calculating bond order between fragments.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         # Fragment 1: atom 0, Fragment 2: atom 1
         fragment_bo = calculate_fragment_bond_order(
-            bond_matrix,
-            fragment1=[0],
-            fragment2=[1]
+            bond_matrix, fragment1=[0], fragment2=[1]
         )
 
         assert fragment_bo > 0, "Fragment bond order should be positive"
 
         # Should match the direct bond order
         direct_bo = bond_matrix[0, 1]
-        assert np.isclose(fragment_bo, direct_bo), \
-            "Fragment bond order should match direct bond order for single atoms"
+        assert np.isclose(
+            fragment_bo, direct_bo
+        ), "Fragment bond order should match direct bond order for single atoms"
 
     def test_calculate_fragment_bond_order_invalid_atom(self, minimal_wavefunction):
         """
         Test that invalid atom index raises ValueError.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         with pytest.raises(ValueError, match="out of bounds"):
             calculate_fragment_bond_order(
-                bond_matrix,
-                fragment1=[0],
-                fragment2=[10]  # Invalid atom
+                bond_matrix, fragment1=[0], fragment2=[10]  # Invalid atom
             )
 
     def test_get_bond_order_statistics(self, minimal_wavefunction):
@@ -615,38 +625,41 @@ class TestBondOrderUtilities:
         Test calculation of bond order statistics.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         stats = get_bond_order_statistics(bond_matrix)
 
         # Check that all expected keys are present
         expected_keys = [
-            'mean', 'std', 'max', 'min', 'median',
-            'num_bonds', 'num_significant_bonds', 'total_bond_order'
+            "mean",
+            "std",
+            "max",
+            "min",
+            "median",
+            "num_bonds",
+            "num_significant_bonds",
+            "total_bond_order",
         ]
         for key in expected_keys:
             assert key in stats, f"Statistics should contain '{key}'"
 
         # Validate values
-        assert stats['num_bonds'] == 1, "H2 should have 1 bond"
-        assert stats['mean'] > 0, "Mean bond order should be positive"
+        assert stats["num_bonds"] == 1, "H2 should have 1 bond"
+        assert stats["mean"] > 0, "Mean bond order should be positive"
 
     def test_compare_bond_orders_identical(self, minimal_wavefunction):
         """
         Test comparison of identical bond order matrices.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
-        comparison = compare_bond_orders(
-            bond_matrix,
-            bond_matrix,
-            method="absolute"
-        )
+        comparison = compare_bond_orders(bond_matrix, bond_matrix, method="absolute")
 
-        assert 'mean_absolute_error' in comparison
-        assert comparison['mean_absolute_error'] < 1e-10, \
-            "Identical matrices should have near-zero error"
+        assert "mean_absolute_error" in comparison
+        assert (
+            comparison["mean_absolute_error"] < 1e-10
+        ), "Identical matrices should have near-zero error"
 
     def test_compare_bond_orders_different_methods(self, minimal_wavefunction):
         """
@@ -656,13 +669,11 @@ class TestBondOrderUtilities:
         mulliken_result = calculate_mulliken_bond_order(minimal_wavefunction)
 
         comparison = compare_bond_orders(
-            mayer_result['total'],
-            mulliken_result['total'],
-            method="absolute"
+            mayer_result["total"], mulliken_result["total"], method="absolute"
         )
 
-        assert 'rmsd' in comparison
-        assert comparison['rmsd'] >= 0, "RMSD should be non-negative"
+        assert "rmsd" in comparison
+        assert comparison["rmsd"] >= 0, "RMSD should be non-negative"
 
     def test_compare_bond_orders_correlation(self, c2h2_wavefunction):
         """
@@ -674,27 +685,26 @@ class TestBondOrderUtilities:
         With only 1 off-diagonal element (2x2 matrix), correlation is NaN.
         """
         result = calculate_mayer_bond_order(c2h2_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         # Add small perturbation
         perturbed_matrix = bond_matrix * 1.05
 
         comparison = compare_bond_orders(
-            bond_matrix,
-            perturbed_matrix,
-            method="correlation"
+            bond_matrix, perturbed_matrix, method="correlation"
         )
 
-        assert 'correlation_coefficient' in comparison
-        assert 0 <= comparison['correlation_coefficient'] <= 1, \
-            "Correlation should be between 0 and 1"
+        assert "correlation_coefficient" in comparison
+        assert (
+            0 <= comparison["correlation_coefficient"] <= 1
+        ), "Correlation should be between 0 and 1"
 
     def test_compare_bond_orders_shape_mismatch(self, minimal_wavefunction):
         """
         Test that shape mismatch raises ValueError.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         wrong_shape_matrix = np.eye(3)  # Different size
 
@@ -705,6 +715,7 @@ class TestBondOrderUtilities:
 # ============================================================================
 # EDGE CASES AND ERROR HANDLING
 # ============================================================================
+
 
 class TestEdgeCases:
     """Test edge cases and error handling."""
@@ -720,7 +731,7 @@ class TestEdgeCases:
         wfn.get_atomic_basis_indices = lambda: {}
 
         result = calculate_mayer_bond_order(wfn)
-        bond_matrix_total = result['total']
+        bond_matrix_total = result["total"]
 
         assert bond_matrix_total.shape == (0, 0), "Should return empty matrix"
 
@@ -736,7 +747,7 @@ class TestEdgeCases:
         wfn.get_atomic_basis_indices = lambda: {0: [0]}
 
         result = calculate_mayer_bond_order(wfn)
-        bond_matrix_total = result['total']
+        bond_matrix_total = result["total"]
 
         assert bond_matrix_total.shape == (1, 1)
         # Single atom should have zero off-diagonal elements
@@ -763,12 +774,13 @@ class TestEdgeCases:
         wfn.get_atomic_basis_indices = lambda: {0: [0], 1: [1]}
 
         result = calculate_mayer_bond_order(wfn)
-        bond_matrix_total = result['total']
+        bond_matrix_total = result["total"]
         bond_order = bond_matrix_total[0, 1]
 
         # Should be very small for non-interacting atoms
-        assert abs(bond_order) < 0.1, \
-            f"Distant atoms should have negligible bond order, got {bond_order}"
+        assert (
+            abs(bond_order) < 0.1
+        ), f"Distant atoms should have negligible bond order, got {bond_order}"
 
     def test_zero_density_matrix(self, minimal_wavefunction):
         """
@@ -779,18 +791,22 @@ class TestEdgeCases:
         minimal_wavefunction.Pbeta = np.zeros_like(minimal_wavefunction.Pbeta)
 
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix_total = result['total']
+        bond_matrix_total = result["total"]
 
         # All bond orders should be zero
-        assert np.allclose(bond_matrix_total, 0.0), \
-            "Zero density should give zero bond orders"
+        assert np.allclose(
+            bond_matrix_total, 0.0
+        ), "Zero density should give zero bond orders"
 
 
 # ============================================================================
 # INTEGRATION TESTS
 # ============================================================================
 
-@pytest.mark.skipif(not BONDORDER_UTILS_AVAILABLE, reason="Bondorder utilities not available")
+
+@pytest.mark.skipif(
+    not BONDORDER_UTILS_AVAILABLE, reason="Bondorder utilities not available"
+)
 class TestIntegration:
     """Integration tests combining multiple functionalities."""
 
@@ -800,20 +816,18 @@ class TestIntegration:
         """
         # Calculate bond orders
         result = calculate_mayer_bond_order(h2_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         # Filter significant bonds
-        significant_bonds = get_bond_orders_above_threshold(
-            bond_matrix,
-            threshold=0.1
-        )
+        significant_bonds = get_bond_orders_above_threshold(bond_matrix, threshold=0.1)
 
         # Calculate statistics
         stats = get_bond_order_statistics(bond_matrix)
 
         # Verify consistency
-        assert len(significant_bonds) == stats['num_significant_bonds'], \
-            "Number of significant bonds should match statistics"
+        assert (
+            len(significant_bonds) == stats["num_significant_bonds"]
+        ), "Number of significant bonds should match statistics"
 
     def test_compare_different_methods(self, h2_wavefunction):
         """
@@ -824,19 +838,17 @@ class TestIntegration:
 
         # Compare using absolute difference
         comparison = compare_bond_orders(
-            mayer_result['total'],
-            mulliken_result['total'],
-            method="absolute"
+            mayer_result["total"], mulliken_result["total"], method="absolute"
         )
 
         # Should have some difference but not too large
         # Note: With identity overlap matrix, Mulliken bond order can be 0
         # while Mayer bond order is 1.0, giving a difference of approximately 1.0
-        assert comparison['mean_absolute_error'] > 0, \
-            "Mayer and Mulliken should differ"
+        assert comparison["mean_absolute_error"] > 0, "Mayer and Mulliken should differ"
         # Use rtol=1e-6 to account for floating-point precision
-        assert comparison['mean_absolute_error'] <= 1.000001, \
-            f"Difference {comparison['mean_absolute_error']:.3f} should not exceed 1.0 for H2"
+        assert (
+            comparison["mean_absolute_error"] <= 1.000001
+        ), f"Difference {comparison['mean_absolute_error']:.3f} should not exceed 1.0 for H2"
 
     def test_mayer_vs_wiberg(self, h2_wavefunction):
         """
@@ -847,10 +859,10 @@ class TestIntegration:
 
         # Wiberg should be identical to Mayer for closed-shell
         np.testing.assert_allclose(
-            mayer_result['total'],
-            wiberg_result['total'],
+            mayer_result["total"],
+            wiberg_result["total"],
             rtol=1e-10,
-            err_msg="Wiberg should equal Mayer for closed-shell systems"
+            err_msg="Wiberg should equal Mayer for closed-shell systems",
         )
 
 
@@ -858,19 +870,21 @@ class TestIntegration:
 # PARAMETERIZED TESTS
 # ============================================================================
 
+
 class TestParameterized:
     """Parameterized tests for multiple cases."""
 
-    @pytest.mark.parametrize("molecule_fixture,expected_bond_range", [
-        ("h2_wavefunction", (0.8, 1.2)),  # H-H single bond
-        ("c2h2_wavefunction", (2.5, 4.2)),  # C≡C triple bond (can exceed 3.0 with polarization functions)
-    ])
-    def test_bond_orders_in_range(
-        self,
-        request,
-        molecule_fixture,
-        expected_bond_range
-    ):
+    @pytest.mark.parametrize(
+        "molecule_fixture,expected_bond_range",
+        [
+            ("h2_wavefunction", (0.8, 1.2)),  # H-H single bond
+            (
+                "c2h2_wavefunction",
+                (2.5, 4.2),
+            ),  # C≡C triple bond (can exceed 3.0 with polarization functions)
+        ],
+    )
+    def test_bond_orders_in_range(self, request, molecule_fixture, expected_bond_range):
         """
         Parameterized test for bond order ranges.
 
@@ -883,20 +897,21 @@ class TestParameterized:
             pytest.skip(f"Fixture {molecule_fixture} not available")
 
         mayer_result = calculate_mayer_bond_order(wfn)
-        bond_matrix_total = mayer_result['total']
+        bond_matrix_total = mayer_result["total"]
         bond_matrix = bond_matrix_total
 
         # Find maximum bond (usually the main bond)
         max_bond = 0
         for i in range(bond_matrix.shape[0]):
-            for j in range(i+1, bond_matrix.shape[1]):
+            for j in range(i + 1, bond_matrix.shape[1]):
                 if bond_matrix[i, j] > max_bond:
                     max_bond = bond_matrix[i, j]
 
         min_expected, max_expected = expected_bond_range
 
-        assert min_expected <= max_bond <= max_expected, \
-            f"Max bond order {max_bond:.3f} should be in range {expected_bond_range}"
+        assert (
+            min_expected <= max_bond <= max_expected
+        ), f"Max bond order {max_bond:.3f} should be in range {expected_bond_range}"
 
     @pytest.mark.parametrize("threshold", [0.01, 0.1, 0.5, 1.0])
     def test_different_thresholds(self, minimal_wavefunction, threshold):
@@ -904,14 +919,15 @@ class TestParameterized:
         Test filtering bonds with different thresholds.
         """
         result = calculate_mayer_bond_order(minimal_wavefunction)
-        bond_matrix = result['total']
+        bond_matrix = result["total"]
 
         bonds = get_bond_orders_above_threshold(bond_matrix, threshold=threshold)
 
         # All returned bonds should meet threshold
         for bond in bonds:
-            assert abs(bond[2]) >= threshold, \
-                f"Bond order {bond[2]} should be >= threshold {threshold}"
+            assert (
+                abs(bond[2]) >= threshold
+            ), f"Bond order {bond[2]} should be >= threshold {threshold}"
 
     @pytest.mark.parametrize("mcbo_type", [0, 1, 2])
     def test_multicenter_types(self, h2_wavefunction, mcbo_type):
@@ -919,9 +935,7 @@ class TestParameterized:
         Test different multicenter bond order types.
         """
         mcbo_total, _, _ = calculate_multicenter_bond_order(
-            h2_wavefunction,
-            atom_indices=[0, 1],
-            mcbo_type=mcbo_type
+            h2_wavefunction, atom_indices=[0, 1], mcbo_type=mcbo_type
         )
 
         # Should return a positive value

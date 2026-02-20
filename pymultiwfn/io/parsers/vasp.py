@@ -7,6 +7,7 @@ from pymultiwfn.core.data import Wavefunction
 import numpy as np
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
 
+
 class VASPParser:
     """Base class for VASP format parsers."""
 
@@ -22,12 +23,13 @@ class VASPParser:
         """Base parsing method to be overridden by subclasses."""
         raise NotImplementedError("VASP parser base class should not be used directly")
 
+
 class POSCARLoader(VASPParser):
     """Parser for VASP POSCAR/CONTCAR files."""
 
     def _parse(self) -> Wavefunction:
         """Parse POSCAR format."""
-        with open(self.filename, 'r') as f:
+        with open(self.filename, "r") as f:
             lines = f.readlines()
 
         # POSCAR format parsing
@@ -52,6 +54,7 @@ class POSCARLoader(VASPParser):
 
         return self.wfn
 
+
 class CHGCARLoader(VASPParser):
     """Parser for VASP CHGCAR files."""
 
@@ -60,6 +63,7 @@ class CHGCARLoader(VASPParser):
         # TODO: Implement CHGCAR parsing for charge density
         raise NotImplementedError("CHGCAR parser not yet implemented")
 
+
 class VASPGridLoader(VASPParser):
     """Parser for VASP grid files (CHGCAR, CHG, ELFCAR, LOCPOT)."""
 
@@ -67,6 +71,7 @@ class VASPGridLoader(VASPParser):
         """Parse VASP grid file format."""
         # TODO: Implement VASP grid file parsing
         raise NotImplementedError("VASP grid parser not yet implemented")
+
 
 # Convenience aliases
 VASPLoader = POSCARLoader  # Default to POSCAR

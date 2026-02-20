@@ -33,12 +33,14 @@ print()
 print("📦 已安装库:")
 try:
     import requests
+
     print(f"  ✅ requests: {requests.__version__}")
 except ImportError:
     print("  ❌ requests: 未安装")
 
 try:
     import numpy as np
+
     print(f"  ✅ numpy: {np.__version__}")
 except ImportError:
     print("  ❌ numpy: 未安装")
@@ -289,7 +291,7 @@ print("=" * 80)
 print()
 
 doc_file_path = "/tmp/pymultiwfn_mulliken_analysis.md"
-with open(doc_file_path, 'w', encoding='utf-8') as f:
+with open(doc_file_path, "w", encoding="utf-8") as f:
     f.write(doc_content)
 
 print(f"✅ 文档已保存: {doc_file_path}")
@@ -303,10 +305,10 @@ print("=" * 80)
 print()
 
 # Base64编码文档
-with open(doc_file_path, 'rb') as f:
+with open(doc_file_path, "rb") as f:
     file_content = f.read()
 
-doc_base64 = base64.b64encode(file_content).decode('utf-8')
+doc_base64 = base64.b64encode(file_content).decode("utf-8")
 
 print(f"✅ 文档Base64编码完成")
 print(f"   文档ID: pymultiwfn_mulliken_analysis")
@@ -323,7 +325,7 @@ print("📝 飞书文档接入步骤:")
 print()
 print("  1. 获取飞书应用凭证")
 print("     - 访问: https://open.feishu.cn/app")
-print("     - 创建应用，选择\"文档\"类型")
+print('     - 创建应用，选择"文档"类型')
 print("     - 获取: App ID, App Secret, Tenant ID")
 print()
 print("  2. 运行SDK脚本")
@@ -375,16 +377,16 @@ print("  from feishu_doc_sdk import FeishuDocClient, base64_encode_file")
 print()
 print("  # 创建客户端")
 print("  client = FeishuDocClient(")
-print("      app_id=\"your_app_id\",")
-print("      app_secret=\"your_app_secret\",")
-print("      tenant_id=\"your_tenant_id\"")
+print('      app_id="your_app_id",')
+print('      app_secret="your_app_secret",')
+print('      tenant_id="your_tenant_id"')
 print("  )")
 print()
 print("  # 上传文档")
-print("  content = base64_encode_file(\"/tmp/pymultiwfn_mulliken_analysis.md\")")
+print('  content = base64_encode_file("/tmp/pymultiwfn_mulliken_analysis.md")')
 print("  result = client.create_document(")
-print("      space_id=\"your_space_id\",")
-print("      title=\"PyMultiWFN - Mulliken分析\",")
+print('      space_id="your_space_id",')
+print('      title="PyMultiWFN - Mulliken分析",')
 print("      content=content")
 print("  )")
 print("  print(f\"文档ID: {result['data']['document']['document_id']}\")")
@@ -400,7 +402,7 @@ print("  from feishu_doc_sdk import FeishuDocClient, base64_encode_file")
 print()
 print("  # 创建分子")
 print("  wf = Wavefunction()")
-print("  wf.add_atom(\"N\", 0, 0, 0, 7.0)")
+print('  wf.add_atom("N", 0, 0, 0, 7.0)')
 print("  # ...")
 print()
 print("  # 计算Mulliken")
@@ -408,7 +410,7 @@ print("  P, Q, ... = mulliken.calculate_mulliken_population_and_charges(wf, over
 print()
 print("  # 上传到飞书")
 print("  client = FeishuDocClient(...)")
-print("  client.create_document(..., title=\"Mulliken分析\", content=content)")
+print('  client.create_document(..., title="Mulliken分析", content=content)')
 print("  ```")
 print()
 

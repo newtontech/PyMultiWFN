@@ -14,14 +14,12 @@ from .composition import (
     SCPAAnalyzer,
     HirshfeldAnalyzer,
     BeckeAnalyzer,
-    FragmentAnalyzer
+    FragmentAnalyzer,
 )
 
 # Import localization methods
-from .localization import (
-    PipekMezeyLocalizer,
-    FosterBoysLocalizer
-)
+from .localization import PipekMezeyLocalizer, FosterBoysLocalizer
+
 
 class OrbitalAnalyzer:
     def __init__(self, wavefunction: Wavefunction):
@@ -49,17 +47,18 @@ class OrbitalAnalyzer:
             energies = self.wfn.energies
             occupations = self.wfn.occupations
             if energies is None or occupations is None:
-                raise ValueError("Alpha orbital properties not available or calculated.")
+                raise ValueError(
+                    "Alpha orbital properties not available or calculated."
+                )
 
         if not (0 <= mo_idx < len(energies)):
             raise IndexError(f"Molecular orbital index {mo_idx} out of range.")
 
-        return {
-            "energy": energies[mo_idx],
-            "occupation": occupations[mo_idx]
-        }
+        return {"energy": energies[mo_idx], "occupation": occupations[mo_idx]}
 
-    def calculate_mo_on_grid(self, mo_idx: int, coords: np.ndarray, is_beta: bool = False) -> np.ndarray:
+    def calculate_mo_on_grid(
+        self, mo_idx: int, coords: np.ndarray, is_beta: bool = False
+    ) -> np.ndarray:
         """
         Calculates the value of a specific molecular orbital on a grid of points.
 
@@ -81,7 +80,9 @@ class OrbitalAnalyzer:
                 raise ValueError("Alpha MO coefficients not available.")
 
         if not (0 <= mo_idx < mo_coefficients.shape[0]):
-            raise IndexError(f"Molecular orbital index {mo_idx} out of range for available MOs.")
+            raise IndexError(
+                f"Molecular orbital index {mo_idx} out of range for available MOs."
+            )
 
         # Evaluate all basis functions at the grid points
         phi = evaluate_basis(self.wfn, coords)  # (N_points, N_basis)
@@ -96,7 +97,9 @@ class OrbitalAnalyzer:
 
         return mo_values
 
-    def calculate_mo_density_on_grid(self, mo_idx: int, coords: np.ndarray, is_beta: bool = False) -> np.ndarray:
+    def calculate_mo_density_on_grid(
+        self, mo_idx: int, coords: np.ndarray, is_beta: bool = False
+    ) -> np.ndarray:
         """
         Calculates the density contribution of a specific molecular orbital on a grid of points.
         (i.e., psi_i(r)^2).

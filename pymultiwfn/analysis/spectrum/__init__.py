@@ -13,16 +13,16 @@ from .excitations import (
     ExcitationAnalyzer,
     ExcitationFileType,
     load_excitation_data,
-    analyze_excitation
+    analyze_excitation,
 )
 
 __all__ = [
-    'ExcitedState',
-    'MOTransition',
-    'ExcitationAnalysis',
-    'ExcitationLoader',
-    'ExcitationAnalyzer',
-    'ExcitationFileType',
-    'load_excitation_data',
-    'analyze_excitation'
+    "ExcitedState",
+    "MOTransition",
+    "ExcitationAnalysis",
+    "ExcitationLoader",
+    "ExcitationAnalyzer",
+    "ExcitationFileType",
+    "load_excitation_data",
+    "analyze_excitation",
 ]

@@ -95,35 +95,35 @@ def genatmraddens_STOfitparm(element_index: int) -> Tuple[int, np.ndarray, np.nd
     if element_index == 1:  # H
         nSTO = 1
         atomcoeff[0] = 3.24527029e-01
-        atomexp[0] = 2.01293729e+00
+        atomexp[0] = 2.01293729e00
     elif element_index == 2:  # He
         nSTO = 1
-        atomcoeff[0] = 2.99950256e+00
-        atomexp[0] = 3.35289305e+00
+        atomcoeff[0] = 2.99950256e00
+        atomexp[0] = 3.35289305e00
     elif element_index == 3:  # Li
         nSTO = 2
         atomcoeff[0] = 3.02835250e-02
-        atomcoeff[1] = 1.51533029e+01
+        atomcoeff[1] = 1.51533029e01
         atomexp[0] = 8.73681191e-01
-        atomexp[1] = 5.89535640e+00
+        atomexp[1] = 5.89535640e00
     elif element_index == 6:  # C
         nSTO = 2
         atomcoeff[0] = 1.36245954e-01
-        atomcoeff[1] = 3.91204239e+00
-        atomexp[0] = 1.44965933e+00
-        atomexp[1] = 7.02943494e+00
+        atomcoeff[1] = 3.91204239e00
+        atomexp[0] = 1.44965933e00
+        atomexp[1] = 7.02943494e00
     elif element_index == 7:  # N
         nSTO = 2
         atomcoeff[0] = 1.74314969e-01
-        atomcoeff[1] = 4.87818629e+00
-        atomexp[0] = 1.68660618e+00
-        atomexp[1] = 8.00762613e+00
+        atomcoeff[1] = 4.87818629e00
+        atomexp[0] = 1.68660618e00
+        atomexp[1] = 8.00762613e00
     elif element_index == 8:  # O
         nSTO = 2
         atomcoeff[0] = 2.13355700e-01
-        atomcoeff[1] = 5.85867930e+00
-        atomexp[0] = 1.93245058e+00
-        atomexp[1] = 9.00693673e+00
+        atomcoeff[1] = 5.85867930e00
+        atomexp[0] = 1.93245058e00
+        atomexp[1] = 9.00693673e00
     else:
         # For other elements, use default values based on period
         if element_index <= 2:  # First row
@@ -175,12 +175,12 @@ def genatmraddens_GTFfitparm(element_index: int) -> Tuple[int, np.ndarray, np.nd
         atomcoeff[3] = 9.05667077e-02
         atomcoeff[4] = 5.45377378e-02
         atomcoeff[5] = 1.27829337e-02
-        atomexp[0] = 1.13559544e+01
-        atomexp[1] = 5.18225323e+01
-        atomexp[2] = 1.13559544e+01
-        atomexp[3] = 5.18225323e+01
-        atomexp[4] = 1.13559544e+01
-        atomexp[5] = 5.18225323e+01
+        atomexp[0] = 1.13559544e01
+        atomexp[1] = 5.18225323e01
+        atomexp[2] = 1.13559544e01
+        atomexp[3] = 5.18225323e01
+        atomexp[4] = 1.13559544e01
+        atomexp[5] = 5.18225323e01
     elif element_index == 2:  # He
         nGTF = 6
         atomcoeff[0] = 1.04897612e-02
@@ -189,12 +189,12 @@ def genatmraddens_GTFfitparm(element_index: int) -> Tuple[int, np.ndarray, np.nd
         atomcoeff[3] = 8.54118855e-01
         atomcoeff[4] = 8.54118855e-01
         atomcoeff[5] = 4.40876164e-01
-        atomexp[0] = 1.90314296e+01
-        atomexp[1] = 7.99337466e+01
-        atomexp[2] = 1.90314296e+01
-        atomexp[3] = 7.99337466e+01
-        atomexp[4] = 1.90314296e+01
-        atomexp[5] = 7.99337466e+01
+        atomexp[0] = 1.90314296e01
+        atomexp[1] = 7.99337466e01
+        atomexp[2] = 1.90314296e01
+        atomexp[3] = 7.99337466e01
+        atomexp[4] = 1.90314296e01
+        atomexp[5] = 7.99337466e01
     elif element_index == 6:  # C
         nGTF = 6
         atomcoeff[0] = 1.55101027e-03
@@ -203,12 +203,12 @@ def genatmraddens_GTFfitparm(element_index: int) -> Tuple[int, np.ndarray, np.nd
         atomcoeff[3] = 5.52757609e-01
         atomcoeff[4] = 5.52757609e-01
         atomcoeff[5] = -3.48184223e-03
-        atomexp[0] = 1.13559544e+01
-        atomexp[1] = 5.18225323e+01
-        atomexp[2] = 1.13559544e+01
-        atomexp[3] = 5.18225323e+01
-        atomexp[4] = 1.13559544e+01
-        atomexp[5] = 5.18225323e+01
+        atomexp[0] = 1.13559544e01
+        atomexp[1] = 5.18225323e01
+        atomexp[2] = 1.13559544e01
+        atomexp[3] = 5.18225323e01
+        atomexp[4] = 1.13559544e01
+        atomexp[5] = 5.18225323e01
     else:
         # For other elements, use default number of GTFs
         if element_index <= 18:

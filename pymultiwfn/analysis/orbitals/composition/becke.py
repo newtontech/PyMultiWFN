@@ -27,8 +27,9 @@ class BeckeAnalyzer:
         if self.wfn.coefficients is None:
             raise ValueError("MO coefficients are required for Becke analysis")
 
-    def calculate_orbital_composition(self, mo_idx: int, coords: np.ndarray,
-                                    is_beta: bool = False) -> Dict[str, np.ndarray]:
+    def calculate_orbital_composition(
+        self, mo_idx: int, coords: np.ndarray, is_beta: bool = False
+    ) -> Dict[str, np.ndarray]:
         """
         Calculate Becke composition for a specific molecular orbital.
 
@@ -60,15 +61,15 @@ class BeckeAnalyzer:
         weights = self._calculate_becke_weights(coords)
 
         # Calculate atomic contributions
-        atom_contributions = self._integrate_contributions(orbital_density, weights, coords)
+        atom_contributions = self._integrate_contributions(
+            orbital_density, weights, coords
+        )
 
-        return {
-            'atom_contributions': atom_contributions,
-            'weights': weights
-        }
+        return {"atom_contributions": atom_contributions, "weights": weights}
 
-    def _calculate_orbital_density(self, mo_idx: int, coords: np.ndarray,
-                                 is_beta: bool = False) -> np.ndarray:
+    def _calculate_orbital_density(
+        self, mo_idx: int, coords: np.ndarray, is_beta: bool = False
+    ) -> np.ndarray:
         """Calculate orbital density on grid points."""
         from pymultiwfn.analysis.orbitals import OrbitalAnalyzer
 
@@ -98,7 +99,7 @@ class BeckeAnalyzer:
 
                 # Apply step function to weights
                 weights[i, :] *= s_ij
-                weights[j, :] *= (1 - s_ij)
+                weights[j, :] *= 1 - s_ij
 
         # Normalize weights
         total_weights = np.sum(weights, axis=0)
@@ -113,8 +114,9 @@ class BeckeAnalyzer:
         s = 1.5 * mu - 0.5 * mu**3
         return 0.5 * (1 - s)
 
-    def _integrate_contributions(self, orbital_density: np.ndarray,
-                               weights: np.ndarray, coords: np.ndarray) -> np.ndarray:
+    def _integrate_contributions(
+        self, orbital_density: np.ndarray, weights: np.ndarray, coords: np.ndarray
+    ) -> np.ndarray:
         """Integrate orbital density with Becke weights."""
         n_atoms = weights.shape[0]
         atom_contributions = np.zeros(n_atoms)

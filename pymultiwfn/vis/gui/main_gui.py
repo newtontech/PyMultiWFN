@@ -8,10 +8,25 @@ replicating the functionality of the original GUI.f90 from Multiwfn.
 import sys
 import os
 import numpy as np
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
-                             QHBoxLayout, QSplitter, QMenuBar, QMenu, QAction,
-                             QToolBar, QStatusBar, QTabWidget, QGroupBox,
-                             QPushButton, QLabel, QMessageBox, QFileDialog)
+from PyQt5.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QSplitter,
+    QMenuBar,
+    QMenu,
+    QAction,
+    QToolBar,
+    QStatusBar,
+    QTabWidget,
+    QGroupBox,
+    QPushButton,
+    QLabel,
+    QMessageBox,
+    QFileDialog,
+)
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QThread
 from PyQt5.QtGui import QIcon, QFont
 
@@ -19,8 +34,14 @@ from PyQt5.QtGui import QIcon, QFont
 from ..molecular import MolecularVisualizer
 from ..orbital import OrbitalVisualizer
 from ..weak_interaction import WeakInteractionAnalyzer
-from .widgets import (OrbitalSelector, ViewControls, IsosurfaceControls,
-                      MoleculeControls, ProgressBar, FileSelector)
+from .widgets import (
+    OrbitalSelector,
+    ViewControls,
+    IsosurfaceControls,
+    MoleculeControls,
+    ProgressBar,
+    FileSelector,
+)
 
 # Core imports
 from ...core.data import Wavefunction
@@ -29,6 +50,7 @@ from ...io.loader import load_wavefunction
 
 class VisualizationThread(QThread):
     """Thread for heavy visualization calculations"""
+
     progress_updated = pyqtSignal(int, str)
     finished_with_result = pyqtSignal(object)
     error_occurred = pyqtSignal(str)
@@ -42,7 +64,7 @@ class VisualizationThread(QThread):
         try:
             if self.task_type == "load_file":
                 self.progress_updated.emit(10, "Loading file...")
-                wf = load_wavefunction(self.kwargs['filename'])
+                wf = load_wavefunction(self.kwargs["filename"])
                 self.progress_updated.emit(90, "Processing data...")
                 self.finished_with_result.emit(wf)
 
@@ -137,7 +159,7 @@ class MultiwfnGUI(QMainWindow):
         file_layout = QVBoxLayout()
         self.file_selector = FileSelector(
             "Select Input File",
-            "Wavefunction Files (*.wfn *.wfx *.fchk *.molden *.mwfn);;All Files (*)"
+            "Wavefunction Files (*.wfn *.wfx *.fchk *.molden *.mwfn);;All Files (*)",
         )
         file_layout.addWidget(self.file_selector)
         file_group.setLayout(file_layout)
@@ -230,7 +252,9 @@ class MultiwfnGUI(QMainWindow):
 
         self.mol_viz_label = QLabel("3D Molecular Visualization")
         self.mol_viz_label.setAlignment(Qt.AlignCenter)
-        self.mol_viz_label.setStyleSheet("QLabel { background-color: #f0f0f0; border: 1px solid #ccc; min-height: 400px; }")
+        self.mol_viz_label.setStyleSheet(
+            "QLabel { background-color: #f0f0f0; border: 1px solid #ccc; min-height: 400px; }"
+        )
 
         mol_viz_layout.addWidget(self.mol_viz_label)
         self.mol_viz_widget.setLayout(mol_viz_layout)
@@ -242,7 +266,9 @@ class MultiwfnGUI(QMainWindow):
 
         self.orbital_viz_label = QLabel("Orbital Visualization")
         self.orbital_viz_label.setAlignment(Qt.AlignCenter)
-        self.orbital_viz_label.setStyleSheet("QLabel { background-color: #f0f0f0; border: 1px solid #ccc; min-height: 400px; }")
+        self.orbital_viz_label.setStyleSheet(
+            "QLabel { background-color: #f0f0f0; border: 1px solid #ccc; min-height: 400px; }"
+        )
 
         orbital_viz_layout.addWidget(self.orbital_viz_label)
         self.orbital_viz_widget.setLayout(orbital_viz_layout)
@@ -254,7 +280,9 @@ class MultiwfnGUI(QMainWindow):
 
         self.weak_viz_label = QLabel("Weak Interaction Analysis")
         self.weak_viz_label.setAlignment(Qt.AlignCenter)
-        self.weak_viz_label.setStyleSheet("QLabel { background-color: #f0f0f0; border: 1px solid #ccc; min-height: 400px; }")
+        self.weak_viz_label.setStyleSheet(
+            "QLabel { background-color: #f0f0f0; border: 1px solid #ccc; min-height: 400px; }"
+        )
 
         weak_viz_layout.addWidget(self.weak_viz_label)
         self.weak_viz_widget.setLayout(weak_viz_layout)
@@ -266,7 +294,9 @@ class MultiwfnGUI(QMainWindow):
 
         self.plot_viz_label = QLabel("2D Plots")
         self.plot_viz_label.setAlignment(Qt.AlignCenter)
-        self.plot_viz_label.setStyleSheet("QLabel { background-color: #f0f0f0; border: 1px solid #ccc; min-height: 400px; }")
+        self.plot_viz_label.setStyleSheet(
+            "QLabel { background-color: #f0f0f0; border: 1px solid #ccc; min-height: 400px; }"
+        )
 
         plot_viz_layout.addWidget(self.plot_viz_label)
         self.plot_viz_widget.setLayout(plot_viz_layout)
@@ -293,43 +323,43 @@ class MultiwfnGUI(QMainWindow):
         menubar = self.menuBar()
 
         # File menu
-        file_menu = menubar.addMenu('File')
+        file_menu = menubar.addMenu("File")
 
-        open_action = QAction('Open File', self)
-        open_action.setShortcut('Ctrl+O')
+        open_action = QAction("Open File", self)
+        open_action.setShortcut("Ctrl+O")
         open_action.triggered.connect(self.open_file)
         file_menu.addAction(open_action)
 
-        save_action = QAction('Save Picture', self)
-        save_action.setShortcut('Ctrl+S')
+        save_action = QAction("Save Picture", self)
+        save_action.setShortcut("Ctrl+S")
         save_action.triggered.connect(self.save_picture)
         file_menu.addAction(save_action)
 
         file_menu.addSeparator()
 
-        exit_action = QAction('Exit', self)
-        exit_action.setShortcut('Ctrl+Q')
+        exit_action = QAction("Exit", self)
+        exit_action.setShortcut("Ctrl+Q")
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
         # View menu
-        view_menu = menubar.addMenu('View')
+        view_menu = menubar.addMenu("View")
 
-        reset_view_action = QAction('Reset View', self)
+        reset_view_action = QAction("Reset View", self)
         reset_view_action.triggered.connect(self.reset_view)
         view_menu.addAction(reset_view_action)
 
         # Tools menu
-        tools_menu = menubar.addMenu('Tools')
+        tools_menu = menubar.addMenu("Tools")
 
-        settings_action = QAction('Settings', self)
+        settings_action = QAction("Settings", self)
         settings_action.triggered.connect(self.show_settings)
         tools_menu.addAction(settings_action)
 
         # Help menu
-        help_menu = menubar.addMenu('Help')
+        help_menu = menubar.addMenu("Help")
 
-        about_action = QAction('About', self)
+        about_action = QAction("About", self)
         about_action.triggered.connect(self.show_about)
         help_menu.addAction(about_action)
 
@@ -338,19 +368,19 @@ class MultiwfnGUI(QMainWindow):
         toolbar = QToolBar()
         self.addToolBar(toolbar)
 
-        open_action = QAction('Open', self)
+        open_action = QAction("Open", self)
         open_action.triggered.connect(self.open_file)
         toolbar.addAction(open_action)
 
         toolbar.addSeparator()
 
-        save_action = QAction('Save', self)
+        save_action = QAction("Save", self)
         save_action.triggered.connect(self.save_picture)
         toolbar.addAction(save_action)
 
         toolbar.addSeparator()
 
-        reset_action = QAction('Reset', self)
+        reset_action = QAction("Reset", self)
         reset_action.triggered.connect(self.reset_view)
         toolbar.addAction(reset_action)
 
@@ -358,7 +388,7 @@ class MultiwfnGUI(QMainWindow):
         """Create the status bar"""
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
-        self.status_bar.showMessage('Ready')
+        self.status_bar.showMessage("Ready")
 
     def setup_connections(self):
         """Setup signal connections"""
@@ -369,8 +399,12 @@ class MultiwfnGUI(QMainWindow):
         self.orbital_selector.orbital_selected.connect(self.on_orbital_selected)
 
         # Control widgets
-        self.isosurface_controls.settings_changed.connect(self.on_isosurface_settings_changed)
-        self.molecule_controls.settings_changed.connect(self.on_molecule_settings_changed)
+        self.isosurface_controls.settings_changed.connect(
+            self.on_isosurface_settings_changed
+        )
+        self.molecule_controls.settings_changed.connect(
+            self.on_molecule_settings_changed
+        )
         self.view_controls.view_changed.connect(self.on_view_changed)
 
         # Analysis buttons
@@ -425,9 +459,13 @@ class MultiwfnGUI(QMainWindow):
         """Update orbital selector with loaded orbitals"""
         if self.wavefunction:
             self.orbital_selector.orbital_combo.clear()
-            self.orbital_selector.orbital_combo.addItems(['None'] +
-                                                         [f'{i}: {self.wavefunction.mo_energies[i-1]:.4f}'
-                                                          for i in range(1, min(self.wavefunction.n_mo + 1, 100))])
+            self.orbital_selector.orbital_combo.addItems(
+                ["None"]
+                + [
+                    f"{i}: {self.wavefunction.mo_energies[i-1]:.4f}"
+                    for i in range(1, min(self.wavefunction.n_mo + 1, 100))
+                ]
+            )
 
     def on_orbital_selected(self, orbital_index):
         """Handle orbital selection"""
@@ -440,9 +478,11 @@ class MultiwfnGUI(QMainWindow):
         if self.worker_thread and self.worker_thread.isRunning():
             return
 
-        self.worker_thread = VisualizationThread("calculate_isosurface",
-                                                orbital_index=orbital_index,
-                                                wavefunction=self.wavefunction)
+        self.worker_thread = VisualizationThread(
+            "calculate_isosurface",
+            orbital_index=orbital_index,
+            wavefunction=self.wavefunction,
+        )
         self.worker_thread.progress_updated.connect(self.update_progress)
         self.worker_thread.finished_with_result.connect(self.on_orbital_visualized)
         self.worker_thread.error_occurred.connect(self.on_error)
@@ -453,14 +493,18 @@ class MultiwfnGUI(QMainWindow):
     def on_orbital_visualized(self, result):
         """Handle orbital visualization result"""
         # Update the orbital visualization widget
-        self.orbital_viz_label.setText(f"Orbital {self.current_orbital + 1} visualization")
+        self.orbital_viz_label.setText(
+            f"Orbital {self.current_orbital + 1} visualization"
+        )
         self.status_bar.showMessage("Orbital visualization complete")
         self.progress_bar.reset()
 
     def calculate_density(self):
         """Calculate electron density"""
         if not self.wavefunction:
-            QMessageBox.warning(self, "Warning", "Please load a wavefunction file first")
+            QMessageBox.warning(
+                self, "Warning", "Please load a wavefunction file first"
+            )
             return
 
         self.status_bar.showMessage("Calculating electron density...")
@@ -469,7 +513,9 @@ class MultiwfnGUI(QMainWindow):
     def calculate_elf(self):
         """Calculate Electron Localization Function"""
         if not self.wavefunction:
-            QMessageBox.warning(self, "Warning", "Please load a wavefunction file first")
+            QMessageBox.warning(
+                self, "Warning", "Please load a wavefunction file first"
+            )
             return
 
         self.status_bar.showMessage("Calculating ELF...")
@@ -478,7 +524,9 @@ class MultiwfnGUI(QMainWindow):
     def calculate_laplacian(self):
         """Calculate Laplacian of electron density"""
         if not self.wavefunction:
-            QMessageBox.warning(self, "Warning", "Please load a wavefunction file first")
+            QMessageBox.warning(
+                self, "Warning", "Please load a wavefunction file first"
+            )
             return
 
         self.status_bar.showMessage("Calculating Laplacian...")
@@ -487,7 +535,9 @@ class MultiwfnGUI(QMainWindow):
     def calculate_gradient(self):
         """Calculate gradient of electron density"""
         if not self.wavefunction:
-            QMessageBox.warning(self, "Warning", "Please load a wavefunction file first")
+            QMessageBox.warning(
+                self, "Warning", "Please load a wavefunction file first"
+            )
             return
 
         self.status_bar.showMessage("Calculating gradient...")
@@ -496,7 +546,9 @@ class MultiwfnGUI(QMainWindow):
     def analyze_weak_interaction(self):
         """Perform weak interaction analysis"""
         if not self.wavefunction:
-            QMessageBox.warning(self, "Warning", "Please load a wavefunction file first")
+            QMessageBox.warning(
+                self, "Warning", "Please load a wavefunction file first"
+            )
             return
 
         self.status_bar.showMessage("Performing weak interaction analysis...")
@@ -536,8 +588,10 @@ class MultiwfnGUI(QMainWindow):
     def open_file(self):
         """Open file dialog"""
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Select Input File", "",
-            "Wavefunction Files (*.wfn *.wfx *.fchk *.molden *.mwfn);;All Files (*)"
+            self,
+            "Select Input File",
+            "",
+            "Wavefunction Files (*.wfn *.wfx *.fchk *.molden *.mwfn);;All Files (*)",
         )
         if file_path:
             self.load_file(file_path)
@@ -545,11 +599,15 @@ class MultiwfnGUI(QMainWindow):
     def save_picture(self):
         """Save current visualization as picture"""
         file_path, _ = QFileDialog.getSaveFileName(
-            self, "Save Picture", "",
-            "PNG Files (*.png);;JPEG Files (*.jpg);;All Files (*)"
+            self,
+            "Save Picture",
+            "",
+            "PNG Files (*.png);;JPEG Files (*.jpg);;All Files (*)",
         )
         if file_path:
-            self.status_bar.showMessage(f"Saving picture to {os.path.basename(file_path)}")
+            self.status_bar.showMessage(
+                f"Saving picture to {os.path.basename(file_path)}"
+            )
             # Implementation for saving picture
 
     def reset_view(self):
@@ -560,11 +618,15 @@ class MultiwfnGUI(QMainWindow):
     def export_data(self):
         """Export current analysis data"""
         file_path, _ = QFileDialog.getSaveFileName(
-            self, "Export Data", "",
-            "Text Files (*.txt);;CSV Files (*.csv);;All Files (*)"
+            self,
+            "Export Data",
+            "",
+            "Text Files (*.txt);;CSV Files (*.csv);;All Files (*)",
         )
         if file_path:
-            self.status_bar.showMessage(f"Exporting data to {os.path.basename(file_path)}")
+            self.status_bar.showMessage(
+                f"Exporting data to {os.path.basename(file_path)}"
+            )
             # Implementation for data export
 
     def show_settings(self):
@@ -592,7 +654,7 @@ def main():
     app.setApplicationVersion("0.1.2")
 
     # Set application style
-    app.setStyle('Fusion')
+    app.setStyle("Fusion")
 
     # Create and show main window
     window = MultiwfnGUI()
@@ -601,5 +663,5 @@ def main():
     sys.exit(app.exec_())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

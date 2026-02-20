@@ -1,5 +1,6 @@
 # pymultiwfn/analysis/population/population.py
 
+
 def perform_population_analysis(wavefunction_data):
     """
     Placeholder function for performing population analysis.
@@ -19,6 +20,4 @@ def perform_population_analysis(wavefunction_data):
     # In a real implementation, this would involve complex calculations
     # using the provided wavefunction_data.
     # For now, it returns dummy data.
-    return {"charges": {"atom1": 0.1, "atom2": -0.1},
-            "bond_orders": {"bond1-2": 0.5}}
-
+    return {"charges": {"atom1": 0.1, "atom2": -0.1}, "bond_orders": {"bond1-2": 0.5}}

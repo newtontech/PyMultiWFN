@@ -1,8 +1,8 @@
-
 import numpy as np
 from typing import Dict, Optional
 
 from pymultiwfn.core.data import Wavefunction
+
 
 def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarray]:
     """
@@ -21,10 +21,14 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarr
     num_basis = wavefunction.num_basis
 
     if wavefunction.overlap_matrix is None:
-        raise ValueError("Overlap matrix (Sbas) is not available in the Wavefunction object.")
+        raise ValueError(
+            "Overlap matrix (Sbas) is not available in the Wavefunction object."
+        )
     if wavefunction.Ptot is None:
-        wavefunction.calculate_density_matrices() # Ensure density matrices are calculated
-    if wavefunction.Ptot is None: # Check again in case calculate_density_matrices failed
+        wavefunction.calculate_density_matrices()  # Ensure density matrices are calculated
+    if (
+        wavefunction.Ptot is None
+    ):  # Check again in case calculate_density_matrices failed
         raise ValueError("Total density matrix (Ptot) could not be calculated.")
 
     atomic_basis_indices = wavefunction.get_atomic_basis_indices()
@@ -41,7 +45,7 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarr
         basis_fns_i = atomic_basis_indices[i]
         for j in range(i + 1, num_atoms):
             basis_fns_j = atomic_basis_indices[j]
-            
+
             # Extract relevant submatrices
             ps_ij = PS_total[np.ix_(basis_fns_i, basis_fns_j)]
             ps_ji = PS_total[np.ix_(basis_fns_j, basis_fns_i)]
@@ -51,16 +55,17 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarr
             accum = np.trace(ps_ij @ ps_ji)
             bond_order_matrix_total[i, j] = accum
             bond_order_matrix_total[j, i] = accum
-    
+
     # Fill diagonal elements: Mayer valence
     for i in range(num_atoms):
         bond_order_matrix_total[i, i] = np.sum(bond_order_matrix_total[i, :])
 
-
     # Handle unrestricted case
     if wavefunction.is_unrestricted:
         if wavefunction.Palpha is None or wavefunction.Pbeta is None:
-             raise ValueError("Alpha and Beta density matrices are not available for unrestricted calculation.")
+            raise ValueError(
+                "Alpha and Beta density matrices are not available for unrestricted calculation."
+            )
 
         bond_order_matrix_alpha = np.zeros((num_atoms, num_atoms))
         bond_order_matrix_beta = np.zeros((num_atoms, num_atoms))
@@ -86,7 +91,7 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarr
                 accum_beta = np.trace(ps_beta_ij @ ps_beta_ji)
                 bond_order_matrix_beta[i, j] = accum_beta
                 bond_order_matrix_beta[j, i] = accum_beta
-        
+
         # Multiply by 2 as per Fortran code for alpha and beta contributions (seems to be a Multiwfn convention)
         # Note: The Fortran code has "bndmata=2*(bndmata+transpose(bndmata))" for alpha/beta contributions after filling.
         # This implies that the 'accum' already is 1/2 of the final value.
@@ -103,19 +108,23 @@ def calculate_mayer_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarr
 
         # Fill diagonal elements for alpha and beta valences
         for i in range(num_atoms):
-            bond_order_matrix_alpha[i, i] = 2.0 * np.sum(bond_order_matrix_alpha[i, i+1:])
-            bond_order_matrix_beta[i, i] = 2.0 * np.sum(bond_order_matrix_beta[i, i+1:])
+            bond_order_matrix_alpha[i, i] = 2.0 * np.sum(
+                bond_order_matrix_alpha[i, i + 1 :]
+            )
+            bond_order_matrix_beta[i, i] = 2.0 * np.sum(
+                bond_order_matrix_beta[i, i + 1 :]
+            )
 
     result = {}
 
     if wavefunction.is_unrestricted:
         # For unrestricted case, total = alpha + beta
         # (to avoid cross-term issues when calculating from Ptot)
-        result['total'] = bond_order_matrix_alpha + bond_order_matrix_beta
-        result['alpha'] = bond_order_matrix_alpha
-        result['beta'] = bond_order_matrix_beta
+        result["total"] = bond_order_matrix_alpha + bond_order_matrix_beta
+        result["alpha"] = bond_order_matrix_alpha
+        result["beta"] = bond_order_matrix_beta
     else:
         # For restricted case, use the calculated total
-        result['total'] = bond_order_matrix_total
+        result["total"] = bond_order_matrix_total
 
     return result

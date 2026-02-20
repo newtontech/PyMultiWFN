@@ -14,6 +14,7 @@ from pymultiwfn.core.data import Wavefunction, Shell
 from pymultiwfn.core.definitions import ELEMENT_NAMES
 from pymultiwfn.integrals import calculate_overlap_matrix
 
+
 class WFNLoader:
     """
     Enhanced loader for Gaussian WFN files.
@@ -34,7 +35,7 @@ class WFNLoader:
             FileNotFoundError: If the file does not exist
             ValueError: If the file extension is not .wfn
         """
-        if not filename.lower().endswith(('.wfn', '.wfx')):
+        if not filename.lower().endswith((".wfn", ".wfx")):
             raise ValueError(f"File must have .wfn or .wfx extension, got: {filename}")
 
         self.filename = filename
@@ -53,10 +54,10 @@ class WFNLoader:
             ValueError: If the file format is invalid or critical data is missing
         """
         try:
-            with open(self.filename, 'r', encoding='utf-8') as f:
+            with open(self.filename, "r", encoding="utf-8") as f:
                 self.lines = f.readlines()
         except UnicodeDecodeError:
-            with open(self.filename, 'r', encoding='latin-1') as f:
+            with open(self.filename, "r", encoding="latin-1") as f:
                 self.lines = f.readlines()
 
         if not self.lines:
@@ -81,7 +82,9 @@ class WFNLoader:
     def _parse_header(self):
         """Enhanced parsing of header information with error handling."""
         if len(self.lines) < 2:
-            raise ValueError("WFN file is too short - needs at least header and atom count")
+            raise ValueError(
+                "WFN file is too short - needs at least header and atom count"
+            )
 
         # First line contains title
         self.wfn.title = self.lines[0].strip()
@@ -112,26 +115,37 @@ class WFNLoader:
                 num_nuclei = int(parts[nuclei_idx - 1])
 
                 # Store nuclei count for validation
-                self.metadata['num_nuclei'] = num_nuclei
-                self.metadata['header_parsed'] = True
+                self.metadata["num_nuclei"] = num_nuclei
+                self.metadata["header_parsed"] = True
             except (ValueError, IndexError) as e:
-                warnings.warn(f"Error parsing Gaussian header line '{header_line}': {e}", RuntimeWarning)
+                warnings.warn(
+                    f"Error parsing Gaussian header line '{header_line}': {e}",
+                    RuntimeWarning,
+                )
                 self._set_default_header_values()
         else:
             # Try to parse as simple format: NMO NPRIMITIVES NELECTRONS MULTIPLICITY
             header_parts = header_line.split()
-            if len(header_parts) >= 4 and all(self._is_float_or_int(p) for p in header_parts[:4]):
+            if len(header_parts) >= 4 and all(
+                self._is_float_or_int(p) for p in header_parts[:4]
+            ):
                 try:
                     self.wfn.num_mos = int(float(header_parts[0]))
                     self.wfn.num_primitives = int(float(header_parts[1]))
                     self.wfn.num_electrons = int(float(header_parts[2]))
                     self.wfn.multiplicity = int(float(header_parts[3]))
-                    self.metadata['header_parsed'] = True
+                    self.metadata["header_parsed"] = True
                 except (ValueError, IndexError) as e:
-                    warnings.warn(f"Error parsing header line '{header_line}': {e}", RuntimeWarning)
+                    warnings.warn(
+                        f"Error parsing header line '{header_line}': {e}",
+                        RuntimeWarning,
+                    )
                     self._set_default_header_values()
             else:
-                warnings.warn(f"Cannot parse header information from line: {header_line}", RuntimeWarning)
+                warnings.warn(
+                    f"Cannot parse header information from line: {header_line}",
+                    RuntimeWarning,
+                )
                 self._set_default_header_values()
 
     def _is_float_or_int(self, value: str) -> bool:
@@ -149,7 +163,7 @@ class WFNLoader:
         self.wfn.num_primitives = 0
         self.wfn.num_electrons = 0
         self.wfn.multiplicity = 1  # Default to singlet
-        self.metadata['header_parsed'] = False
+        self.metadata["header_parsed"] = False
 
     def _parse_atoms(self):
         """Enhanced parsing of atomic coordinates with error handling."""
@@ -160,14 +174,22 @@ class WFNLoader:
         # WFN format: ELEMENT index (CENTRE n) x y z CHARGE = charge
         # Example: H    1    (CENTRE  1)   0.00000000  0.00000000  0.70160240  CHARGE =  1.0
         atom_pattern = re.compile(
-            r'^([A-Z][a-z]?)\s+\d+\s+\(CENTRE\s+\d+\)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+CHARGE\s*=\s*(\d+\.\d+)$'
+            r"^([A-Z][a-z]?)\s+\d+\s+\(CENTRE\s+\d+\)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+CHARGE\s*=\s*(\d+\.\d+)$"
         )
 
         atoms_found = 0
         total_nuclear_charge = 0.0
         for i in range(atom_start, len(self.lines)):
             line = self.lines[i].strip()
-            if not line or line.upper().startswith(('CENTRE ASSIGNMENTS', 'TYPE ASSIGNMENTS', 'EXPONENTS', 'MO', 'END DATA')):
+            if not line or line.upper().startswith(
+                (
+                    "CENTRE ASSIGNMENTS",
+                    "TYPE ASSIGNMENTS",
+                    "EXPONENTS",
+                    "MO",
+                    "END DATA",
+                )
+            ):
                 break
 
             # Try WFN atom pattern
@@ -186,13 +208,15 @@ class WFNLoader:
                     atoms_found += 1
                     total_nuclear_charge += charge
                 except (ValueError, IndexError) as e:
-                    warnings.warn(f"Error parsing atom line '{line}': {e}", RuntimeWarning)
+                    warnings.warn(
+                        f"Error parsing atom line '{line}': {e}", RuntimeWarning
+                    )
                     continue
 
         if atoms_found == 0:
             warnings.warn("No atoms found in WFN file", RuntimeWarning)
         else:
-            self.metadata['atoms_parsed'] = atoms_found
+            self.metadata["atoms_parsed"] = atoms_found
 
         # Calculate electron count from nuclear charges and molecular charge
         # For WFN files, the header doesn't contain electron count directly
@@ -200,16 +224,47 @@ class WFNLoader:
         # If molecular charge is not specified (default 0), then num_electrons = total_nuclear_charge
         if total_nuclear_charge > 0:
             self.wfn.num_electrons = total_nuclear_charge - self.wfn.charge
-            self.metadata['electrons_calculated_from_atoms'] = True
+            self.metadata["electrons_calculated_from_atoms"] = True
 
     def _get_atomic_number(self, element_symbol: str) -> int:
         """Get atomic number from element symbol."""
         symbol_to_number = {
-            'H': 1, 'He': 2, 'Li': 3, 'Be': 4, 'B': 5, 'C': 6, 'N': 7, 'O': 8,
-            'F': 9, 'Ne': 10, 'Na': 11, 'Mg': 12, 'Al': 13, 'Si': 14, 'P': 15,
-            'S': 16, 'Cl': 17, 'Ar': 18, 'K': 19, 'Ca': 20, 'Sc': 21, 'Ti': 22,
-            'V': 23, 'Cr': 24, 'Mn': 25, 'Fe': 26, 'Co': 27, 'Ni': 28, 'Cu': 29,
-            'Zn': 30, 'Ga': 31, 'Ge': 32, 'As': 33, 'Se': 34, 'Br': 35, 'Kr': 36,
+            "H": 1,
+            "He": 2,
+            "Li": 3,
+            "Be": 4,
+            "B": 5,
+            "C": 6,
+            "N": 7,
+            "O": 8,
+            "F": 9,
+            "Ne": 10,
+            "Na": 11,
+            "Mg": 12,
+            "Al": 13,
+            "Si": 14,
+            "P": 15,
+            "S": 16,
+            "Cl": 17,
+            "Ar": 18,
+            "K": 19,
+            "Ca": 20,
+            "Sc": 21,
+            "Ti": 22,
+            "V": 23,
+            "Cr": 24,
+            "Mn": 25,
+            "Fe": 26,
+            "Co": 27,
+            "Ni": 28,
+            "Cu": 29,
+            "Zn": 30,
+            "Ga": 31,
+            "Ge": 32,
+            "As": 33,
+            "Se": 34,
+            "Br": 35,
+            "Kr": 36,
             # Add more as needed
         }
         return symbol_to_number.get(element_symbol.capitalize(), 0)
@@ -230,46 +285,57 @@ class WFNLoader:
             line_upper = line.upper().strip()
 
             # Stop at END DATA
-            if line_upper.startswith('END DATA'):
+            if line_upper.startswith("END DATA"):
                 break
 
             # Check for MO header line FIRST (before parsing coefficients)
             # Format: MO    1     MO 0.0        OCC NO =    X  ORB. ENERGY =    Y
-            if line_upper.startswith('MO') and 'OCC NO' in line_upper:
+            if line_upper.startswith("MO") and "OCC NO" in line_upper:
                 # Save previous MO if exists
-                if current_mo is not None and current_mo['coefficients']:
+                if current_mo is not None and current_mo["coefficients"]:
                     mo_sections.append(current_mo)
 
                 # Parse new MO header
                 # Extract occupation and energy
-                occ_match = re.search(r'OCC\s+NO\s*=\s*([-+]?\d*\.?\d+(?:[ED][-+]?\d+)?)', line_upper)
-                energy_match = re.search(r'ORB\.\s*ENERGY\s*=\s*([-+]?\d*\.?\d+(?:[ED][-+]?\d+)?)', line_upper)
+                occ_match = re.search(
+                    r"OCC\s+NO\s*=\s*([-+]?\d*\.?\d+(?:[ED][-+]?\d+)?)", line_upper
+                )
+                energy_match = re.search(
+                    r"ORB\.\s*ENERGY\s*=\s*([-+]?\d*\.?\d+(?:[ED][-+]?\d+)?)",
+                    line_upper,
+                )
 
-                occupation = float(occ_match.group(1).replace('D', 'E')) if occ_match else 0.0
-                energy = float(energy_match.group(1).replace('D', 'E')) if energy_match else 0.0
+                occupation = (
+                    float(occ_match.group(1).replace("D", "E")) if occ_match else 0.0
+                )
+                energy = (
+                    float(energy_match.group(1).replace("D", "E"))
+                    if energy_match
+                    else 0.0
+                )
 
                 current_mo = {
-                    'occupation': occupation,
-                    'energy': energy,
-                    'coefficients': []
+                    "occupation": occupation,
+                    "energy": energy,
+                    "coefficients": [],
                 }
 
             # Parse coefficient lines
             # Only parse if we're in an MO section AND the line doesn't start with 'MO'
-            elif current_mo is not None and line and not line_upper.startswith('MO'):
+            elif current_mo is not None and line and not line_upper.startswith("MO"):
                 # Try to parse as coefficients
                 parts = line.split()
                 for part in parts:
                     try:
                         # Handle FORTRAN D notation
-                        coeff_str = part.upper().replace('D', 'E')
+                        coeff_str = part.upper().replace("D", "E")
                         coeff = float(coeff_str)
-                        current_mo['coefficients'].append(coeff)
+                        current_mo["coefficients"].append(coeff)
                     except ValueError:
                         pass
 
         # Add the last MO
-        if current_mo is not None and current_mo['coefficients']:
+        if current_mo is not None and current_mo["coefficients"]:
             mo_sections.append(current_mo)
 
         if not mo_sections:
@@ -282,9 +348,9 @@ class WFNLoader:
         coefficients_list = []
 
         for mo in mo_sections:
-            occupations.append(mo['occupation'])
-            energies.append(mo['energy'])
-            coefficients_list.append(mo['coefficients'])
+            occupations.append(mo["occupation"])
+            energies.append(mo["energy"])
+            coefficients_list.append(mo["coefficients"])
 
         # Use num_basis as the expected number of coefficients
         expected_coeffs = self.wfn.num_basis
@@ -308,10 +374,10 @@ class WFNLoader:
             # Update num_mos from actual parsed data
             self.wfn.num_mos = len(normalized_coeffs)
 
-            self.metadata['mo_coefficients_parsed'] = True
-            self.metadata['num_mos_parsed'] = len(normalized_coeffs)
-            self.metadata['occupations_parsed'] = True
-            self.metadata['energies_parsed'] = True
+            self.metadata["mo_coefficients_parsed"] = True
+            self.metadata["num_mos_parsed"] = len(normalized_coeffs)
+            self.metadata["occupations_parsed"] = True
+            self.metadata["energies_parsed"] = True
 
     def _validate_parsed_data(self):
         """Validate parsed data for consistency."""
@@ -319,18 +385,24 @@ class WFNLoader:
             raise ValueError("No atoms were parsed from the WFN file")
 
         if self.wfn.num_electrons == 0:
-            warnings.warn("No electron count was parsed from the WFN file", RuntimeWarning)
+            warnings.warn(
+                "No electron count was parsed from the WFN file", RuntimeWarning
+            )
 
         if len(self.wfn.shells) == 0:
-            warnings.warn("No basis shells were parsed from the WFN file", RuntimeWarning)
+            warnings.warn(
+                "No basis shells were parsed from the WFN file", RuntimeWarning
+            )
 
         # Calculate number of basis functions if not set
         if self.wfn.num_basis == 0 and len(self.wfn.shells) > 0:
-            self.wfn.num_basis = sum(self._shell_num_functions(shell.type) for shell in self.wfn.shells)
+            self.wfn.num_basis = sum(
+                self._shell_num_functions(shell.type) for shell in self.wfn.shells
+            )
 
         # Set validation metadata
-        self.metadata['validation_passed'] = True
-        self.metadata['validation_timestamp'] = np.datetime64('now')
+        self.metadata["validation_passed"] = True
+        self.metadata["validation_timestamp"] = np.datetime64("now")
 
     def _parse_basis_and_mo(self, lines):
         """
@@ -352,7 +424,7 @@ class WFNLoader:
             line_upper = line.upper().strip()
 
             # Parse CENTRE ASSIGNMENTS
-            if line_upper.startswith('CENTRE ASSIGNMENTS'):
+            if line_upper.startswith("CENTRE ASSIGNMENTS"):
                 parts = line.split()
                 # Skip "CENTRE ASSIGNMENTS" prefix, get the numbers
                 for part in parts[2:]:
@@ -362,7 +434,7 @@ class WFNLoader:
                         pass
 
             # Parse TYPE ASSIGNMENTS
-            elif line_upper.startswith('TYPE ASSIGNMENTS'):
+            elif line_upper.startswith("TYPE ASSIGNMENTS"):
                 parts = line.split()
                 # Skip "TYPE ASSIGNMENTS" prefix, get the numbers
                 for part in parts[2:]:
@@ -372,21 +444,21 @@ class WFNLoader:
                         pass
 
             # Parse EXPONENTS
-            elif line_upper.startswith('EXPONENTS'):
+            elif line_upper.startswith("EXPONENTS"):
                 parts = line.split()
                 # Skip "EXPONENTS" prefix, get the numbers
                 for part in parts[1:]:
                     try:
                         # Handle FORTRAN notation like 0.3387000D+02
-                        exp_str = part.upper().replace('D', 'E')
+                        exp_str = part.upper().replace("D", "E")
                         exponents.append(float(exp_str))
                     except ValueError:
                         pass
 
         # Store parsed data
-        self.metadata['centre_assignments'] = centre_assignments
-        self.metadata['type_assignments'] = type_assignments
-        self.metadata['exponents'] = exponents
+        self.metadata["centre_assignments"] = centre_assignments
+        self.metadata["type_assignments"] = type_assignments
+        self.metadata["exponents"] = exponents
 
         # Validate
         if not centre_assignments or not type_assignments:
@@ -394,7 +466,10 @@ class WFNLoader:
             return
 
         if len(centre_assignments) != len(type_assignments):
-            warnings.warn(f"Mismatch between CENTRE assignments ({len(centre_assignments)}) and TYPE assignments ({len(type_assignments)})", RuntimeWarning)
+            warnings.warn(
+                f"Mismatch between CENTRE assignments ({len(centre_assignments)}) and TYPE assignments ({len(type_assignments)})",
+                RuntimeWarning,
+            )
             # Use the minimum length
             num_basis = min(len(centre_assignments), len(type_assignments))
         else:
@@ -406,7 +481,9 @@ class WFNLoader:
         # In WFN format, each entry in TYPE ASSIGNMENTS is a single primitive/basis function
         # We need to group consecutive primitives of the same type on the same atom into shells
 
-        shells_dict = {}  # Key: (atom_idx, shell_type), Value: list of (exponent, bf_idx)
+        shells_dict = (
+            {}
+        )  # Key: (atom_idx, shell_type), Value: list of (exponent, bf_idx)
 
         # Debug: Print first 20 type_assignments and centre_assignments
         print(f"[DEBUG] Basis function information (first 20 of {num_basis}):")
@@ -415,7 +492,9 @@ class WFNLoader:
             atom_idx = centre_assignments[i]
             shell_type = type_assignments[i]
             exp_val = exponents[i] if i < len(exponents) else "N/A"
-            print(f"[DEBUG] {i:5d} | {atom_idx:6d} | {shell_type:8d} | {'?':7s} | {exp_val}")
+            print(
+                f"[DEBUG] {i:5d} | {atom_idx:6d} | {shell_type:8d} | {'?':7s} | {exp_val}"
+            )
 
         # Count WFN types
         wfn_type_counts = {}
@@ -466,7 +545,7 @@ class WFNLoader:
                     type=shell_type,
                     center_idx=atom_idx,
                     exponents=np.array(shell_exponents),
-                    coefficients=np.ones((1, len(shell_exponents)))
+                    coefficients=np.ones((1, len(shell_exponents))),
                 )
                 self.wfn.shells.append(shell)
 
@@ -497,7 +576,9 @@ class WFNLoader:
         if self.wfn.num_basis > 0:
             # Use identity matrix for WFN format (orthonormal basis)
             self.wfn.overlap_matrix = np.eye(self.wfn.num_basis)
-            print(f"[DEBUG] Using identity overlap matrix for WFN format: shape={self.wfn.overlap_matrix.shape}")
+            print(
+                f"[DEBUG] Using identity overlap matrix for WFN format: shape={self.wfn.overlap_matrix.shape}"
+            )
 
             # Note: We're NOT normalizing the basis functions because the identity
             # overlap matrix already implies orthonormal basis functions
@@ -519,9 +600,9 @@ class WFNLoader:
         # Use Cartesian coordinates (consistent with evaluate_basis)
         func_counts = {
             -1: 4,  # SP (1 S + 3 P)
-            0: 1,   # S
-            1: 3,   # P
-            2: 6,   # D (Cartesian: xx, yy, zz, xy, xz, yz)
+            0: 1,  # S
+            1: 3,  # P
+            2: 6,  # D (Cartesian: xx, yy, zz, xy, xz, yz)
             3: 10,  # F (Cartesian: 10 functions)
         }
         return func_counts.get(shell_type, 1)
@@ -555,8 +636,10 @@ class WFNLoader:
         num_basis = len(basis_functions)
 
         if num_basis != self.wfn.num_basis:
-            raise ValueError(f"Extracted {num_basis} basis functions, "
-                           f"but num_basis is {self.wfn.num_basis}")
+            raise ValueError(
+                f"Extracted {num_basis} basis functions, "
+                f"but num_basis is {self.wfn.num_basis}"
+            )
 
         # Initialize overlap matrix
         overlap_matrix = np.zeros((num_basis, num_basis))
@@ -595,13 +678,17 @@ class WFNLoader:
             return overlap_matrix
 
         except Exception as e:
-            warnings.warn(f"Full overlap calculation failed: {e}. "
-                        f"Using simple distance-based overlap calculation.")
+            warnings.warn(
+                f"Full overlap calculation failed: {e}. "
+                f"Using simple distance-based overlap calculation."
+            )
             # Fallback: use simple distance-based overlap
             # This is not chemically accurate but better than identity matrix
             return self._calculate_distance_based_overlap(basis_functions)
 
-    def _calculate_distance_based_overlap(self, basis_functions: List[dict]) -> np.ndarray:
+    def _calculate_distance_based_overlap(
+        self, basis_functions: List[dict]
+    ) -> np.ndarray:
         """
         Calculate approximate overlap matrix as identity with minimal distance correction.
 
@@ -628,13 +715,13 @@ class WFNLoader:
 
         for i in range(num_basis):
             bf_i = basis_functions[i]
-            type_i = bf_i['type']
-            coords_i = np.array(bf_i['coords'])
+            type_i = bf_i["type"]
+            coords_i = np.array(bf_i["coords"])
 
             for j in range(i + 1, num_basis):
                 bf_j = basis_functions[j]
-                type_j = bf_j['type']
-                coords_j = np.array(bf_j['coords'])
+                type_j = bf_j["type"]
+                coords_j = np.array(bf_j["coords"])
 
                 # Only add small corrections for same-type, different-center functions
                 if type_i == type_j:
@@ -673,15 +760,17 @@ class WFNLoader:
         # Normalize each MO coefficient vector
         for i in range(len(self.wfn.coefficients)):
             coeff_vector = self.wfn.coefficients[i, :]
-            norm = np.sqrt(np.sum(coeff_vector ** 2))
+            norm = np.sqrt(np.sum(coeff_vector**2))
 
             if norm > 1e-10:
                 # Normalize the coefficient vector
                 self.wfn.coefficients[i, :] /= norm
             else:
                 # Warning: MO has near-zero norm
-                warnings.warn(f"MO {i} has near-zero norm ({norm:.2e}), skipping normalization",
-                            RuntimeWarning)
+                warnings.warn(
+                    f"MO {i} has near-zero norm ({norm:.2e}), skipping normalization",
+                    RuntimeWarning,
+                )
 
         print(f"[DEBUG] MO coefficients normalized")
 
@@ -707,11 +796,11 @@ class WFNLoader:
         Returns:
             List of basis function dictionaries compatible with overlap calculation
         """
-        if not hasattr(self.wfn, '_centre_assignments'):
+        if not hasattr(self.wfn, "_centre_assignments"):
             raise ValueError("WFN file missing centre assignments")
-        if not hasattr(self.wfn, '_type_assignments'):
+        if not hasattr(self.wfn, "_type_assignments"):
             raise ValueError("WFN file missing type assignments")
-        if not hasattr(self.wfn, '_exponents'):
+        if not hasattr(self.wfn, "_exponents"):
             raise ValueError("WFN file missing exponents")
 
         centre_assignments = self.wfn._centre_assignments
@@ -727,40 +816,40 @@ class WFNLoader:
         # - 4 = D_xx, 5 = D_yy, 6 = D_zz, 7 = D_xy, 8 = D_xz, 9 = D_yz
         # - 10-19 = F components
         wfn_type_to_overlap_type = {
-            1: 0,   # S
-            2: 1,   # Px
-            3: 2,   # Py
-            4: 3,   # Pz
-            5: 4,   # D_xx
-            6: 5,   # D_yy
-            7: 6,   # D_zz
-            8: 7,   # D_xy
-            9: 8,   # D_xz
+            1: 0,  # S
+            2: 1,  # Px
+            3: 2,  # Py
+            4: 3,  # Pz
+            5: 4,  # D_xx
+            6: 5,  # D_yy
+            7: 6,  # D_zz
+            8: 7,  # D_xy
+            9: 8,  # D_xz
             10: 9,  # D_yz
-            11: 10, # F_xxx
-            12: 11, # F_yyy
-            13: 12, # F_zzz
-            14: 13, # F_xxy
-            15: 14, # F_xxz
-            16: 15, # F_xyy
-            17: 16, # F_yyz
-            18: 17, # F_xzz
-            19: 18, # F_yzz
-            20: 19, # F_xyz
+            11: 10,  # F_xxx
+            12: 11,  # F_yyy
+            13: 12,  # F_zzz
+            14: 13,  # F_xxy
+            15: 14,  # F_xxz
+            16: 15,  # F_xyy
+            17: 16,  # F_yyz
+            18: 17,  # F_xzz
+            19: 18,  # F_yzz
+            20: 19,  # F_xyz
         }
 
         # Map WFN types to shell types (for grouping)
         # - S = 0, P = 1, D = 2, F = 3
         wfn_type_to_shell_type = {
-            1: 0,   # S
-            2: 1,   # P
-            3: 1,   # P
-            4: 1,   # P
-            5: 2,   # D
-            6: 2,   # D
-            7: 2,   # D
-            8: 2,   # D
-            9: 2,   # D
+            1: 0,  # S
+            2: 1,  # P
+            3: 1,  # P
+            4: 1,  # P
+            5: 2,  # D
+            6: 2,  # D
+            7: 2,  # D
+            8: 2,  # D
+            9: 2,  # D
             10: 2,  # D
         }
         # Add F types (11-20) to shell type mapping
@@ -783,18 +872,18 @@ class WFNLoader:
             shell_type = wfn_type_to_shell_type.get(wfn_type, 0)
 
             # Create basis function dictionary
-            basis_functions.append({
-                'type': overlap_type,
-                'center': centre_idx,
-                'coords': coords,
-                'exponents': np.array([exp]),
-                'coefficients': np.array([1.0]),
-                'shell_type': shell_type,
-                'shell_idx': i,
-                'bf_idx': bf_idx,
-            })
+            basis_functions.append(
+                {
+                    "type": overlap_type,
+                    "center": centre_idx,
+                    "coords": coords,
+                    "exponents": np.array([exp]),
+                    "coefficients": np.array([1.0]),
+                    "shell_type": shell_type,
+                    "shell_idx": i,
+                    "bf_idx": bf_idx,
+                }
+            )
             bf_idx += 1
 
         return basis_functions
-
-

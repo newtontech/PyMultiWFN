@@ -1,5 +1,29 @@
 # AGENTS.md - PyMultiWFN Ralph Loop
 
+## Dual-Agent Mode (Hourly Development)
+
+This project uses a dual-agent Ralph Loop for hourly automated development:
+
+**Coder Agent**:
+- Implements features and fixes bugs
+- Focuses on code implementation
+- Runs tests after each change
+- Updates IMPLEMENTATION_PLAN.md
+
+**Verifier Agent**:
+- Reviews code changes (git diff)
+- Validates code quality (PEP 8, type hints, docstrings)
+- Runs comprehensive test suite
+- Approves or requests changes
+
+**Automation**:
+- Loop runs automatically via cron at :27 every hour
+- Maximum 24 iterations per session
+- Automatically commits when tests pass
+- Logs all progress to `nightly-development/logs/`
+
+See `nightly-development/STATUS.md` for current session status.
+
 ## Test Commands (Backpressure)
 
 ```bash

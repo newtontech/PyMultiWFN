@@ -8,6 +8,7 @@ import numpy as np
 from pymultiwfn.core.data import Wavefunction, Shell
 from pymultiwfn.core.definitions import ELEMENT_NAMES
 
+
 class MWFNLoader:
     def __init__(self, filename: str):
         self.filename = filename
@@ -15,7 +16,7 @@ class MWFNLoader:
 
     def load(self) -> Wavefunction:
         """Parse MWFN file and return Wavefunction object."""
-        with open(self.filename, 'r') as f:
+        with open(self.filename, "r") as f:
             content = f.read()
 
         self._parse_mwfn(content)
@@ -28,26 +29,26 @@ class MWFNLoader:
         # This is a placeholder implementation
         # MWFN format would need to be defined based on Multiwfn's output format
 
-        lines = content.strip().split('\n')
+        lines = content.strip().split("\n")
         for line in lines:
             line = line.strip()
-            if line.startswith('#') or not line:
+            if line.startswith("#") or not line:
                 continue
 
             # Parse basic information
-            if 'Number of atoms' in line:
+            if "Number of atoms" in line:
                 try:
-                    self.wfn.num_atoms = int(line.split('=')[-1].strip())
+                    self.wfn.num_atoms = int(line.split("=")[-1].strip())
                 except (ValueError, IndexError):
                     pass
-            elif 'Number of electrons' in line:
+            elif "Number of electrons" in line:
                 try:
-                    self.wfn.num_electrons = int(line.split('=')[-1].strip())
+                    self.wfn.num_electrons = int(line.split("=")[-1].strip())
                 except (ValueError, IndexError):
                     pass
-            elif 'Multiplicity' in line:
+            elif "Multiplicity" in line:
                 try:
-                    self.wfn.multiplicity = int(line.split('=')[-1].strip())
+                    self.wfn.multiplicity = int(line.split("=")[-1].strip())
                 except (ValueError, IndexError):
                     pass
 

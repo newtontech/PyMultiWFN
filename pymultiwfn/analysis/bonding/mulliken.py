@@ -2,9 +2,8 @@ import numpy as np
 from pymultiwfn.core.data import Wavefunction
 from typing import Dict, Optional
 
-def calculate_mulliken_bond_order(
-    wavefunction: Wavefunction
-) -> Dict[str, np.ndarray]:
+
+def calculate_mulliken_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarray]:
     """
     Calculates the Mulliken bond order (Mulliken overlap population) matrix.
 
@@ -17,11 +16,15 @@ def calculate_mulliken_bond_order(
         - 'alpha': Alpha Mulliken bond order matrix (for unrestricted), None if restricted
         - 'beta': Beta Mulliken bond order matrix (for unrestricted), None if restricted
     """
-    if wavefunction.Ptot is None or wavefunction.Palpha is None or wavefunction.Pbeta is None:
+    if (
+        wavefunction.Ptot is None
+        or wavefunction.Palpha is None
+        or wavefunction.Pbeta is None
+    ):
         wavefunction.calculate_density_matrices()
 
     num_atoms = wavefunction.num_atoms
-    
+
     # Get mapping from atom index to its basis function indices
     atom_to_bfs_map = wavefunction.get_atomic_basis_indices()
 
@@ -34,32 +37,33 @@ def calculate_mulliken_bond_order(
     PS_tot_element_wise = wavefunction.Ptot * wavefunction.overlap_matrix
 
     for i in range(num_atoms):
-        bfs_i = atom_to_bfs_map.get(i, []) # Get list of bfs for atom i
-        if not bfs_i: # Skip if atom has no basis functions assigned
+        bfs_i = atom_to_bfs_map.get(i, [])  # Get list of bfs for atom i
+        if not bfs_i:  # Skip if atom has no basis functions assigned
             continue
 
         for j in range(i + 1, num_atoms):
-            bfs_j = atom_to_bfs_map.get(j, []) # Get list of bfs for atom j
-            if not bfs_j: # Skip if atom has no basis functions assigned
+            bfs_j = atom_to_bfs_map.get(j, [])  # Get list of bfs for atom j
+            if not bfs_j:  # Skip if atom has no basis functions assigned
                 continue
 
             # Sum up elements of the population matrix belonging to basis functions
             # on atom i and atom j.
             bond_order_val = np.sum(PS_tot_element_wise[np.ix_(bfs_i, bfs_j)])
-            
+
             bnd_mattot[i, j] = bond_order_val
-            bnd_mattot[j, i] = bond_order_val # Symmetric matrix
+            bnd_mattot[j, i] = bond_order_val  # Symmetric matrix
 
     # Fortran code applies factor of 2 and then sums diagonals
     # bndmattot=2*(bndmattot+transpose(bndmattot))
     # forall (i=1:ncenter) bndmattot(i,i)=sum(bndmattot(i,:))
     # It seems to apply 2* to off-diagonals, and then sum for diagonals.
     # We can do this in two steps to be explicit.
-    bnd_mattot_off_diag = bnd_mattot + bnd_mattot.T # Already symmetric from above loop, just make explicit
+    bnd_mattot_off_diag = (
+        bnd_mattot + bnd_mattot.T
+    )  # Already symmetric from above loop, just make explicit
     bnd_mattot = 2 * bnd_mattot_off_diag
     for i in range(num_atoms):
         bnd_mattot[i, i] = np.sum(bnd_mattot[i, :])
-
 
     # --- Calculate Alpha and Beta Mulliken Bond Orders for Unrestricted Wavefunctions ---
     if wavefunction.is_unrestricted:
@@ -81,12 +85,12 @@ def calculate_mulliken_bond_order(
 
                 bond_order_alpha = np.sum(PS_alpha_element_wise[np.ix_(bfs_i, bfs_j)])
                 bond_order_beta = np.sum(PS_beta_element_wise[np.ix_(bfs_i, bfs_j)])
-                
+
                 bnd_mata[i, j] = bond_order_alpha
                 bnd_mata[j, i] = bond_order_alpha
                 bnd_matb[i, j] = bond_order_beta
                 bnd_matb[j, i] = bond_order_beta
-        
+
         bnd_mata_off_diag = bnd_mata + bnd_mata.T
         bnd_mata = 2 * bnd_mata_off_diag
         bnd_matb_off_diag = bnd_matb + bnd_matb.T
@@ -96,13 +100,13 @@ def calculate_mulliken_bond_order(
         for i in range(num_atoms):
             bnd_mata[i, i] = np.sum(bnd_mata[i, :])
             bnd_matb[i, i] = np.sum(bnd_matb[i, :])
-        
+
         # Total Mulliken bond order for unrestricted case is sum of alpha and beta
         bnd_mattot = bnd_mata + bnd_matb
 
-    result = {'total': bnd_mattot}
+    result = {"total": bnd_mattot}
     if wavefunction.is_unrestricted:
-        result['alpha'] = bnd_mata
-        result['beta'] = bnd_matb
+        result["alpha"] = bnd_mata
+        result["beta"] = bnd_matb
 
     return result

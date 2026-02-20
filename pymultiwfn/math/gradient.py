@@ -84,6 +84,7 @@ def _evaluate_basis_all(wfn: Wavefunction, coords: np.ndarray) -> np.ndarray:
     Wrapper for basis.evaluate_basis for compatibility.
     """
     from pymultiwfn.math.basis import evaluate_basis
+
     return evaluate_basis(wfn, coords)
 
 
@@ -142,14 +143,14 @@ def _evaluate_basis_gradient_all(wfn: Wavefunction, coords: np.ndarray) -> np.nd
             grad_phi[:, 2, basis_idx] = r_vec[:, 0] * grad_radial[:, 2]
 
             # φ_y = y * radial
-            grad_phi[:, 0, basis_idx+1] = r_vec[:, 1] * grad_radial[:, 0]
-            grad_phi[:, 1, basis_idx+1] = radial + r_vec[:, 1] * grad_radial[:, 1]
-            grad_phi[:, 2, basis_idx+1] = r_vec[:, 1] * grad_radial[:, 2]
+            grad_phi[:, 0, basis_idx + 1] = r_vec[:, 1] * grad_radial[:, 0]
+            grad_phi[:, 1, basis_idx + 1] = radial + r_vec[:, 1] * grad_radial[:, 1]
+            grad_phi[:, 2, basis_idx + 1] = r_vec[:, 1] * grad_radial[:, 2]
 
             # φ_z = z * radial
-            grad_phi[:, 0, basis_idx+2] = r_vec[:, 2] * grad_radial[:, 0]
-            grad_phi[:, 1, basis_idx+2] = r_vec[:, 2] * grad_radial[:, 1]
-            grad_phi[:, 2, basis_idx+2] = radial + r_vec[:, 2] * grad_radial[:, 2]
+            grad_phi[:, 0, basis_idx + 2] = r_vec[:, 2] * grad_radial[:, 0]
+            grad_phi[:, 1, basis_idx + 2] = r_vec[:, 2] * grad_radial[:, 1]
+            grad_phi[:, 2, basis_idx + 2] = radial + r_vec[:, 2] * grad_radial[:, 2]
 
             basis_idx += 3
 
@@ -173,13 +174,13 @@ def _evaluate_basis_gradient_all(wfn: Wavefunction, coords: np.ndarray) -> np.nd
             grad_phi[:, 1, basis_idx] = r_vec[:, 0] * grad_radial_p[:, 1]
             grad_phi[:, 2, basis_idx] = r_vec[:, 0] * grad_radial_p[:, 2]
 
-            grad_phi[:, 0, basis_idx+1] = r_vec[:, 1] * grad_radial_p[:, 0]
-            grad_phi[:, 1, basis_idx+1] = radial_p + r_vec[:, 1] * grad_radial_p[:, 1]
-            grad_phi[:, 2, basis_idx+1] = r_vec[:, 1] * grad_radial_p[:, 2]
+            grad_phi[:, 0, basis_idx + 1] = r_vec[:, 1] * grad_radial_p[:, 0]
+            grad_phi[:, 1, basis_idx + 1] = radial_p + r_vec[:, 1] * grad_radial_p[:, 1]
+            grad_phi[:, 2, basis_idx + 1] = r_vec[:, 1] * grad_radial_p[:, 2]
 
-            grad_phi[:, 0, basis_idx+2] = r_vec[:, 2] * grad_radial_p[:, 0]
-            grad_phi[:, 1, basis_idx+2] = r_vec[:, 2] * grad_radial_p[:, 1]
-            grad_phi[:, 2, basis_idx+2] = radial_p + r_vec[:, 2] * grad_radial_p[:, 2]
+            grad_phi[:, 0, basis_idx + 2] = r_vec[:, 2] * grad_radial_p[:, 0]
+            grad_phi[:, 1, basis_idx + 2] = r_vec[:, 2] * grad_radial_p[:, 1]
+            grad_phi[:, 2, basis_idx + 2] = radial_p + r_vec[:, 2] * grad_radial_p[:, 2]
 
             basis_idx += 3
 
@@ -200,29 +201,29 @@ def _evaluate_basis_gradient_all(wfn: Wavefunction, coords: np.ndarray) -> np.nd
             grad_phi[:, 2, basis_idx] = xx * grad_radial[:, 2]
 
             # φ_yy = yy * radial
-            grad_phi[:, 0, basis_idx+1] = yy * grad_radial[:, 0]
-            grad_phi[:, 1, basis_idx+1] = 2 * y * radial + yy * grad_radial[:, 1]
-            grad_phi[:, 2, basis_idx+1] = yy * grad_radial[:, 2]
+            grad_phi[:, 0, basis_idx + 1] = yy * grad_radial[:, 0]
+            grad_phi[:, 1, basis_idx + 1] = 2 * y * radial + yy * grad_radial[:, 1]
+            grad_phi[:, 2, basis_idx + 1] = yy * grad_radial[:, 2]
 
             # φ_zz = zz * radial
-            grad_phi[:, 0, basis_idx+2] = zz * grad_radial[:, 0]
-            grad_phi[:, 1, basis_idx+2] = zz * grad_radial[:, 1]
-            grad_phi[:, 2, basis_idx+2] = 2 * z * radial + zz * grad_radial[:, 2]
+            grad_phi[:, 0, basis_idx + 2] = zz * grad_radial[:, 0]
+            grad_phi[:, 1, basis_idx + 2] = zz * grad_radial[:, 1]
+            grad_phi[:, 2, basis_idx + 2] = 2 * z * radial + zz * grad_radial[:, 2]
 
             # φ_xy = xy * radial
-            grad_phi[:, 0, basis_idx+3] = y * radial + xy * grad_radial[:, 0]
-            grad_phi[:, 1, basis_idx+3] = x * radial + xy * grad_radial[:, 1]
-            grad_phi[:, 2, basis_idx+3] = xy * grad_radial[:, 2]
+            grad_phi[:, 0, basis_idx + 3] = y * radial + xy * grad_radial[:, 0]
+            grad_phi[:, 1, basis_idx + 3] = x * radial + xy * grad_radial[:, 1]
+            grad_phi[:, 2, basis_idx + 3] = xy * grad_radial[:, 2]
 
             # φ_xz = xz * radial
-            grad_phi[:, 0, basis_idx+4] = z * radial + xz * grad_radial[:, 0]
-            grad_phi[:, 1, basis_idx+4] = xz * grad_radial[:, 1]
-            grad_phi[:, 2, basis_idx+4] = x * radial + xz * grad_radial[:, 2]
+            grad_phi[:, 0, basis_idx + 4] = z * radial + xz * grad_radial[:, 0]
+            grad_phi[:, 1, basis_idx + 4] = xz * grad_radial[:, 1]
+            grad_phi[:, 2, basis_idx + 4] = x * radial + xz * grad_radial[:, 2]
 
             # φ_yz = yz * radial
-            grad_phi[:, 0, basis_idx+5] = yz * grad_radial[:, 0]
-            grad_phi[:, 1, basis_idx+5] = z * radial + yz * grad_radial[:, 1]
-            grad_phi[:, 2, basis_idx+5] = y * radial + yz * grad_radial[:, 2]
+            grad_phi[:, 0, basis_idx + 5] = yz * grad_radial[:, 0]
+            grad_phi[:, 1, basis_idx + 5] = z * radial + yz * grad_radial[:, 1]
+            grad_phi[:, 2, basis_idx + 5] = y * radial + yz * grad_radial[:, 2]
 
             basis_idx += 6
 
@@ -282,10 +283,10 @@ def _evaluate_basis_laplacian_all(wfn: Wavefunction, coords: np.ndarray) -> np.n
             lap_phi[:, basis_idx] = 2 * grad_radial[:, 0] + x * lap_radial
 
             # φ_y = y * radial
-            lap_phi[:, basis_idx+1] = 2 * grad_radial[:, 1] + y * lap_radial
+            lap_phi[:, basis_idx + 1] = 2 * grad_radial[:, 1] + y * lap_radial
 
             # φ_z = z * radial
-            lap_phi[:, basis_idx+2] = 2 * grad_radial[:, 2] + z * lap_radial
+            lap_phi[:, basis_idx + 2] = 2 * grad_radial[:, 2] + z * lap_radial
 
             basis_idx += 3
 
@@ -308,13 +309,14 @@ def _evaluate_basis_laplacian_all(wfn: Wavefunction, coords: np.ndarray) -> np.n
             x, y, z = r_vec[:, 0], r_vec[:, 1], r_vec[:, 2]
 
             lap_phi[:, basis_idx] = 2 * grad_radial[:, 0] + x * lap_radial
-            lap_phi[:, basis_idx+1] = 2 * grad_radial[:, 1] + y * lap_radial
-            lap_phi[:, basis_idx+2] = 2 * grad_radial[:, 2] + z * lap_radial
+            lap_phi[:, basis_idx + 1] = 2 * grad_radial[:, 1] + y * lap_radial
+            lap_phi[:, basis_idx + 2] = 2 * grad_radial[:, 2] + z * lap_radial
 
             basis_idx += 3
 
         # D shell (type=2) - Cartesian
         elif shell.type == 2:
+            radial = _eval_contraction(shell.exponents, shell.coefficients, r2)
             lap_radial = _eval_contraction_laplacian(
                 shell.exponents, shell.coefficients, r2
             )
@@ -333,28 +335,28 @@ def _evaluate_basis_laplacian_all(wfn: Wavefunction, coords: np.ndarray) -> np.n
             )
 
             # φ_yy = yy * radial
-            lap_phi[:, basis_idx+1] = (
+            lap_phi[:, basis_idx + 1] = (
                 2 * radial + 4 * y * grad_radial[:, 1] + yy * lap_radial
             )
 
             # φ_zz = zz * radial
-            lap_phi[:, basis_idx+2] = (
+            lap_phi[:, basis_idx + 2] = (
                 2 * radial + 4 * z * grad_radial[:, 2] + zz * lap_radial
             )
 
             # φ_xy = xy * radial
             # ∇²φ_xy = 2*(x*d/dy(radial) + y*d/dx(radial)) + xy*∇²radial
-            lap_phi[:, basis_idx+3] = (
+            lap_phi[:, basis_idx + 3] = (
                 2 * (x * grad_radial[:, 1] + y * grad_radial[:, 0]) + xy * lap_radial
             )
 
             # φ_xz = xz * radial
-            lap_phi[:, basis_idx+4] = (
+            lap_phi[:, basis_idx + 4] = (
                 2 * (x * grad_radial[:, 2] + z * grad_radial[:, 0]) + xz * lap_radial
             )
 
             # φ_yz = yz * radial
-            lap_phi[:, basis_idx+5] = (
+            lap_phi[:, basis_idx + 5] = (
                 2 * (y * grad_radial[:, 2] + z * grad_radial[:, 1]) + yz * lap_radial
             )
 
@@ -364,10 +366,7 @@ def _evaluate_basis_laplacian_all(wfn: Wavefunction, coords: np.ndarray) -> np.n
 
 
 def _eval_contraction_gradient(
-    exps: np.ndarray,
-    coeffs: np.ndarray,
-    r2: np.ndarray,
-    r_vec: np.ndarray
+    exps: np.ndarray, coeffs: np.ndarray, r2: np.ndarray, r_vec: np.ndarray
 ) -> np.ndarray:
     """
     Evaluates gradient of the radial contraction.
@@ -393,9 +392,7 @@ def _eval_contraction_gradient(
 
 
 def _eval_contraction_laplacian(
-    exps: np.ndarray,
-    coeffs: np.ndarray,
-    r2: np.ndarray
+    exps: np.ndarray, coeffs: np.ndarray, r2: np.ndarray
 ) -> np.ndarray:
     """
     Evaluates Laplacian of the radial contraction.
@@ -443,15 +440,13 @@ def _make_density_matrix(coeffs: np.ndarray, occs: np.ndarray) -> np.ndarray:
     n_occ = occs[occ_idx]
 
     # P_mu_nu = sum_i n_i C_i_mu C_i_nu
-    P = np.einsum('i,ij,ik->jk', n_occ, C_occ, C_occ)
+    P = np.einsum("i,ij,ik->jk", n_occ, C_occ, C_occ)
 
     return P
 
 
 def _contract_gradient(
-    phi: np.ndarray,
-    grad_phi: np.ndarray,
-    P: np.ndarray
+    phi: np.ndarray, grad_phi: np.ndarray, P: np.ndarray
 ) -> np.ndarray:
     """
     Contracts basis values and gradients with density matrix.
@@ -481,10 +476,7 @@ def _contract_gradient(
 
 
 def _contract_laplacian(
-    phi: np.ndarray,
-    grad_phi: np.ndarray,
-    lap_phi: np.ndarray,
-    P: np.ndarray
+    phi: np.ndarray, grad_phi: np.ndarray, lap_phi: np.ndarray, P: np.ndarray
 ) -> np.ndarray:
     """
     Contracts basis values, gradients, and Laplacians with density matrix.
@@ -506,14 +498,14 @@ def _contract_laplacian(
     P_lap = P @ lap_phi.T
 
     # First term: Σ_ij P_ij ∇²φ_i φ_j
-    term1 = np.einsum('ij,ji->i', P, lap_phi.T * phi.T)
+    term1 = np.einsum("ij,ji->i", P, lap_phi.T * phi.T)
 
     # Second term: 2 * Σ_ij P_ij ∇φ_i · ∇φ_j
     # Compute dot product of gradients for each pair of basis functions
     # grad_dot[k, i, j] = ∇φ_i · ∇φ_j at point k
     term2 = np.zeros(n_points)
     for d in range(3):
-        term2 += np.einsum('ij,ji->i', P, grad_phi[:, d, :].T * grad_phi[:, d, :].T)
+        term2 += np.einsum("ij,ji->i", P, grad_phi[:, d, :].T * grad_phi[:, d, :].T)
 
     laplacian = term1 + 2 * term2
 

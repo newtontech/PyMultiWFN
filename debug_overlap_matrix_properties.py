@@ -26,9 +26,9 @@ def analyze_overlap_matrix(wfn, wfn_name, verbose=True):
     Returns:
         Dictionary with analysis results
     """
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print(f"Analyzing: {wfn_name}")
-    print("="*70)
+    print("=" * 70)
 
     # Basic wavefunction info
     if verbose:
@@ -151,31 +151,31 @@ def analyze_overlap_matrix(wfn, wfn_name, verbose=True):
             print(f"    {' '.join(row_vals)}")
 
         print("  Bottom-right 5x5:")
-        row_start = max(0, S.shape[1]-5)
-        for i in range(max(0, S.shape[0]-5), S.shape[0]):
+        row_start = max(0, S.shape[1] - 5)
+        for i in range(max(0, S.shape[0] - 5), S.shape[0]):
             row_vals = [f"{S[i,j]:8.4f}" for j in range(row_start, S.shape[1])]
             print(f"    {' '.join(row_vals)}")
 
     # Return analysis results
     return {
-        'wfn_name': wfn_name,
-        'shape': S.shape,
-        'is_symmetric': is_symmetric,
-        'min_diagonal': min_diagonal,
-        'max_diagonal': max_diagonal,
-        'trace': trace,
-        'eigenvalues': eigenvalues,
-        'condition_number': np.max(eigenvalues) / np.min(eigenvalues),
-        'is_identity': is_identity,
-        'matrix': S,
+        "wfn_name": wfn_name,
+        "shape": S.shape,
+        "is_symmetric": is_symmetric,
+        "min_diagonal": min_diagonal,
+        "max_diagonal": max_diagonal,
+        "trace": trace,
+        "eigenvalues": eigenvalues,
+        "condition_number": np.max(eigenvalues) / np.min(eigenvalues),
+        "is_identity": is_identity,
+        "matrix": S,
     }
 
 
 def main():
     """Main function."""
-    print("="*70)
+    print("=" * 70)
     print("PyMultiWFN Overlap Matrix Debugger")
-    print("="*70)
+    print("=" * 70)
 
     test_data_dir = Path("/home/yhm/software/PyMultiWFN/consistency_verifier/examples")
 
@@ -204,12 +204,13 @@ def main():
         except Exception as e:
             print(f"\n❌ Error loading {filename}: {e}")
             import traceback
+
             traceback.print_exc()
 
     # Summary
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("SUMMARY")
-    print("="*70)
+    print("=" * 70)
 
     if results:
         print(f"\nAnalyzed {len(results)} wavefunction(s)")
@@ -218,13 +219,13 @@ def main():
         issues = []
 
         for result in results:
-            if not result['is_symmetric']:
+            if not result["is_symmetric"]:
                 issues.append(f"{result['wfn_name']}: Not symmetric")
 
-            if result['is_identity']:
+            if result["is_identity"]:
                 issues.append(f"{result['wfn_name']}: Identity matrix (ERROR!)")
 
-            if np.min(result['eigenvalues']) <= 0:
+            if np.min(result["eigenvalues"]) <= 0:
                 issues.append(f"{result['wfn_name']}: Has non-positive eigenvalues")
 
         if issues:
@@ -234,7 +235,7 @@ def main():
         else:
             print("\n✅ All matrices pass basic checks!")
 
-    print("\n" + "="*70 + "\n")
+    print("\n" + "=" * 70 + "\n")
 
 
 if __name__ == "__main__":

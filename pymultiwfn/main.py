@@ -9,9 +9,12 @@ from pymultiwfn.math.density import calc_density
 # Global variable to hold the current wavefunction
 current_wfn = None
 
+
 def main():
     global current_wfn
-    parser = argparse.ArgumentParser(description="PyMultiWFN: A Python refactoring of Multiwfn")
+    parser = argparse.ArgumentParser(
+        description="PyMultiWFN: A Python refactoring of Multiwfn"
+    )
     parser.add_argument("filename", nargs="?", help="Input file path")
     args = parser.parse_args()
 
@@ -31,11 +34,13 @@ def main():
     if current_wfn:
         main_menu()
 
+
 def print_splash():
     print(" Multiwfn -- A Multifunctional Wavefunction Analyzer")
     print(" (c) Tian Lu, 2025")
     print(" Refactored in Python by PyMultiWFN Team")
     print("")
+
 
 def process_file(filepath):
     global current_wfn
@@ -53,6 +58,7 @@ def process_file(filepath):
         print(f"Error loading file: {e}")
         current_wfn = None
 
+
 def show_detailed_info():
     global current_wfn
     if current_wfn is None:
@@ -68,7 +74,7 @@ def show_detailed_info():
     print(f"Basis functions: {wfn.num_basis}")
     print(f"Charge: {wfn.charge}")
     print(f"Multiplicity: {wfn.multiplicity}")
-    
+
     if wfn.occupations is not None:
         print("Occupations: Loaded/Inferred")
     else:
@@ -77,8 +83,10 @@ def show_detailed_info():
     # Density check at the first atom
     if wfn.num_atoms > 0:
         atom0 = wfn.atoms[0]
-        coords = np.array([atom0.coord]) # Shape (1, 3)
-        print(f"\nCalculating density at atom 1 ({atom0.element}) position: {coords[0]}")
+        coords = np.array([atom0.coord])  # Shape (1, 3)
+        print(
+            f"\nCalculating density at atom 1 ({atom0.element}) position: {coords[0]}"
+        )
         try:
             rho = calc_density(wfn, coords)
             print(f"Electron Density: {rho[0]:.6f}")
@@ -89,6 +97,7 @@ def show_detailed_info():
         except Exception as e:
             print(f"Error calculating density: {e}")
 
+
 def main_menu():
     while True:
         print("---------------------------------------------------------")
@@ -97,16 +106,17 @@ def main_menu():
         print(" 1 Show detailed information")
         print(" ...")
         print(" q Exit")
-        
+
         choice = input("Input command: ")
-        if choice == 'q':
+        if choice == "q":
             break
-        elif choice == '1':
+        elif choice == "1":
             show_detailed_info()
-        elif choice == '0':
-             print("Function 0 is not yet implemented.")
+        elif choice == "0":
+            print("Function 0 is not yet implemented.")
         else:
             print("Invalid command")
+
 
 if __name__ == "__main__":
     main()

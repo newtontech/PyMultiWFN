@@ -7,6 +7,7 @@ import re
 import numpy as np
 from pymultiwfn.core.data import Wavefunction
 
+
 class DXLoader:
     def __init__(self, filename: str):
         self.filename = filename
@@ -14,7 +15,7 @@ class DXLoader:
 
     def load(self) -> Wavefunction:
         """Parse DX file and return Wavefunction object."""
-        with open(self.filename, 'r') as f:
+        with open(self.filename, "r") as f:
             content = f.read()
 
         self._parse_dx(content)
@@ -22,7 +23,7 @@ class DXLoader:
 
     def _parse_dx(self, content: str):
         """Parse OpenDX format for volumetric data."""
-        lines = content.strip().split('\n')
+        lines = content.strip().split("\n")
 
         # Parse header information
         self._parse_header(lines)
@@ -30,7 +31,7 @@ class DXLoader:
         # Find data section
         data_start = None
         for i, line in enumerate(lines):
-            if line.strip().startswith('object 1 class gridpositions counts'):
+            if line.strip().startswith("object 1 class gridpositions counts"):
                 # Extract grid dimensions
                 parts = line.strip().split()
                 if len(parts) >= 8:
@@ -51,10 +52,10 @@ class DXLoader:
             line = line.strip()
 
             # Extract title if available
-            if 'object' in line and 'class' in line and 'field' in line:
+            if "object" in line and "class" in line and "field" in line:
                 parts = line.split()
-                if len(parts) >= 3 and parts[0] == 'object':
-                    self.wfn.title = ' '.join(parts[3:]).strip('"')
+                if len(parts) >= 3 and parts[0] == "object":
+                    self.wfn.title = " ".join(parts[3:]).strip('"')
                     break
 
     def _parse_grid_data(self, lines, start_idx):
@@ -75,10 +76,14 @@ class DXLoader:
                 parts = lines[line_idx + i].strip().split()
                 if len(parts) >= 3:
                     if origin is None:
-                        origin = np.array([float(parts[0]), float(parts[1]), float(parts[2])])
+                        origin = np.array(
+                            [float(parts[0]), float(parts[1]), float(parts[2])]
+                        )
                     else:
                         # These are delta vectors, calculate spacing
-                        vector = np.array([float(parts[0]), float(parts[1]), float(parts[2])])
+                        vector = np.array(
+                            [float(parts[0]), float(parts[1]), float(parts[2])]
+                        )
                         if spacing is None:
                             spacing = np.linalg.norm(vector)
 
@@ -90,11 +95,11 @@ class DXLoader:
             line = lines[i].strip()
 
             # Check for data section marker
-            if 'object 2 class array type float rank 1 shape' in line:
+            if "object 2 class array type float rank 1 shape" in line:
                 data_section_found = True
                 # Find the actual data values (usually after "data follows")
                 for j in range(i + 1, len(lines)):
-                    if 'data follows' in lines[j].lower():
+                    if "data follows" in lines[j].lower():
                         line_idx = j + 1
                         break
                 break
@@ -107,7 +112,7 @@ class DXLoader:
             line = lines[i].strip()
 
             # Check for end of data
-            if line.startswith('attribute') or line.startswith('object'):
+            if line.startswith("attribute") or line.startswith("object"):
                 break
 
             if line:
@@ -123,7 +128,9 @@ class DXLoader:
             grid_data = np.array(grid_data)
 
             # Reshape according to grid dimensions
-            expected_size = self.wfn.grid_shape[0] * self.wfn.grid_shape[1] * self.wfn.grid_shape[2]
+            expected_size = (
+                self.wfn.grid_shape[0] * self.wfn.grid_shape[1] * self.wfn.grid_shape[2]
+            )
             if len(grid_data) >= expected_size:
                 grid_data = grid_data[:expected_size].reshape(self.wfn.grid_shape)
                 self.wfn.grid_data = grid_data
@@ -136,7 +143,7 @@ class DXLoader:
 
     def get_volumetric_data(self):
         """Get the parsed volumetric data."""
-        if hasattr(self.wfn, 'grid_data'):
+        if hasattr(self.wfn, "grid_data"):
             return self.wfn.grid_data
         else:
             raise ValueError("No volumetric data loaded")
@@ -144,10 +151,10 @@ class DXLoader:
     def get_grid_info(self):
         """Get grid information (shape, origin, spacing)."""
         info = {}
-        if hasattr(self.wfn, 'grid_shape'):
-            info['shape'] = self.wfn.grid_shape
-        if hasattr(self.wfn, 'grid_origin'):
-            info['origin'] = self.wfn.grid_origin
-        if hasattr(self.wfn, 'grid_spacing'):
-            info['spacing'] = self.wfn.grid_spacing
+        if hasattr(self.wfn, "grid_shape"):
+            info["shape"] = self.wfn.grid_shape
+        if hasattr(self.wfn, "grid_origin"):
+            info["origin"] = self.wfn.grid_origin
+        if hasattr(self.wfn, "grid_spacing"):
+            info["spacing"] = self.wfn.grid_spacing
         return info

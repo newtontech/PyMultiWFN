@@ -32,4 +32,6 @@ for i, indices in atomic_indices.items():
 print(f"\n=== Expected vs Actual ===")
 print(f"Number of atoms: {wfn.num_atoms}")
 print(f"Number of basis functions: {wfn.num_basis}")
-print(f"Total basis functions from atoms: {sum(len(indices) for indices in atomic_indices.values())}")
+print(
+    f"Total basis functions from atoms: {sum(len(indices) for indices in atomic_indices.values())}"
+)

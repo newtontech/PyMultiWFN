@@ -21,6 +21,7 @@ from ..config import Config
 
 class PlotStyle(Enum):
     """Available plot styles"""
+
     DEFAULT = "default"
     SEABORN = "seaborn-v0_8"
     CLASSIC = "classic"
@@ -29,6 +30,7 @@ class PlotStyle(Enum):
 
 class GraphFormat(Enum):
     """Available graph output formats"""
+
     PNG = "png"
     SVG = "svg"
     PDF = "pdf"
@@ -38,6 +40,7 @@ class GraphFormat(Enum):
 @dataclass
 class PlotSettings:
     """Settings for plot generation"""
+
     style: PlotStyle = PlotStyle.DEFAULT
     figure_size: Tuple[int, int] = (10, 8)
     dpi: int = 300
@@ -72,21 +75,27 @@ class Plotter:
         try:
             plt.style.use(self.settings.style.value)
         except:
-            plt.style.use('default')
+            plt.style.use("default")
 
         # Color maps for different types of data
         self.color_maps = {
-            'density': 'viridis',
-            'orbital': 'RdBu_r',
-            'gradient': 'plasma',
-            'potential': 'coolwarm',
-            'rdg': 'hot',
-            'sign_lambda2': 'seismic'
+            "density": "viridis",
+            "orbital": "RdBu_r",
+            "gradient": "plasma",
+            "potential": "coolwarm",
+            "rdg": "hot",
+            "sign_lambda2": "seismic",
         }
 
-    def plot_1d(self, x: np.ndarray, y: np.ndarray,
-                xlabel: str = 'X', ylabel: str = 'Y',
-                title: str = 'Plot', color: str = 'blue') -> plt.Figure:
+    def plot_1d(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        xlabel: str = "X",
+        ylabel: str = "Y",
+        title: str = "Plot",
+        color: str = "blue",
+    ) -> plt.Figure:
         """Create a 1D plot"""
         fig, ax = plt.subplots(figsize=(8, 6))
         ax.plot(x, y, color=color, linewidth=2)
@@ -96,40 +105,57 @@ class Plotter:
         ax.grid(True, alpha=0.3)
         return fig
 
-    def plot_contour(self, x: np.ndarray, y: np.ndarray, z: np.ndarray,
-                     xlabel: str = 'X', ylabel: str = 'Y',
-                     title: str = 'Contour Plot') -> plt.Figure:
+    def plot_contour(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        z: np.ndarray,
+        xlabel: str = "X",
+        ylabel: str = "Y",
+        title: str = "Contour Plot",
+    ) -> plt.Figure:
         """Create a contour plot"""
         fig, ax = plt.subplots(figsize=(8, 6))
-        contour = ax.contourf(x, y, z, levels=20, cmap='viridis')
+        contour = ax.contourf(x, y, z, levels=20, cmap="viridis")
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
         ax.set_title(title)
         plt.colorbar(contour, ax=ax)
         return fig
 
-    def plot_3d_surface(self, x: np.ndarray, y: np.ndarray, z: np.ndarray,
-                       xlabel: str = 'X', ylabel: str = 'Y', zlabel: str = 'Z',
-                       title: str = '3D Surface Plot', colorscale: str = 'Viridis') -> go.Figure:
+    def plot_3d_surface(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        z: np.ndarray,
+        xlabel: str = "X",
+        ylabel: str = "Y",
+        zlabel: str = "Z",
+        title: str = "3D Surface Plot",
+        colorscale: str = "Viridis",
+    ) -> go.Figure:
         """Create a 3D surface plot using plotly"""
         fig = go.Figure(data=[go.Surface(x=x, y=y, z=z, colorscale=colorscale)])
         fig.update_layout(
             title=title,
-            scene=dict(
-                xaxis_title=xlabel,
-                yaxis_title=ylabel,
-                zaxis_title=zlabel
-            )
+            scene=dict(xaxis_title=xlabel, yaxis_title=ylabel, zaxis_title=zlabel),
         )
         return fig
 
-    def plot_scatter(self, x: np.ndarray, y: np.ndarray,
-                    xlabel: str = 'X', ylabel: str = 'Y',
-                    title: str = 'Scatter Plot',
-                    xlabel_tex: str = None, ylabel_tex: str = None,
-                    color: str = 'blue', alpha: float = 0.6,
-                    xlim: Tuple[float, float] = None,
-                    ylim: Tuple[float, float] = None) -> plt.Figure:
+    def plot_scatter(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        xlabel: str = "X",
+        ylabel: str = "Y",
+        title: str = "Scatter Plot",
+        xlabel_tex: str = None,
+        ylabel_tex: str = None,
+        color: str = "blue",
+        alpha: float = 0.6,
+        xlim: Tuple[float, float] = None,
+        ylim: Tuple[float, float] = None,
+    ) -> plt.Figure:
         """
         Create a scatter plot, commonly used for NCI/IGM analysis
 
@@ -179,7 +205,7 @@ class Plotter:
         else:
             ax.set_ylabel(ylabel, fontsize=self.settings.font_size)
 
-        ax.set_title(title, fontsize=self.settings.font_size + 2, fontweight='bold')
+        ax.set_title(title, fontsize=self.settings.font_size + 2, fontweight="bold")
         ax.grid(True, alpha=0.3)
 
         # Set limits
@@ -191,10 +217,14 @@ class Plotter:
         plt.tight_layout()
         return fig
 
-    def plot_nci_scatter(self, sign_lambda2_rho: np.ndarray, rdg: np.ndarray,
-                        xlim: Tuple[float, float] = (-0.5, 0.5),
-                        ylim: Tuple[float, float] = (0, 2),
-                        title: str = 'NCI Analysis: sign(λ₂)ρ vs RDG') -> plt.Figure:
+    def plot_nci_scatter(
+        self,
+        sign_lambda2_rho: np.ndarray,
+        rdg: np.ndarray,
+        xlim: Tuple[float, float] = (-0.5, 0.5),
+        ylim: Tuple[float, float] = (0, 2),
+        title: str = "NCI Analysis: sign(λ₂)ρ vs RDG",
+    ) -> plt.Figure:
         """
         Create NCI scatter plot
 
@@ -215,21 +245,26 @@ class Plotter:
             Matplotlib figure object
         """
         return self.plot_scatter(
-            sign_lambda2_rho, rdg,
-            xlabel='sign(λ₂)ρ (a.u.)',
-            ylabel='Reduced Density Gradient',
-            xlabel_tex=r'sign($\lambda_2$)\rho$ (a.u.)',
-            ylabel_tex='RDG',
+            sign_lambda2_rho,
+            rdg,
+            xlabel="sign(λ₂)ρ (a.u.)",
+            ylabel="Reduced Density Gradient",
+            xlabel_tex=r"sign($\lambda_2$)\rho$ (a.u.)",
+            ylabel_tex="RDG",
             title=title,
-            color='blue',
+            color="blue",
             xlim=xlim,
-            ylim=ylim
+            ylim=ylim,
         )
 
-    def plot_igm_scatter(self, sign_lambda2_rho: np.ndarray, delta_g: np.ndarray,
-                       plot_type: str = 'total',
-                       xlim: Tuple[float, float] = (-0.5, 0.5),
-                       ylim: Tuple[float, float] = None) -> plt.Figure:
+    def plot_igm_scatter(
+        self,
+        sign_lambda2_rho: np.ndarray,
+        delta_g: np.ndarray,
+        plot_type: str = "total",
+        xlim: Tuple[float, float] = (-0.5, 0.5),
+        ylim: Tuple[float, float] = None,
+    ) -> plt.Figure:
         """
         Create IGM scatter plot
 
@@ -255,38 +290,46 @@ class Plotter:
             delta_g_total = delta_g
             delta_g_inter = delta_g_intra = None
 
-        if plot_type == 'inter' and delta_g_inter is not None:
+        if plot_type == "inter" and delta_g_inter is not None:
             y_data = delta_g_inter
-            ylabel = r'δg$^{inter}$ (a.u.)'
-            title = 'IGM Analysis: δg_inter vs sign(λ₂)ρ'
-        elif plot_type == 'intra' and delta_g_intra is not None:
+            ylabel = r"δg$^{inter}$ (a.u.)"
+            title = "IGM Analysis: δg_inter vs sign(λ₂)ρ"
+        elif plot_type == "intra" and delta_g_intra is not None:
             y_data = delta_g_intra
-            ylabel = r'δg$^{intra}$ (a.u.)'
-            title = 'IGM Analysis: δg_intra vs sign(λ₂)ρ'
+            ylabel = r"δg$^{intra}$ (a.u.)"
+            title = "IGM Analysis: δg_intra vs sign(λ₂)ρ"
         else:
             y_data = delta_g_total
-            ylabel = r'δg$ (a.u.)'
-            title = 'IGM Analysis: δg vs sign(λ₂)ρ'
+            ylabel = r"δg$ (a.u.)"
+            title = "IGM Analysis: δg vs sign(λ₂)ρ"
 
         if ylim is None:
             ylim = (0, np.percentile(y_data[y_data > 0], 99))
 
         return self.plot_scatter(
-            sign_lambda2_rho, y_data,
-            xlabel='sign(λ₂)ρ (a.u.)',
+            sign_lambda2_rho,
+            y_data,
+            xlabel="sign(λ₂)ρ (a.u.)",
             ylabel=ylabel,
-            xlabel_tex=r'sign($\lambda_2$)\rho$ (a.u.)',
+            xlabel_tex=r"sign($\lambda_2$)\rho$ (a.u.)",
             ylabel_tex=ylabel,
             title=title,
-            color='red',
+            color="red",
             xlim=xlim,
-            ylim=ylim
+            ylim=ylim,
         )
 
-    def plot_density_map(self, x: np.ndarray, y: np.ndarray, density: np.ndarray,
-                         xlabel: str = 'X', ylabel: str = 'Y',
-                         title: str = 'Electron Density Map',
-                         levels: int = 20, colorscale: str = 'viridis') -> plt.Figure:
+    def plot_density_map(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        density: np.ndarray,
+        xlabel: str = "X",
+        ylabel: str = "Y",
+        title: str = "Electron Density Map",
+        levels: int = 20,
+        colorscale: str = "viridis",
+    ) -> plt.Figure:
         """
         Create 2D density map
 
@@ -317,30 +360,41 @@ class Plotter:
             # Reshape 1D data to 2D grid
             nx = int(np.sqrt(len(density)))
             ny = len(density) // nx
-            density_2d = density[:nx*ny].reshape(nx, ny)
+            density_2d = density[: nx * ny].reshape(nx, ny)
         else:
             density_2d = density
 
         # Use appropriate colormap
-        cmap = self.color_maps.get('density', colorscale)
+        cmap = self.color_maps.get("density", colorscale)
 
-        contour = ax.contourf(x[:density_2d.shape[0]], y[:density_2d.shape[1]],
-                             density_2d, levels=levels, cmap=cmap)
+        contour = ax.contourf(
+            x[: density_2d.shape[0]],
+            y[: density_2d.shape[1]],
+            density_2d,
+            levels=levels,
+            cmap=cmap,
+        )
         ax.set_xlabel(xlabel, fontsize=self.settings.font_size)
         ax.set_ylabel(ylabel, fontsize=self.settings.font_size)
-        ax.set_title(title, fontsize=self.settings.font_size + 2, fontweight='bold')
+        ax.set_title(title, fontsize=self.settings.font_size + 2, fontweight="bold")
 
         # Add colorbar
         cbar = plt.colorbar(contour, ax=ax)
-        cbar.set_label('Density (a.u.)', fontsize=self.settings.font_size)
+        cbar.set_label("Density (a.u.)", fontsize=self.settings.font_size)
 
         plt.tight_layout()
         return fig
 
-    def plot_potential_map(self, x: np.ndarray, y: np.ndarray, potential: np.ndarray,
-                          xlabel: str = 'X', ylabel: str = 'Y',
-                          title: str = 'Potential Map',
-                          levels: int = 20) -> plt.Figure:
+    def plot_potential_map(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        potential: np.ndarray,
+        xlabel: str = "X",
+        ylabel: str = "Y",
+        title: str = "Potential Map",
+        levels: int = 20,
+    ) -> plt.Figure:
         """
         Create 2D potential map (e.g., electrostatic, vdW potential)
 
@@ -369,33 +423,42 @@ class Plotter:
             # Reshape 1D data to 2D grid
             nx = int(np.sqrt(len(potential)))
             ny = len(potential) // nx
-            potential_2d = potential[:nx*ny].reshape(nx, ny)
+            potential_2d = potential[: nx * ny].reshape(nx, ny)
         else:
             potential_2d = potential
 
         # Use divergent colormap for potential
-        cmap = self.color_maps.get('potential', 'RdBu_r')
+        cmap = self.color_maps.get("potential", "RdBu_r")
 
         # Create symmetric levels for better visualization
         vmax = np.max(np.abs(potential_2d))
         levels_array = np.linspace(-vmax, vmax, levels)
 
-        contour = ax.contourf(x[:potential_2d.shape[0]], y[:potential_2d.shape[1]],
-                             potential_2d, levels=levels_array, cmap=cmap)
+        contour = ax.contourf(
+            x[: potential_2d.shape[0]],
+            y[: potential_2d.shape[1]],
+            potential_2d,
+            levels=levels_array,
+            cmap=cmap,
+        )
         ax.set_xlabel(xlabel, fontsize=self.settings.font_size)
         ax.set_ylabel(ylabel, fontsize=self.settings.font_size)
-        ax.set_title(title, fontsize=self.settings.font_size + 2, fontweight='bold')
+        ax.set_title(title, fontsize=self.settings.font_size + 2, fontweight="bold")
 
         # Add colorbar
         cbar = plt.colorbar(contour, ax=ax)
-        cbar.set_label('Potential (a.u.)', fontsize=self.settings.font_size)
+        cbar.set_label("Potential (a.u.)", fontsize=self.settings.font_size)
 
         plt.tight_layout()
         return fig
 
-    def save_plot(self, fig: plt.Figure, filename: str,
-                  format: GraphFormat = GraphFormat.PNG,
-                  dpi: int = None) -> None:
+    def save_plot(
+        self,
+        fig: plt.Figure,
+        filename: str,
+        format: GraphFormat = GraphFormat.PNG,
+        dpi: int = None,
+    ) -> None:
         """
         Save plot to file
 
@@ -413,11 +476,11 @@ class Plotter:
         if dpi is None:
             dpi = self.settings.dpi
 
-        fig.savefig(filename, format=format.value, dpi=dpi, bbox_inches='tight')
+        fig.savefig(filename, format=format.value, dpi=dpi, bbox_inches="tight")
 
-    def create_multi_panel_figure(self, plots: List[plt.Figure],
-                                 titles: List[str],
-                                 layout: Tuple[int, int] = None) -> plt.Figure:
+    def create_multi_panel_figure(
+        self, plots: List[plt.Figure], titles: List[str], layout: Tuple[int, int] = None
+    ) -> plt.Figure:
         """
         Create multi-panel figure from multiple plots
 

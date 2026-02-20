@@ -28,8 +28,9 @@ class HirshfeldAnalyzer:
         if self.wfn.coefficients is None:
             raise ValueError("MO coefficients are required for Hirshfeld analysis")
 
-    def calculate_orbital_composition(self, mo_idx: int, coords: np.ndarray,
-                                    is_beta: bool = False) -> Dict[str, np.ndarray]:
+    def calculate_orbital_composition(
+        self, mo_idx: int, coords: np.ndarray, is_beta: bool = False
+    ) -> Dict[str, np.ndarray]:
         """
         Calculate Hirshfeld composition for a specific molecular orbital.
 
@@ -61,15 +62,15 @@ class HirshfeldAnalyzer:
         weights = self._calculate_hirshfeld_weights(coords)
 
         # Calculate atomic contributions
-        atom_contributions = self._integrate_contributions(orbital_density, weights, coords)
+        atom_contributions = self._integrate_contributions(
+            orbital_density, weights, coords
+        )
 
-        return {
-            'atom_contributions': atom_contributions,
-            'weights': weights
-        }
+        return {"atom_contributions": atom_contributions, "weights": weights}
 
-    def _calculate_orbital_density(self, mo_idx: int, coords: np.ndarray,
-                                 is_beta: bool = False) -> np.ndarray:
+    def _calculate_orbital_density(
+        self, mo_idx: int, coords: np.ndarray, is_beta: bool = False
+    ) -> np.ndarray:
         """Calculate orbital density on grid points."""
         from pymultiwfn.analysis.orbitals import OrbitalAnalyzer
 
@@ -86,9 +87,7 @@ class HirshfeldAnalyzer:
         promolecular_densities = np.zeros((n_atoms, n_points))
 
         for i, atom in enumerate(self.wfn.atoms):
-            promolecular_densities[i, :] = self._calculate_atomic_density(
-                atom, coords
-            )
+            promolecular_densities[i, :] = self._calculate_atomic_density(atom, coords)
 
         # Calculate total promolecular density
         total_promolecular_density = np.sum(promolecular_densities, axis=0)
@@ -98,7 +97,9 @@ class HirshfeldAnalyzer:
         for i in range(n_atoms):
             # Avoid division by zero
             mask = total_promolecular_density > 1e-12
-            weights[i, mask] = promolecular_densities[i, mask] / total_promolecular_density[mask]
+            weights[i, mask] = (
+                promolecular_densities[i, mask] / total_promolecular_density[mask]
+            )
 
         return weights
 
@@ -126,8 +127,9 @@ class HirshfeldAnalyzer:
 
         return density
 
-    def _integrate_contributions(self, orbital_density: np.ndarray,
-                               weights: np.ndarray, coords: np.ndarray) -> np.ndarray:
+    def _integrate_contributions(
+        self, orbital_density: np.ndarray, weights: np.ndarray, coords: np.ndarray
+    ) -> np.ndarray:
         """Integrate orbital density with Hirshfeld weights."""
         n_atoms = weights.shape[0]
         atom_contributions = np.zeros(n_atoms)

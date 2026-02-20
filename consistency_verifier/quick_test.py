@@ -9,10 +9,13 @@ import sys
 import subprocess
 
 # Set Multiwfn path
-os.environ['MULTIWFN_BIN'] = '/home/yhm/software/PyMultiWFN/Multiwfn_3.8_bin_Linux_noGUI/Multiwfn'
+os.environ["MULTIWFN_BIN"] = (
+    "/home/yhm/software/PyMultiWFN/Multiwfn_3.8_bin_Linux_noGUI/Multiwfn"
+)
 
 # Test file
-TEST_FILE = '/home/yhm/software/PyMultiWFN/consistency_verifier/examples/H2_CCSD.wfn'
+TEST_FILE = "/home/yhm/software/PyMultiWFN/consistency_verifier/examples/H2_CCSD.wfn"
+
 
 def run_consistency_test():
     print("=" * 60)
@@ -26,6 +29,7 @@ def run_consistency_test():
     print("[1/3] Loading with PyMultiWFN...")
     try:
         from pymultiwfn.io.file_manager import FileManager
+
         fm = FileManager()
         wfn = fm.load_wavefunction(TEST_FILE)
         py_electrons = wfn.num_electrons
@@ -42,18 +46,18 @@ def run_consistency_test():
     print("\n[2/3] Running with Multiwfn...")
     try:
         result = subprocess.run(
-            [os.environ['MULTIWFN_BIN'], TEST_FILE],
-            input='18\n1\nq\n',
+            [os.environ["MULTIWFN_BIN"], TEST_FILE],
+            input="18\n1\nq\n",
             capture_output=True,
             text=True,
-            timeout=10
+            timeout=10,
         )
         output = result.stdout
 
         # Parse electrons from output
-        for line in output.split('\n'):
-            if 'Total/Alpha/Beta electrons:' in line:
-                parts = line.split(':')
+        for line in output.split("\n"):
+            if "Total/Alpha/Beta electrons:" in line:
+                parts = line.split(":")
                 if len(parts) > 1:
                     mw_electrons = float(parts[1].strip())
                     print(f"  ✓ Electrons: {mw_electrons}")
@@ -75,6 +79,7 @@ def run_consistency_test():
         print("\n❌ CONSISTENCY CHECK FAILED")
         print("=" * 60)
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(run_consistency_test())

@@ -5,10 +5,23 @@ This module contains various GUI widgets used in the main interface.
 """
 
 import numpy as np
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QSlider,
-                             QLabel, QSpinBox, QDoubleSpinBox, QPushButton,
-                             QComboBox, QCheckBox, QGroupBox, QGridLayout,
-                             QProgressBar, QFileDialog, QMessageBox)
+from PyQt5.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QSlider,
+    QLabel,
+    QSpinBox,
+    QDoubleSpinBox,
+    QPushButton,
+    QComboBox,
+    QCheckBox,
+    QGroupBox,
+    QGridLayout,
+    QProgressBar,
+    QFileDialog,
+    QMessageBox,
+)
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont
 
@@ -28,7 +41,9 @@ class OrbitalSelector(QWidget):
 
         # Orbital list
         self.orbital_combo = QComboBox()
-        self.orbital_combo.addItems(['None'] + [f'{i}' for i in range(1, self.n_mo + 1)])
+        self.orbital_combo.addItems(
+            ["None"] + [f"{i}" for i in range(1, self.n_mo + 1)]
+        )
         self.orbital_combo.currentIndexChanged.connect(self.on_orbital_selected)
 
         # Orbital info display
@@ -113,10 +128,10 @@ class ViewControls(QWidget):
     def on_view_changed(self):
         """Emit view change signal"""
         view_params = {
-            'x_rot': self.x_rot_slider.value(),
-            'y_rot': self.y_rot_slider.value(),
-            'z_rot': self.z_rot_slider.value(),
-            'zoom': self.zoom_slider.value() / 100.0
+            "x_rot": self.x_rot_slider.value(),
+            "y_rot": self.y_rot_slider.value(),
+            "z_rot": self.z_rot_slider.value(),
+            "zoom": self.zoom_slider.value() / 100.0,
         }
         self.view_changed.emit(view_params)
 
@@ -156,15 +171,17 @@ class IsosurfaceControls(QWidget):
         # Quality control
         quality_layout = QHBoxLayout()
         self.quality_combo = QComboBox()
-        self.quality_combo.addItems([
-            "Very Poor (25k points)",
-            "Poor (50k points)",
-            "Default (120k points)",
-            "Good (300k points)",
-            "High (500k points)",
-            "Very High (1000k points)",
-            "Perfect (1500k points)"
-        ])
+        self.quality_combo.addItems(
+            [
+                "Very Poor (25k points)",
+                "Poor (50k points)",
+                "Default (120k points)",
+                "Good (300k points)",
+                "High (500k points)",
+                "Very High (1000k points)",
+                "Perfect (1500k points)",
+            ]
+        )
         self.quality_combo.setCurrentIndex(2)  # Default
         self.quality_combo.currentIndexChanged.connect(self.on_settings_changed)
 
@@ -174,13 +191,9 @@ class IsosurfaceControls(QWidget):
         # Style control
         style_layout = QHBoxLayout()
         self.style_combo = QComboBox()
-        self.style_combo.addItems([
-            "Solid Face",
-            "Mesh",
-            "Points",
-            "Solid + Mesh",
-            "Transparent Face"
-        ])
+        self.style_combo.addItems(
+            ["Solid Face", "Mesh", "Points", "Solid + Mesh", "Transparent Face"]
+        )
         self.style_combo.currentIndexChanged.connect(self.on_settings_changed)
 
         style_layout.addWidget(QLabel("Style:"))
@@ -205,9 +218,9 @@ class IsosurfaceControls(QWidget):
     def on_settings_changed(self):
         """Emit settings change signal"""
         settings = {
-            'isovalue': self.iso_value_spin.value(),
-            'quality': self.quality_combo.currentIndex(),
-            'style': self.style_combo.currentIndex()
+            "isovalue": self.iso_value_spin.value(),
+            "quality": self.quality_combo.currentIndex(),
+            "style": self.style_combo.currentIndex(),
         }
         self.settings_changed.emit(settings)
 
@@ -282,12 +295,12 @@ class MoleculeControls(QWidget):
     def on_settings_changed(self):
         """Emit settings change signal"""
         settings = {
-            'atom_size': self.atom_size_spin.value(),
-            'bond_threshold': self.bond_threshold_spin.value(),
-            'style': self.style_combo.currentIndex(),
-            'show_labels': self.show_labels_cb.isChecked(),
-            'show_axis': self.show_axis_cb.isChecked(),
-            'show_hydrogens': self.show_hydrogens_cb.isChecked()
+            "atom_size": self.atom_size_spin.value(),
+            "bond_threshold": self.bond_threshold_spin.value(),
+            "style": self.style_combo.currentIndex(),
+            "show_labels": self.show_labels_cb.isChecked(),
+            "show_axis": self.show_axis_cb.isChecked(),
+            "show_hydrogens": self.show_hydrogens_cb.isChecked(),
         }
         self.settings_changed.emit(settings)
 
@@ -352,11 +365,17 @@ class FileSelector(QWidget):
 
     def browse_file(self):
         """Open file dialog"""
-        file_path, _ = QFileDialog.getOpenFileName(self, self.title, "", self.file_filter)
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, self.title, "", self.file_filter
+        )
         if file_path:
             self.path_label.setText(file_path)
             self.file_selected.emit(file_path)
 
     def get_file_path(self):
         """Get current file path"""
-        return self.path_label.text() if self.path_label.text() != "No file selected" else None
+        return (
+            self.path_label.text()
+            if self.path_label.text() != "No file selected"
+            else None
+        )

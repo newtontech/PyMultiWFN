@@ -54,7 +54,7 @@ def calculate_mayer_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
         if not bfs_i:
             continue
 
-        for j in range(i+1, n_atoms):
+        for j in range(i + 1, n_atoms):
             bfs_j = atom_to_bfs.get(j, [])
             if not bfs_j:
                 continue
@@ -73,12 +73,14 @@ def calculate_mayer_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
     for i in range(n_atoms):
         bnd_total[i, i] = np.sum(bnd_total[i, :])
 
-    result = {'total': bnd_total}
+    result = {"total": bnd_total}
 
     # For unrestricted wavefunctions, calculate alpha and beta bond orders
     if wfn.is_unrestricted:
         if wfn.Palpha is None or wfn.Pbeta is None:
-            raise ValueError("Alpha and beta density matrices are required for unrestricted calculation")
+            raise ValueError(
+                "Alpha and beta density matrices are required for unrestricted calculation"
+            )
 
         PS_alpha = wfn.Palpha @ wfn.overlap_matrix
         PS_beta = wfn.Pbeta @ wfn.overlap_matrix
@@ -91,7 +93,7 @@ def calculate_mayer_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
             if not bfs_i:
                 continue
 
-            for j in range(i+1, n_atoms):
+            for j in range(i + 1, n_atoms):
                 bfs_j = atom_to_bfs.get(j, [])
                 if not bfs_j:
                     continue
@@ -119,8 +121,8 @@ def calculate_mayer_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
             bnd_alpha[i, i] = np.sum(bnd_alpha[i, :])
             bnd_beta[i, i] = np.sum(bnd_beta[i, :])
 
-        result['alpha'] = bnd_alpha
-        result['beta'] = bnd_beta
+        result["alpha"] = bnd_alpha
+        result["beta"] = bnd_beta
 
     return result
 
@@ -140,7 +142,9 @@ def calculate_mulliken_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
     """
 
     if wfn.overlap_matrix is None:
-        raise ValueError("Overlap matrix is required for Mulliken bond order calculation")
+        raise ValueError(
+            "Overlap matrix is required for Mulliken bond order calculation"
+        )
 
     # Ensure density matrices are available
     if wfn.Ptot is None and wfn.Palpha is None and wfn.Pbeta is None:
@@ -160,7 +164,9 @@ def calculate_mulliken_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
             # Fallback: use alpha density matrix for closed-shell
             PS_total = wfn.Palpha * wfn.overlap_matrix
         else:
-            raise ValueError("No density matrix available for Mulliken bond order calculation")
+            raise ValueError(
+                "No density matrix available for Mulliken bond order calculation"
+            )
 
         # Calculate bond orders using vectorized operations
         for i in range(n_atoms):
@@ -168,7 +174,7 @@ def calculate_mulliken_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
             if not bfs_i:
                 continue
 
-            for j in range(i+1, n_atoms):
+            for j in range(i + 1, n_atoms):
                 bfs_j = atom_to_bfs.get(j, [])
                 if not bfs_j:
                     continue
@@ -187,7 +193,9 @@ def calculate_mulliken_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
     else:
         # Unrestricted case
         if wfn.Palpha is None or wfn.Pbeta is None:
-            raise ValueError("Alpha and beta density matrices are required for unrestricted calculation")
+            raise ValueError(
+                "Alpha and beta density matrices are required for unrestricted calculation"
+            )
 
         PS_alpha = wfn.Palpha * wfn.overlap_matrix
         PS_beta = wfn.Pbeta * wfn.overlap_matrix
@@ -201,7 +209,7 @@ def calculate_mulliken_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
             if not bfs_i:
                 continue
 
-            for j in range(i+1, n_atoms):
+            for j in range(i + 1, n_atoms):
                 bfs_j = atom_to_bfs.get(j, [])
                 if not bfs_j:
                     continue
@@ -223,10 +231,10 @@ def calculate_mulliken_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
 
         bnd_total = bnd_alpha + bnd_beta
 
-    result = {'total': bnd_total}
+    result = {"total": bnd_total}
     if wfn.is_unrestricted:
-        result['alpha'] = bnd_alpha
-        result['beta'] = bnd_beta
+        result["alpha"] = bnd_alpha
+        result["beta"] = bnd_beta
 
     return result
 
@@ -234,7 +242,7 @@ def calculate_mulliken_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
 def get_bond_orders_above_threshold(
     bond_matrix: np.ndarray,
     threshold: float = 0.01,
-    atom_names: Optional[List[str]] = None
+    atom_names: Optional[List[str]] = None,
 ) -> List[Tuple[int, int, float]]:
     """
     Get bond orders above a specified threshold.
@@ -268,7 +276,7 @@ def get_bond_orders_above_threshold(
     significant_bonds = []
 
     for i in range(n_atoms):
-        for j in range(i+1, n_atoms):
+        for j in range(i + 1, n_atoms):
             bond_order = bond_matrix[i, j]
             if abs(bond_order) >= threshold:
                 significant_bonds.append((i, j, bond_order))
@@ -282,7 +290,7 @@ def get_bond_orders_above_threshold(
 def print_bond_orders(
     bond_results: Dict[str, np.ndarray],
     threshold: float = 0.01,
-    atom_names: Optional[List[str]] = None
+    atom_names: Optional[List[str]] = None,
 ):
     """
     Print bond orders in a formatted way.
@@ -296,10 +304,10 @@ def print_bond_orders(
         ValueError: If bond_results is missing required keys or matrices have inconsistent dimensions
     """
     # Input validation
-    if 'total' not in bond_results:
+    if "total" not in bond_results:
         raise ValueError("bond_results must contain 'total' key")
 
-    total_matrix = bond_results['total']
+    total_matrix = bond_results["total"]
     if total_matrix.ndim != 2 or total_matrix.shape[0] != total_matrix.shape[1]:
         raise ValueError("Total bond matrix must be a square 2D matrix")
 
@@ -316,53 +324,66 @@ def print_bond_orders(
 
     print(f"Bond orders with absolute value >= {threshold:.6f}")
 
-    if 'alpha' in bond_results and 'beta' in bond_results:
+    if "alpha" in bond_results and "beta" in bond_results:
         # Unrestricted case
-        alpha_matrix = bond_results['alpha']
-        beta_matrix = bond_results['beta']
+        alpha_matrix = bond_results["alpha"]
+        beta_matrix = bond_results["beta"]
 
         # Validate alpha and beta matrices
-        if alpha_matrix.shape != total_matrix.shape or beta_matrix.shape != total_matrix.shape:
-            raise ValueError("Alpha and beta bond matrices must have same dimensions as total matrix")
+        if (
+            alpha_matrix.shape != total_matrix.shape
+            or beta_matrix.shape != total_matrix.shape
+        ):
+            raise ValueError(
+                "Alpha and beta bond matrices must have same dimensions as total matrix"
+            )
 
         count = 0
         for i in range(n_atoms):
-            for j in range(i+1, n_atoms):
+            for j in range(i + 1, n_atoms):
                 alpha_bo = alpha_matrix[i, j]
                 beta_bo = beta_matrix[i, j]
                 total_bo = alpha_bo + beta_bo
 
                 if abs(total_bo) >= threshold:
                     count += 1
-                    print(f" #{count:3d}: {i+1:3d}({atom_names[i]}) - {j+1:3d}({atom_names[j]}) "
-                          f"Alpha: {alpha_bo:10.6f} Beta: {beta_bo:10.6f} Total: {total_bo:10.6f}")
+                    print(
+                        f" #{count:3d}: {i+1:3d}({atom_names[i]}) - {j+1:3d}({atom_names[j]}) "
+                        f"Alpha: {alpha_bo:10.6f} Beta: {beta_bo:10.6f} Total: {total_bo:10.6f}"
+                    )
 
-        print("\nNote: The 'Total' bond orders shown above are more meaningful than the below ones.")
-        print("If you are not familiar with related theory, you can simply ignore below output")
+        print(
+            "\nNote: The 'Total' bond orders shown above are more meaningful than the below ones."
+        )
+        print(
+            "If you are not familiar with related theory, you can simply ignore below output"
+        )
         print(f"\nBond order from mixed alpha&beta density matrix >= {threshold:.6f}")
 
         count = 0
         for i in range(n_atoms):
-            for j in range(i+1, n_atoms):
+            for j in range(i + 1, n_atoms):
                 total_bo = total_matrix[i, j]
                 if abs(total_bo) >= threshold:
                     count += 1
-                    print(f" #{count:3d}: {i+1:3d}({atom_names[i]}) - {j+1:3d}({atom_names[j]}) {total_bo:14.8f}")
+                    print(
+                        f" #{count:3d}: {i+1:3d}({atom_names[i]}) - {j+1:3d}({atom_names[j]}) {total_bo:14.8f}"
+                    )
     else:
         # Closed-shell case
         count = 0
         for i in range(n_atoms):
-            for j in range(i+1, n_atoms):
+            for j in range(i + 1, n_atoms):
                 total_bo = total_matrix[i, j]
                 if abs(total_bo) >= threshold:
                     count += 1
-                    print(f" #{count:3d}: {i+1:3d}({atom_names[i]}) - {j+1:3d}({atom_names[j]}) {total_bo:14.8f}")
+                    print(
+                        f" #{count:3d}: {i+1:3d}({atom_names[i]}) - {j+1:3d}({atom_names[j]}) {total_bo:14.8f}"
+                    )
 
 
 def calculate_fragment_bond_order(
-    bond_matrix: np.ndarray,
-    fragment1: List[int],
-    fragment2: List[int]
+    bond_matrix: np.ndarray, fragment1: List[int], fragment2: List[int]
 ) -> float:
     """
     Calculate total bond order between two fragments.
@@ -399,9 +420,7 @@ def calculate_fragment_bond_order(
 
 
 def decompose_mulliken_bond_order(
-    wfn: Wavefunction,
-    atom1: int,
-    atom2: int
+    wfn: Wavefunction, atom1: int, atom2: int
 ) -> Dict[str, Union[float, List[Tuple[int, float, float, float]]]]:
     """
     Decompose Mulliken bond order between two atoms to orbital contributions.
@@ -455,9 +474,12 @@ def decompose_mulliken_bond_order(
         contrib = 0.0
         for mu in bfs1:
             for nu in bfs2:
-                contrib += (wfn.occupations[mo_idx] if wfn.occupations is not None else 2.0) * \
-                          wfn.coefficients[mo_idx, mu] * wfn.coefficients[mo_idx, nu] * \
-                          wfn.overlap_matrix[mu, nu]
+                contrib += (
+                    (wfn.occupations[mo_idx] if wfn.occupations is not None else 2.0)
+                    * wfn.coefficients[mo_idx, mu]
+                    * wfn.coefficients[mo_idx, nu]
+                    * wfn.overlap_matrix[mu, nu]
+                )
 
         # Scale by 2 for closed-shell
         if not wfn.is_unrestricted:
@@ -470,10 +492,7 @@ def decompose_mulliken_bond_order(
 
         contributions.append((mo_idx, occupation, energy, contrib))
 
-    return {
-        'total_bond_order': total_bond,
-        'orbital_contributions': contributions
-    }
+    return {"total_bond_order": total_bond, "orbital_contributions": contributions}
 
 
 def calculate_wiberg_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
@@ -495,9 +514,7 @@ def calculate_wiberg_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
 
 
 def calculate_fuzzy_bond_order(
-    wfn: Wavefunction,
-    method: str = "mayer",
-    **kwargs
+    wfn: Wavefunction, method: str = "mayer", **kwargs
 ) -> Dict[str, np.ndarray]:
     """
     Calculate bond orders using fuzzy atom partitioning.
@@ -551,23 +568,21 @@ def get_bond_order_statistics(bond_matrix: np.ndarray) -> Dict[str, float]:
 
     # Calculate statistics
     stats = {
-        'mean': np.mean(bond_orders),
-        'std': np.std(bond_orders),
-        'max': np.max(bond_orders),
-        'min': np.min(bond_orders),
-        'median': np.median(bond_orders),
-        'num_bonds': len(bond_orders),
-        'num_significant_bonds': np.sum(np.abs(bond_orders) >= 0.1),
-        'total_bond_order': np.sum(bond_orders)
+        "mean": np.mean(bond_orders),
+        "std": np.std(bond_orders),
+        "max": np.max(bond_orders),
+        "min": np.min(bond_orders),
+        "median": np.median(bond_orders),
+        "num_bonds": len(bond_orders),
+        "num_significant_bonds": np.sum(np.abs(bond_orders) >= 0.1),
+        "total_bond_order": np.sum(bond_orders),
     }
 
     return stats
 
 
 def compare_bond_orders(
-    bond_matrix1: np.ndarray,
-    bond_matrix2: np.ndarray,
-    method: str = "absolute"
+    bond_matrix1: np.ndarray, bond_matrix2: np.ndarray, method: str = "absolute"
 ) -> Dict[str, Union[float, np.ndarray]]:
     """
     Compare two bond order matrices.
@@ -598,21 +613,21 @@ def compare_bond_orders(
 
     if method == "absolute":
         diff = bonds1 - bonds2
-        comparison['mean_absolute_error'] = np.mean(np.abs(diff))
-        comparison['max_absolute_error'] = np.max(np.abs(diff))
-        comparison['rmsd'] = np.sqrt(np.mean(diff**2))
+        comparison["mean_absolute_error"] = np.mean(np.abs(diff))
+        comparison["max_absolute_error"] = np.max(np.abs(diff))
+        comparison["rmsd"] = np.sqrt(np.mean(diff**2))
 
     elif method == "relative":
         # Avoid division by zero
         mask = np.abs(bonds2) > 1e-10
         rel_diff = np.zeros_like(bonds1)
         rel_diff[mask] = (bonds1[mask] - bonds2[mask]) / bonds2[mask]
-        comparison['mean_relative_error'] = np.mean(np.abs(rel_diff[mask]))
-        comparison['max_relative_error'] = np.max(np.abs(rel_diff[mask]))
+        comparison["mean_relative_error"] = np.mean(np.abs(rel_diff[mask]))
+        comparison["max_relative_error"] = np.max(np.abs(rel_diff[mask]))
 
     elif method == "correlation":
         correlation = np.corrcoef(bonds1, bonds2)[0, 1]
-        comparison['correlation_coefficient'] = correlation
+        comparison["correlation_coefficient"] = correlation
 
     else:
         raise ValueError(f"Unknown comparison method: {method}")

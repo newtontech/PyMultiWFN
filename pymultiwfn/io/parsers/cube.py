@@ -7,6 +7,7 @@ import re
 import numpy as np
 from pymultiwfn.core.data import Wavefunction
 
+
 class CubeLoader:
     def __init__(self, filename: str):
         self.filename = filename
@@ -15,7 +16,7 @@ class CubeLoader:
 
     def load(self) -> Wavefunction:
         """Parse Cube file and return Wavefunction object."""
-        with open(self.filename, 'r') as f:
+        with open(self.filename, "r") as f:
             lines = f.readlines()
 
         self._parse_cube(lines)
@@ -73,7 +74,12 @@ class CubeLoader:
                     element = f"X{atomic_num}"
                     if 1 <= atomic_num <= 118:
                         from pymultiwfn.core.definitions import ELEMENT_NAMES
-                        element = ELEMENT_NAMES[atomic_num] if atomic_num < len(ELEMENT_NAMES) else f"X{atomic_num}"
+
+                        element = (
+                            ELEMENT_NAMES[atomic_num]
+                            if atomic_num < len(ELEMENT_NAMES)
+                            else f"X{atomic_num}"
+                        )
 
                     self.wfn.add_atom(element, atomic_num, x, y, z, charge)
                 except (ValueError, IndexError):
@@ -96,10 +102,10 @@ class CubeLoader:
 
         # Store grid information
         self.grid_data = {
-            'origin': np.array([origin_x, origin_y, origin_z]),
-            'vectors': np.array([info[1] for info in grid_info]),
-            'dimensions': [info[0] for info in grid_info],
-            'data': np.array(data_values)
+            "origin": np.array([origin_x, origin_y, origin_z]),
+            "vectors": np.array([info[1] for info in grid_info]),
+            "dimensions": [info[0] for info in grid_info],
+            "data": np.array(data_values),
         }
 
         # Store as attribute of wavefunction
@@ -110,9 +116,9 @@ class CubeLoader:
         if self.grid_data is None:
             return None
 
-        origin = self.grid_data['origin']
-        vectors = self.grid_data['vectors']
-        dimensions = self.grid_data['dimensions']
+        origin = self.grid_data["origin"]
+        vectors = self.grid_data["vectors"]
+        dimensions = self.grid_data["dimensions"]
 
         # Create coordinate arrays
         x = np.arange(dimensions[0])
@@ -120,7 +126,7 @@ class CubeLoader:
         z = np.arange(dimensions[2])
 
         # Create mesh grid
-        X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
+        X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
 
         # Transform to real space
         coords = np.stack([X, Y, Z], axis=-1)
@@ -135,10 +141,10 @@ class CubeLoader:
 
         # This is a simplified nearest-neighbor interpolation
         # For better results, implement trilinear interpolation
-        origin = self.grid_data['origin']
-        vectors = self.grid_data['vectors']
-        dimensions = self.grid_data['dimensions']
-        data = self.grid_data['data'].reshape(dimensions)
+        origin = self.grid_data["origin"]
+        vectors = self.grid_data["vectors"]
+        dimensions = self.grid_data["dimensions"]
+        data = self.grid_data["data"].reshape(dimensions)
 
         # Convert point to grid coordinates
         rel_pos = point - origin

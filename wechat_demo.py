@@ -33,12 +33,14 @@ print()
 print("📦 已安装库:")
 try:
     import requests
+
     print(f"  ✅ requests: {requests.__version__}")
 except ImportError:
     print(f"  ❌ requests: 未安装")
 
 try:
     import numpy as np
+
     print(f"  ✅ numpy: {np.__version__}")
 except ImportError:
     print(f"  ❌ numpy: 未安装")
@@ -55,7 +57,7 @@ print("📄 微信公众号集成相关文件:")
 files = [
     "wechat_mp_sdk.py",
     "WECHAT_QUICKSTART.md",
-    "/tmp/pymultiwfn_wechat_article.html"
+    "/tmp/pymultiwfn_wechat_article.html",
 ]
 
 for f in files:
@@ -63,7 +65,7 @@ for f in files:
         full_path = f
     else:
         full_path = os.path.join(os.getcwd(), f)
-    
+
     if os.path.exists(full_path):
         size = os.path.getsize(full_path)
         print(f"  ✅ {f:30s} ({size:6d} bytes)")
@@ -135,7 +137,7 @@ article_content = """<!DOCTYPE html>
 </html>"""
 
 article_file = "/tmp/pymultiwfn_wechat_complete_article.html"
-with open(article_file, 'w', encoding='utf-8') as f:
+with open(article_file, "w", encoding="utf-8") as f:
     f.write(article_content)
 
 print(f"✅ 文章已保存: {article_file}")
@@ -154,11 +156,11 @@ print()
 print("  1. 获取微信公众号凭证")
 print("     - 访问: https://mp.weixin.qq.com/")
 print("     - 登录公众号后台")
-print("     - 点击\"开发\" > \"基本配置\"")
+print('     - 点击"开发" > "基本配置"')
 print("     - 获取: AppID 和 AppSecret")
 print()
 print("  2. 配置开发环境")
-print("     - 在\"开发\" > \"基本配置\"中配置服务器地址")
+print('     - 在"开发" > "基本配置"中配置服务器地址')
 print("     - 填写令牌（Token）")
 print("     - 选择消息加解密方式")
 print()
@@ -178,7 +180,7 @@ print("     - 在公众号后台发布文章")
 print()
 print("  6. 推送给粉丝")
 print("     - 在公众号后台编辑文章")
-print("     - 选择\"群发\"功能")
+print('     - 选择"群发"功能')
 print("     - 推送给所有粉丝或特定标签")
 print()
 print("=" * 80)
@@ -203,12 +205,12 @@ print("  from wechat_mp_sdk import WeChatMediaPlatform")
 print()
 print("  # 创建客户端")
 print("  client = WeChatMediaPlatform(")
-print("       app_id=\"your_app_id\",")
-print("       app_secret=\"your_app_secret\"")
+print('       app_id="your_app_id",')
+print('       app_secret="your_app_secret"')
 print("  )")
 print()
 print("  # 上传图片")
-print("  result = client.upload_image(\"cover.jpg\")")
+print('  result = client.upload_image("cover.jpg")')
 print("  print(f\"media_id: {result['media_id']}\")")
 print("  ```")
 print()
@@ -222,12 +224,12 @@ print("  client = WeChatMediaPlatform(...)")
 print()
 print("  # 创建文章")
 print("  article = create_article(")
-print("      title=\"PyMultiWFN - 量子化学分析\",")
-print("      author=\"PyMultiWFN Team\",")
-print("      digest=\"完整的量子化学分析工具\",")
-print("      content=\"<html>...</html>\",")
-print("      content_source_url=\"https://github.com/chemoinfolabs/pymultiwfn\",")
-print("      thumb_media_id=\"cover_media_id\"")
+print('      title="PyMultiWFN - 量子化学分析",')
+print('      author="PyMultiWFN Team",')
+print('      digest="完整的量子化学分析工具",')
+print('      content="<html>...</html>",')
+print('      content_source_url="https://github.com/chemoinfolabs/pymultiwfn",')
+print('      thumb_media_id="cover_media_id"')
 print("  )")
 print()
 print("  # 上传图文")

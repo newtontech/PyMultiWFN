@@ -13,22 +13,15 @@ from typing import List, Dict
 
 from pymultiwfn.core.data import Atom, Shell, Wavefunction
 
-
 # =============================================================================
 # Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def sample_atom():
     """Create a sample Atom instance for testing."""
-    return Atom(
-        element="C",
-        index=6,
-        x=0.0,
-        y=0.0,
-        z=0.0,
-        charge=6.0
-    )
+    return Atom(element="C", index=6, x=0.0, y=0.0, z=0.0, charge=6.0)
 
 
 @pytest.fixture
@@ -48,7 +41,7 @@ def sample_shell():
         type=0,  # S shell
         center_idx=0,
         exponents=np.array([0.5, 1.0, 2.0]),
-        coefficients=np.array([0.1, 0.2, 0.3])
+        coefficients=np.array([0.1, 0.2, 0.3]),
     )
 
 
@@ -58,7 +51,9 @@ def sample_shells():
     return [
         Shell(0, 0, np.array([0.5, 1.0]), np.array([0.1, 0.2])),  # S shell
         Shell(1, 0, np.array([0.3, 0.6]), np.array([0.15, 0.25])),  # P shell
-        Shell(-1, 1, np.array([0.4, 0.8]), np.array([[0.12, 0.22], [0.13, 0.23]])),  # SP shell
+        Shell(
+            -1, 1, np.array([0.4, 0.8]), np.array([[0.12, 0.22], [0.13, 0.23]])
+        ),  # SP shell
     ]
 
 
@@ -115,6 +110,7 @@ def unrestricted_wavefunction():
 # Atom Class Tests
 # =============================================================================
 
+
 class TestAtom:
     """Test suite for Atom class."""
 
@@ -127,12 +123,15 @@ class TestAtom:
         assert sample_atom.z == 0.0
         assert sample_atom.charge == 6.0
 
-    @pytest.mark.parametrize("element, index, x, y, z, charge", [
-        ("H", 1, 0.0, 0.0, 0.0, 1.0),
-        ("He", 2, 1.0, 2.0, 3.0, 2.0),
-        ("Li", 3, -1.5, 0.5, 2.3, 3.0),
-        ("C", 6, 0.0, 0.0, 0.0, 4.0),  # ECP case
-    ])
+    @pytest.mark.parametrize(
+        "element, index, x, y, z, charge",
+        [
+            ("H", 1, 0.0, 0.0, 0.0, 1.0),
+            ("He", 2, 1.0, 2.0, 3.0, 2.0),
+            ("Li", 3, -1.5, 0.5, 2.3, 3.0),
+            ("C", 6, 0.0, 0.0, 0.0, 4.0),  # ECP case
+        ],
+    )
     def test_atom_various_elements(self, element, index, x, y, z, charge):
         """Test Atom initialization with various elements and coordinates."""
         atom = Atom(element, index, x, y, z, charge)
@@ -162,12 +161,15 @@ class TestAtom:
         # But with same values
         assert np.array_equal(coord1, coord2)
 
-    @pytest.mark.parametrize("x, y, z", [
-        (0.0, 0.0, 0.0),
-        (1.5, 2.3, -0.7),
-        (-1.0, -2.0, -3.0),
-        (1e-10, 1e-10, 1e-10),  # Very small values
-    ])
+    @pytest.mark.parametrize(
+        "x, y, z",
+        [
+            (0.0, 0.0, 0.0),
+            (1.5, 2.3, -0.7),
+            (-1.0, -2.0, -3.0),
+            (1e-10, 1e-10, 1e-10),  # Very small values
+        ],
+    )
     def test_atom_various_coordinates(self, x, y, z):
         """Test Atom with various coordinate values."""
         atom = Atom("H", 1, x, y, z, 1.0)
@@ -188,6 +190,7 @@ class TestAtom:
 # Shell Class Tests
 # =============================================================================
 
+
 class TestShell:
     """Test suite for Shell class."""
 
@@ -198,30 +201,32 @@ class TestShell:
         assert len(sample_shell.exponents) == 3
         assert len(sample_shell.coefficients) == 3
 
-    @pytest.mark.parametrize("shell_type, name", [
-        (0, "S"),
-        (1, "P"),
-        (2, "D"),
-        (3, "F"),
-        (-1, "SP"),
-    ])
+    @pytest.mark.parametrize(
+        "shell_type, name",
+        [
+            (0, "S"),
+            (1, "P"),
+            (2, "D"),
+            (3, "F"),
+            (-1, "SP"),
+        ],
+    )
     def test_shell_various_types(self, shell_type, name):
         """Test Shell initialization with various shell types."""
         shell = Shell(
             type=shell_type,
             center_idx=0,
             exponents=np.array([1.0]),
-            coefficients=np.array([0.5])
+            coefficients=np.array([0.5]),
         )
         assert shell.type == shell_type
 
     def test_shell_sp_shape(self):
         """Test that SP shell has correct coefficient shape (2, N)."""
         exponents = np.array([0.5, 1.0, 2.0])
-        coefficients = np.array([
-            [0.1, 0.2, 0.3],  # S coefficients
-            [0.15, 0.25, 0.35]  # P coefficients
-        ])
+        coefficients = np.array(
+            [[0.1, 0.2, 0.3], [0.15, 0.25, 0.35]]  # S coefficients  # P coefficients
+        )
         shell = Shell(-1, 0, exponents, coefficients)
         assert shell.type == -1
         assert shell.coefficients.shape == (2, 3)
@@ -251,6 +256,7 @@ class TestShell:
 # =============================================================================
 # Wavefunction Class Tests - Initialization
 # =============================================================================
+
 
 class TestWavefunctionInitialization:
     """Test suite for Wavefunction class initialization."""
@@ -282,7 +288,7 @@ class TestWavefunctionInitialization:
             num_basis=1,
             title="Hydrogen",
             method="HF",
-            basis_set_name="STO-3G"
+            basis_set_name="STO-3G",
         )
         assert len(wf.atoms) == 1
         assert wf.num_electrons == 1.0
@@ -297,6 +303,7 @@ class TestWavefunctionInitialization:
 # =============================================================================
 # Wavefunction Class Tests - Atoms
 # =============================================================================
+
 
 class TestWavefunctionAtoms:
     """Test suite for Wavefunction atom management."""
@@ -342,6 +349,7 @@ class TestWavefunctionAtoms:
 # Wavefunction Class Tests - Property Aliases
 # =============================================================================
 
+
 class TestWavefunctionPropertyAliases:
     """Test suite for Wavefunction property aliases."""
 
@@ -383,6 +391,7 @@ class TestWavefunctionPropertyAliases:
 # Wavefunction Class Tests - Occupation Inference
 # =============================================================================
 
+
 class TestWavefunctionOccupationInference:
     """Test suite for orbital occupation inference."""
 
@@ -423,6 +432,7 @@ class TestWavefunctionOccupationInference:
 # Wavefunction Class Tests - Density Matrices
 # =============================================================================
 
+
 class TestWavefunctionDensityMatrices:
     """Test suite for density matrix calculations."""
 
@@ -442,7 +452,9 @@ class TestWavefunctionDensityMatrices:
         assert restricted_wavefunction.Ptot.shape == (n_basis, n_basis)
 
         # For restricted, Pbeta should be all zeros
-        np.testing.assert_array_equal(restricted_wavefunction.Pbeta, np.zeros((n_basis, n_basis)))
+        np.testing.assert_array_equal(
+            restricted_wavefunction.Pbeta, np.zeros((n_basis, n_basis))
+        )
 
     def test_calculate_density_matrices_unrestricted(self, unrestricted_wavefunction):
         """Test density matrix calculation for unrestricted case."""
@@ -454,8 +466,12 @@ class TestWavefunctionDensityMatrices:
         assert unrestricted_wavefunction.Ptot is not None
 
         # Check that Ptot = Palpha + Pbeta
-        expected_Ptot = unrestricted_wavefunction.Palpha + unrestricted_wavefunction.Pbeta
-        np.testing.assert_array_almost_equal(unrestricted_wavefunction.Ptot, expected_Ptot)
+        expected_Ptot = (
+            unrestricted_wavefunction.Palpha + unrestricted_wavefunction.Pbeta
+        )
+        np.testing.assert_array_almost_equal(
+            unrestricted_wavefunction.Ptot, expected_Ptot
+        )
 
     def test_calculate_density_matrices_no_coefficients(self):
         """Test density matrix calculation when coefficients are None."""
@@ -486,6 +502,7 @@ class TestWavefunctionDensityMatrices:
 # =============================================================================
 # Wavefunction Class Tests - Overlap Matrix
 # =============================================================================
+
 
 class TestWavefunctionOverlapMatrix:
     """Test suite for overlap matrix calculation."""
@@ -521,6 +538,7 @@ class TestWavefunctionOverlapMatrix:
 # =============================================================================
 # Wavefunction Class Tests - Atomic Basis Mapping
 # =============================================================================
+
 
 class TestWavefunctionAtomicBasisMapping:
     """Test suite for atomic basis function mapping."""
@@ -579,7 +597,9 @@ class TestWavefunctionAtomicBasisMapping:
         wf.atoms = [Atom("C", 6, 0.0, 0.0, 0.0, 6.0)]
         wf.num_basis = 4
         wf.shells = [
-            Shell(-1, 0, np.array([0.5]), np.array([[0.1, 0.15]])),  # SP shell on atom 0
+            Shell(
+                -1, 0, np.array([0.5]), np.array([[0.1, 0.15]])
+            ),  # SP shell on atom 0
         ]
         mapping = wf.get_atomic_basis_indices()
 
@@ -619,6 +639,7 @@ class TestWavefunctionAtomicBasisMapping:
 # =============================================================================
 # Edge Cases and Type Checking
 # =============================================================================
+
 
 class TestEdgeCases:
     """Test suite for edge cases and type checking."""
@@ -683,6 +704,7 @@ class TestEdgeCases:
 # =============================================================================
 # Integration Tests
 # =============================================================================
+
 
 class TestIntegration:
     """Integration tests for multiple components working together."""

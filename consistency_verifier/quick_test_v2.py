@@ -10,10 +10,12 @@ import subprocess
 import re
 
 # Set Multiwfn path
-os.environ['MULTIWFN_BIN'] = '/home/yhm/software/PyMultiWFN/Multiwfn_3.8_bin_Linux_noGUI/Multiwfn'
+os.environ["MULTIWFN_BIN"] = (
+    "/home/yhm/software/PyMultiWFN/Multiwfn_3.8_bin_Linux_noGUI/Multiwfn"
+)
 
 # Test file
-TEST_FILE = '/home/yhm/software/PyMultiWFN/consistency_verifier/examples/H2_CCSD.wfn'
+TEST_FILE = "/home/yhm/software/PyMultiWFN/consistency_verifier/examples/H2_CCSD.wfn"
 
 print("=" * 60)
 print("PyMultiWFN Consistency Quick Test v2")
@@ -26,13 +28,10 @@ print("")
 print("[1/3] Loading with PyMultiWFN...")
 try:
     # First, try installing in editable mode
-    subprocess.run(
-        ['pip', 'install', '-e', '.'],
-        capture_output=True,
-        check=True
-    )
-    
+    subprocess.run(["pip", "install", "-e", "."], capture_output=True, check=True)
+
     from pymultiwfn.io.file_manager import FileManager
+
     fm = FileManager()
     wfn = fm.load_wavefunction(TEST_FILE)
     py_electrons = wfn.num_electrons
@@ -44,6 +43,7 @@ try:
 except Exception as e:
     print(f"  ✗ Error: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)
 
@@ -51,31 +51,32 @@ except Exception as e:
 print("\n[2/3] Running with Multiwfn...")
 try:
     result = subprocess.run(
-        [os.environ['MULTIWFN_BIN'], TEST_FILE],
-        input='18\n1\nq\n',
+        [os.environ["MULTIWFN_BIN"], TEST_FILE],
+        input="18\n1\nq\n",
         capture_output=True,
         text=True,
-        timeout=10
+        timeout=10,
     )
     output = result.stdout
-    
+
     # Parse electrons from output - look for the line with total electrons
-    for line in output.split('\n'):
-        if 'Total/Alpha/Beta electrons:' in line:
+    for line in output.split("\n"):
+        if "Total/Alpha/Beta electrons:" in line:
             # Extract the number after the colon
-            match = re.search(r'Total/Alpha/Beta electrons:\s+([\d.]+)', line)
+            match = re.search(r"Total/Alpha/Beta electrons:\s+([\d.]+)", line)
             if match:
                 mw_electrons = float(match.group(1))
                 print(f"  ✓ Electrons: {mw_electrons}")
                 break
         # Also check for net charge
-        if 'Net charge:' in line:
-            match = re.search(r'Net charge:\s+([\-\d.]+)', line)
+        if "Net charge:" in line:
+            match = re.search(r"Net charge:\s+([\-\d.]+)", line)
             if match:
                 print(f"  ✓ Net charge: {match.group(1)}")
 except Exception as e:
     print(f"  ✗ Error: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)
 

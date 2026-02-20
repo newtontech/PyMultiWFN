@@ -16,9 +16,9 @@ from overlap_fix import calculate_overlap_matrix_fixed
 
 def test_overlap_calculation():
     """Test the fixed overlap calculation."""
-    print("="*70)
+    print("=" * 70)
     print("Testing Fixed Overlap Calculation")
-    print("="*70)
+    print("=" * 70)
 
     test_data_dir = Path("/home/yhm/software/PyMultiWFN/consistency_verifier/examples")
 
@@ -46,7 +46,9 @@ def test_overlap_calculation():
                 eigenvalues = np.linalg.eigvalsh(S_fixed)
                 print(f"  Min eigenvalue: {np.min(eigenvalues):.6f}")
                 print(f"  Max eigenvalue: {np.max(eigenvalues):.6f}")
-                print(f"  Condition number: {np.max(eigenvalues) / np.min(eigenvalues):.2e}")
+                print(
+                    f"  Condition number: {np.max(eigenvalues) / np.min(eigenvalues):.2e}"
+                )
 
                 # Check if identity
                 is_identity = np.allclose(S_fixed, np.eye(S_fixed.shape[0]), rtol=1e-10)
@@ -59,7 +61,12 @@ def test_overlap_calculation():
                 if S_fixed.shape[0] <= 10:
                     print(f"\n  Sample values (top-left 3x3):")
                     for i in range(min(3, S_fixed.shape[0])):
-                        row_str = " ".join([f"{S_fixed[i,j]:8.4f}" for j in range(min(3, S_fixed.shape[1]))])
+                        row_str = " ".join(
+                            [
+                                f"{S_fixed[i,j]:8.4f}"
+                                for j in range(min(3, S_fixed.shape[1]))
+                            ]
+                        )
                         print(f"    {row_str}")
             else:
                 print(f"  ❌ Overlap matrix is empty!")
@@ -67,6 +74,7 @@ def test_overlap_calculation():
         except Exception as e:
             print(f"  ❌ Error: {e}")
             import traceback
+
             traceback.print_exc()
     else:
         print(f"  ⚠️  File not found: {h2_path}")
@@ -108,13 +116,14 @@ def test_overlap_calculation():
         except Exception as e:
             print(f"  ❌ Error: {e}")
             import traceback
+
             traceback.print_exc()
     else:
         print(f"  ⚠️  File not found: {c2h2_path}")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Test Complete")
-    print("="*70)
+    print("=" * 70)
 
 
 if __name__ == "__main__":

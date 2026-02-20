@@ -23,6 +23,7 @@ from pymultiwfn.core.constants import BOHR_TO_ANGSTROM, AU_TO_EV
 
 class BroadeningFunction(Enum):
     """Enumeration of available broadening functions."""
+
     GAUSSIAN = 1
     LORENTZIAN = 2
     PSEUDO_VOIGT = 3
@@ -30,6 +31,7 @@ class BroadeningFunction(Enum):
 
 class CompositionMethod(Enum):
     """Methods for calculating orbital compositions."""
+
     MULLIKEN = 1
     SCPA = 2
     HIRSHFELD = 3
@@ -38,6 +40,7 @@ class CompositionMethod(Enum):
 
 class FragmentType(Enum):
     """Types of fragment definitions."""
+
     BASIS_FUNCTION = 1  # Fragment defined by basis functions
     ATOM = 2  # Fragment defined by atoms
     MOLECULAR_ORBITAL = 3  # Fragment defined by MOs
@@ -46,6 +49,7 @@ class FragmentType(Enum):
 @dataclass
 class DOSConfig:
     """Configuration parameters for DOS calculations."""
+
     # Energy range (in atomic units)
     energy_min: float = -0.8
     energy_max: float = 0.2
@@ -72,6 +76,7 @@ class DOSConfig:
 @dataclass
 class Fragment:
     """Defines a fragment for DOS calculations."""
+
     indices: List[int]  # Basis function, atom, or MO indices
     fragment_type: FragmentType
     name: str = ""
@@ -84,6 +89,7 @@ class Fragment:
 @dataclass
 class DOSResult:
     """Container for DOS calculation results."""
+
     # Energy grid
     energies: np.ndarray
 
@@ -168,12 +174,14 @@ class DOSAnalyzer:
         if self.config.broadening_func == BroadeningFunction.GAUSSIAN:
             # Gaussian: A * exp(-4*ln(2)*(x/FWHM)^2)
             sigma = fwhm / (2 * np.sqrt(2 * np.log(2)))
-            return np.exp(-0.5 * (energy_diff / sigma) ** 2) / (sigma * np.sqrt(2 * np.pi))
+            return np.exp(-0.5 * (energy_diff / sigma) ** 2) / (
+                sigma * np.sqrt(2 * np.pi)
+            )
 
         elif self.config.broadening_func == BroadeningFunction.LORENTZIAN:
             # Lorentzian: (FWHM/2π) / ((x-E0)^2 + (FWHM/2)^2)
             gamma = fwhm / 2
-            return (gamma / np.pi) / (energy_diff ** 2 + gamma ** 2)
+            return (gamma / np.pi) / (energy_diff**2 + gamma**2)
 
         elif self.config.broadening_func == BroadeningFunction.PSEUDO_VOIGT:
             # Pseudo-Voigt: weighted sum of Gaussian and Lorentzian
@@ -185,8 +193,10 @@ class DOSAnalyzer:
             lor_contrib = self._broadening_function(energy_diff, fwhm)
             self.config.broadening_func = old_func
 
-            return (self.config.pseudo_voigt_weight * gauss_contrib +
-                    (1 - self.config.pseudo_voigt_weight) * lor_contrib)
+            return (
+                self.config.pseudo_voigt_weight * gauss_contrib
+                + (1 - self.config.pseudo_voigt_weight) * lor_contrib
+            )
 
         return 0.0
 
@@ -206,15 +216,23 @@ class DOSAnalyzer:
 
         for i, fragment in enumerate(self.fragments):
             if fragment.fragment_type == FragmentType.BASIS_FUNCTION:
-                compositions[:, i] = self._calculate_basis_function_compositions(fragment.indices)
+                compositions[:, i] = self._calculate_basis_function_compositions(
+                    fragment.indices
+                )
             elif fragment.fragment_type == FragmentType.ATOM:
-                compositions[:, i] = self._calculate_atomic_compositions(fragment.indices)
+                compositions[:, i] = self._calculate_atomic_compositions(
+                    fragment.indices
+                )
             elif fragment.fragment_type == FragmentType.MOLECULAR_ORBITAL:
-                compositions[:, i] = self._calculate_mo_fragment_compositions(fragment.indices)
+                compositions[:, i] = self._calculate_mo_fragment_compositions(
+                    fragment.indices
+                )
 
         return compositions
 
-    def _calculate_basis_function_compositions(self, basis_indices: List[int]) -> np.ndarray:
+    def _calculate_basis_function_compositions(
+        self, basis_indices: List[int]
+    ) -> np.ndarray:
         """Calculate compositions for basis function fragment."""
         n_mo = len(self.wf.mo_energies)
         compositions = np.zeros(n_mo)
@@ -279,7 +297,9 @@ class DOSAnalyzer:
 
             # Add broadened contribution to each energy point
             for i_e, e_grid in enumerate(energy_grid):
-                contribution = self._broadening_function(e_grid - e_mo, self.config.fwhm)
+                contribution = self._broadening_function(
+                    e_grid - e_mo, self.config.fwhm
+                )
                 tdos[i_e] += contribution * occ
 
         # Apply scaling
@@ -287,7 +307,9 @@ class DOSAnalyzer:
 
         return tdos
 
-    def _calculate_pdos(self, energy_grid: np.ndarray, compositions: np.ndarray) -> np.ndarray:
+    def _calculate_pdos(
+        self, energy_grid: np.ndarray, compositions: np.ndarray
+    ) -> np.ndarray:
         """Calculate Projected Density of States."""
         if compositions.size == 0:
             return np.array([])
@@ -307,13 +329,17 @@ class DOSAnalyzer:
         mo_energies += self.config.energy_shift
 
         for i_frag in range(n_fragments):
-            for i_mo, (e_mo, occ, comp) in enumerate(zip(mo_energies, mo_occupations, compositions[:, i_frag])):
+            for i_mo, (e_mo, occ, comp) in enumerate(
+                zip(mo_energies, mo_occupations, compositions[:, i_frag])
+            ):
                 if occ <= 0 or comp <= 0:
                     continue
 
                 # Add broadened contribution
                 for i_e, e_grid in enumerate(energy_grid):
-                    contribution = self._broadening_function(e_grid - e_mo, self.config.fwhm)
+                    contribution = self._broadening_function(
+                        e_grid - e_mo, self.config.fwhm
+                    )
                     pdos[i_frag, i_e] += contribution * occ * comp
 
         # Apply scaling
@@ -372,7 +398,7 @@ class DOSAnalyzer:
             fragment_names=fragment_names,
             homo_energy=homo_energy,
             lumo_energy=lumo_energy,
-            config=self.config
+            config=self.config,
         )
 
     def calculate_ldos(self, point: np.ndarray, energy_grid: np.ndarray) -> np.ndarray:
@@ -422,57 +448,53 @@ class DOSAnalyzer:
 
         if len(occupied_indices) > 0:
             homo_idx = occupied_indices[-1]
-            info['homo_index'] = homo_idx
-            info['homo_energy'] = mo_energies_shifted[homo_idx]
-            info['homo_occupation'] = mo_occupations[homo_idx]
+            info["homo_index"] = homo_idx
+            info["homo_energy"] = mo_energies_shifted[homo_idx]
+            info["homo_occupation"] = mo_occupations[homo_idx]
 
         if len(virtual_indices) > 0:
             lumo_idx = virtual_indices[0]
-            info['lumo_index'] = lumo_idx
-            info['lumo_energy'] = mo_energies_shifted[lumo_idx]
-            info['lumo_occupation'] = mo_occupations[lumo_idx]
+            info["lumo_index"] = lumo_idx
+            info["lumo_energy"] = mo_energies_shifted[lumo_idx]
+            info["lumo_occupation"] = mo_occupations[lumo_idx]
 
         if len(occupied_indices) > 0 and len(virtual_indices) > 0:
-            info['gap'] = info['lumo_energy'] - info['homo_energy']
+            info["gap"] = info["lumo_energy"] - info["homo_energy"]
 
         return info
 
 
 # Utility functions for creating common fragment types
 
-def create_atomic_fragment(wavefunction: Wavefunction, atom_indices: List[int],
-                         name: str = "") -> Fragment:
+
+def create_atomic_fragment(
+    wavefunction: Wavefunction, atom_indices: List[int], name: str = ""
+) -> Fragment:
     """Create a fragment from atomic indices."""
     if not name:
         name = f"Atoms_{','.join(map(str, atom_indices))}"
-    return Fragment(
-        indices=atom_indices,
-        fragment_type=FragmentType.ATOM,
-        name=name
-    )
+    return Fragment(indices=atom_indices, fragment_type=FragmentType.ATOM, name=name)
 
 
-def create_basis_function_fragment(basis_indices: List[int],
-                                 name: str = "") -> Fragment:
+def create_basis_function_fragment(
+    basis_indices: List[int], name: str = ""
+) -> Fragment:
     """Create a fragment from basis function indices."""
     if not name:
         name = f"Basis_{','.join(map(str, basis_indices))}"
     return Fragment(
-        indices=basis_indices,
-        fragment_type=FragmentType.BASIS_FUNCTION,
-        name=name
+        indices=basis_indices, fragment_type=FragmentType.BASIS_FUNCTION, name=name
     )
 
 
-def create_molecular_orbital_fragment(mo_indices: List[int],
-                                    name: str = "") -> Fragment:
+def create_molecular_orbital_fragment(
+    mo_indices: List[int], name: str = ""
+) -> Fragment:
     """Create a fragment from molecular orbital indices."""
     if not name:
         name = f"MOs_{','.join(map(str, mo_indices))}"
     return Fragment(
-        indices=mo_indices,
-        fragment_type=FragmentType.MOLECULAR_ORBITAL,
-        name=name
+        indices=mo_indices, fragment_type=FragmentType.MOLECULAR_ORBITAL, name=name
     )
 
 

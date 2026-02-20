@@ -1,9 +1,11 @@
 """
 Fixed WFN parser that correctly stores centre_assignments for basis function indexing.
 """
+
 from pymultiwfn.io.parsers.wfn import WFNLoader
 from pymultiwfn.core.data import Wavefunction
 import numpy as np
+
 
 class WFNLoaderFixed(WFNLoader):
     """
@@ -21,16 +23,17 @@ class WFNLoaderFixed(WFNLoader):
         wfn = super().load()
 
         # Store centre_assignments in the wavefunction object for later use
-        if 'centre_assignments' in self.metadata:
+        if "centre_assignments" in self.metadata:
             # Use the centre_assignments (193 entries for 193 primitives)
             # But only the first num_basis entries correspond to actual basis functions
-            self.metadata['centre_assignments'] = self.metadata['centre_assignments']
+            self.metadata["centre_assignments"] = self.metadata["centre_assignments"]
 
         return wfn
 
 
 # Monkey patch the Wavefunction.get_atomic_basis_indices method
 _original_get_atomic_basis_indices = Wavefunction.get_atomic_basis_indices
+
 
 def get_atomic_basis_indices_fixed(self) -> dict:
     """
@@ -75,8 +78,10 @@ def get_atomic_basis_indices_fixed(self) -> dict:
     if total_bfs_assigned != num_basis:
         # This is the key issue: the shell-based calculation doesn't match num_basis
         # As a workaround, we need to truncate or adjust the mapping
-        print(f"Warning: Shell-based calculation gave {total_bfs_assigned} basis functions, "
-              f"but num_basis is {num_basis}. This indicates a mismatch in shell parsing.")
+        print(
+            f"Warning: Shell-based calculation gave {total_bfs_assigned} basis functions, "
+            f"but num_basis is {num_basis}. This indicates a mismatch in shell parsing."
+        )
 
         # As a temporary fix, truncate indices to match num_basis
         # This is not ideal, but it prevents index errors

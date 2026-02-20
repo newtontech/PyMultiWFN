@@ -19,43 +19,48 @@ from pymultiwfn.math.density import calc_density
 
 class SurfaceType(Enum):
     """Enumeration for different surface definition types."""
-    ELECTRON_DENSITY = 1      # Isosurface of electron density
-    REAL_SPACE_FUNCTION = 2   # Isosurface of a specific real space function
-    HIRSHFELD = 5            # Hirshfeld surface (isosurface of Hirshfeld weight)
-    BECKE = 6                # Becke surface (isosurface of Becke weight)
-    EXTERNAL_GRID = 10       # Isosurface of external grid data
-    MEMORY_GRID = 11         # Isosurface of grid data in memory
+
+    ELECTRON_DENSITY = 1  # Isosurface of electron density
+    REAL_SPACE_FUNCTION = 2  # Isosurface of a specific real space function
+    HIRSHFELD = 5  # Hirshfeld surface (isosurface of Hirshfeld weight)
+    BECKE = 6  # Becke surface (isosurface of Becke weight)
+    EXTERNAL_GRID = 10  # Isosurface of external grid data
+    MEMORY_GRID = 11  # Isosurface of grid data in memory
 
 
 class MappedFunction(Enum):
     """Enumeration for functions that can be mapped on molecular surfaces."""
+
     USER_DEFINED = -1
     EXTERNAL_FILE = 0
-    ESP = 1                  # Electrostatic potential
-    ALIE = 2                 # Average local ionization energy
-    ESP_ATOMIC = 3           # Electrostatic potential from atomic charges
-    LEA = 4                  # Local electron affinity
-    LEAE = -4                # Local electron attachment energy
-    EDR = 5                  # Electron delocalization range function
-    ORBITAL_OVERLAP = 6      # Orbital overlap distance function
-    PAIR_DENSITY = 10        # Pair density
-    ELECTRON_DENSITY = 11    # Electron density
-    SIGN_LAMBDA2_RHO = 12    # Sign(lambda2)*rho
-    DI = 20                  # Distance from nearest nucleus inside surface
-    DE = 21                  # Distance from nearest nucleus outside surface
-    DNORM = 22               # Normalized distance
+    ESP = 1  # Electrostatic potential
+    ALIE = 2  # Average local ionization energy
+    ESP_ATOMIC = 3  # Electrostatic potential from atomic charges
+    LEA = 4  # Local electron affinity
+    LEAE = -4  # Local electron attachment energy
+    EDR = 5  # Electron delocalization range function
+    ORBITAL_OVERLAP = 6  # Orbital overlap distance function
+    PAIR_DENSITY = 10  # Pair density
+    ELECTRON_DENSITY = 11  # Electron density
+    SIGN_LAMBDA2_RHO = 12  # Sign(lambda2)*rho
+    DI = 20  # Distance from nearest nucleus inside surface
+    DE = 21  # Distance from nearest nucleus outside surface
+    DNORM = 22  # Normalized distance
 
 
 @dataclass
 class SurfaceData:
     """Data structure to store surface analysis results."""
-    vertices: np.ndarray      # Surface vertex coordinates (N, 3)
-    triangles: np.ndarray     # Surface triangle indices (M, 3)
-    vertex_values: np.ndarray # Mapped function values at vertices (N,)
-    surface_area: float       # Total surface area
-    surface_volume: float     # Volume enclosed by surface
+
+    vertices: np.ndarray  # Surface vertex coordinates (N, 3)
+    triangles: np.ndarray  # Surface triangle indices (M, 3)
+    vertex_values: np.ndarray  # Mapped function values at vertices (N,)
+    surface_area: float  # Total surface area
+    surface_volume: float  # Volume enclosed by surface
     fragment_areas: Optional[Dict[int, float]] = None  # Area per fragment
-    fragment_stats: Optional[Dict[int, Dict[str, float]]] = None  # Statistics per fragment
+    fragment_stats: Optional[Dict[int, Dict[str, float]]] = (
+        None  # Statistics per fragment
+    )
 
 
 class SurfaceAnalyzer:
@@ -85,14 +90,16 @@ class SurfaceAnalyzer:
         self.merge_ratio = 0.5
         self.eliminate_redundant = True
 
-    def generate_surface(self,
-                        surface_type: SurfaceType,
-                        isovalue: float = 0.001,
-                        grid_spacing: Optional[float] = None,
-                        fragment_atoms: Optional[List[int]] = None,
-                        external_data: Optional[np.ndarray] = None,
-                        grid_origin: Optional[np.ndarray] = None,
-                        grid_spacing_3d: Optional[np.ndarray] = None) -> SurfaceData:
+    def generate_surface(
+        self,
+        surface_type: SurfaceType,
+        isovalue: float = 0.001,
+        grid_spacing: Optional[float] = None,
+        fragment_atoms: Optional[List[int]] = None,
+        external_data: Optional[np.ndarray] = None,
+        grid_origin: Optional[np.ndarray] = None,
+        grid_spacing_3d: Optional[np.ndarray] = None,
+    ) -> SurfaceData:
         """
         Generate molecular surface using specified definition.
 
@@ -115,7 +122,9 @@ class SurfaceAnalyzer:
             return self._generate_density_isosurface(isovalue)
         elif surface_type == SurfaceType.HIRSHFELD:
             if fragment_atoms is None:
-                raise ValueError("fragment_atoms must be specified for Hirshfeld surface")
+                raise ValueError(
+                    "fragment_atoms must be specified for Hirshfeld surface"
+                )
             return self._generate_hirshfeld_surface(isovalue, fragment_atoms)
         elif surface_type == SurfaceType.BECKE:
             if fragment_atoms is None:
@@ -123,7 +132,9 @@ class SurfaceAnalyzer:
             return self._generate_becke_surface(isovalue, fragment_atoms)
         elif surface_type in [SurfaceType.EXTERNAL_GRID, SurfaceType.MEMORY_GRID]:
             if external_data is None:
-                raise ValueError("external_data must be provided for external grid surfaces")
+                raise ValueError(
+                    "external_data must be provided for external grid surfaces"
+                )
             return self._generate_external_isosurface(
                 external_data, isovalue, grid_origin, grid_spacing_3d
             )
@@ -144,24 +155,30 @@ class SurfaceAnalyzer:
         density_grid = self._calculate_density_grid(x, y, z)
 
         # Apply marching tetrahedra to extract surface
-        vertices, triangles = self._marching_tetrahedra(density_grid, isovalue, grid_origin)
+        vertices, triangles = self._marching_tetrahedra(
+            density_grid, isovalue, grid_origin
+        )
 
         # Calculate surface properties
         surface_area = self._calculate_surface_area(vertices, triangles)
         surface_volume = self._calculate_enclosed_volume(vertices, triangles)
 
         # Map electron density onto surface vertices
-        vertex_values = self._interpolate_to_vertices(vertices, density_grid, grid_origin)
+        vertex_values = self._interpolate_to_vertices(
+            vertices, density_grid, grid_origin
+        )
 
         return SurfaceData(
             vertices=vertices,
             triangles=triangles,
             vertex_values=vertex_values,
             surface_area=surface_area,
-            surface_volume=surface_volume
+            surface_volume=surface_volume,
         )
 
-    def _generate_hirshfeld_surface(self, isovalue: float, fragment_atoms: List[int]) -> SurfaceData:
+    def _generate_hirshfeld_surface(
+        self, isovalue: float, fragment_atoms: List[int]
+    ) -> SurfaceData:
         """Generate Hirshfeld surface for specified fragment."""
         # Create grid around molecule
         grid_origin, grid_dims, n_points = self._create_bounding_box()
@@ -175,24 +192,30 @@ class SurfaceAnalyzer:
         hirshfeld_grid = self._calculate_hirshfeld_weights(x, y, z, fragment_atoms)
 
         # Apply marching tetrahedra to extract surface
-        vertices, triangles = self._marching_tetrahedra(hirshfeld_grid, isovalue, grid_origin)
+        vertices, triangles = self._marching_tetrahedra(
+            hirshfeld_grid, isovalue, grid_origin
+        )
 
         # Calculate surface properties
         surface_area = self._calculate_surface_area(vertices, triangles)
         surface_volume = self._calculate_enclosed_volume(vertices, triangles)
 
         # Map Hirshfeld weights onto surface vertices
-        vertex_values = self._interpolate_to_vertices(vertices, hirshfeld_grid, grid_origin)
+        vertex_values = self._interpolate_to_vertices(
+            vertices, hirshfeld_grid, grid_origin
+        )
 
         return SurfaceData(
             vertices=vertices,
             triangles=triangles,
             vertex_values=vertex_values,
             surface_area=surface_area,
-            surface_volume=surface_volume
+            surface_volume=surface_volume,
         )
 
-    def _generate_becke_surface(self, isovalue: float, fragment_atoms: List[int]) -> SurfaceData:
+    def _generate_becke_surface(
+        self, isovalue: float, fragment_atoms: List[int]
+    ) -> SurfaceData:
         """Generate Becke surface for specified fragment."""
         # Create grid around molecule
         grid_origin, grid_dims, n_points = self._create_bounding_box()
@@ -206,7 +229,9 @@ class SurfaceAnalyzer:
         becke_grid = self._calculate_becke_weights(x, y, z, fragment_atoms)
 
         # Apply marching tetrahedra to extract surface
-        vertices, triangles = self._marching_tetrahedra(becke_grid, isovalue, grid_origin)
+        vertices, triangles = self._marching_tetrahedra(
+            becke_grid, isovalue, grid_origin
+        )
 
         # Calculate surface properties
         surface_area = self._calculate_surface_area(vertices, triangles)
@@ -220,13 +245,12 @@ class SurfaceAnalyzer:
             triangles=triangles,
             vertex_values=vertex_values,
             surface_area=surface_area,
-            surface_volume=surface_volume
+            surface_volume=surface_volume,
         )
 
-    def map_function_to_surface(self,
-                               surface_data: SurfaceData,
-                               mapped_function: MappedFunction,
-                               **kwargs) -> SurfaceData:
+    def map_function_to_surface(
+        self, surface_data: SurfaceData, mapped_function: MappedFunction, **kwargs
+    ) -> SurfaceData:
         """
         Map a real space function onto the generated surface.
 
@@ -255,8 +279,9 @@ class SurfaceAnalyzer:
         surface_data.vertex_values = vertex_values
         return surface_data
 
-    def analyze_surface_statistics(self, surface_data: SurfaceData,
-                                  fragment_atoms: Optional[List[int]] = None) -> Dict[str, Any]:
+    def analyze_surface_statistics(
+        self, surface_data: SurfaceData, fragment_atoms: Optional[List[int]] = None
+    ) -> Dict[str, Any]:
         """
         Perform statistical analysis of surface properties.
 
@@ -268,18 +293,18 @@ class SurfaceAnalyzer:
             Dictionary containing statistical analysis results
         """
         stats = {
-            'surface_area': surface_data.surface_area,
-            'surface_volume': surface_data.surface_volume,
-            'vertex_count': len(surface_data.vertices),
-            'triangle_count': len(surface_data.triangles),
-            'value_stats': {
-                'mean': np.mean(surface_data.vertex_values),
-                'std': np.std(surface_data.vertex_values),
-                'min': np.min(surface_data.vertex_values),
-                'max': np.max(surface_data.vertex_values),
-                'positive_area': 0.0,
-                'negative_area': 0.0
-            }
+            "surface_area": surface_data.surface_area,
+            "surface_volume": surface_data.surface_volume,
+            "vertex_count": len(surface_data.vertices),
+            "triangle_count": len(surface_data.triangles),
+            "value_stats": {
+                "mean": np.mean(surface_data.vertex_values),
+                "std": np.std(surface_data.vertex_values),
+                "min": np.min(surface_data.vertex_values),
+                "max": np.max(surface_data.vertex_values),
+                "positive_area": 0.0,
+                "negative_area": 0.0,
+            },
         }
 
         # Calculate positive and negative surface areas
@@ -294,19 +319,21 @@ class SurfaceAnalyzer:
                 surface_data.vertices, surface_data.triangles, negative_mask
             )
 
-            stats['value_stats']['positive_area'] = pos_area
-            stats['value_stats']['negative_area'] = neg_area
+            stats["value_stats"]["positive_area"] = pos_area
+            stats["value_stats"]["negative_area"] = neg_area
 
         # Fragment-based analysis if requested
         if fragment_atoms is not None:
             fragment_stats = self._analyze_fragments(surface_data, fragment_atoms)
-            stats['fragment_stats'] = fragment_stats
+            stats["fragment_stats"] = fragment_stats
 
         return stats
 
     # Private helper methods
 
-    def _create_bounding_box(self) -> Tuple[np.ndarray, np.ndarray, Tuple[int, int, int]]:
+    def _create_bounding_box(
+        self,
+    ) -> Tuple[np.ndarray, np.ndarray, Tuple[int, int, int]]:
         """Create bounding box for grid generation."""
         min_coords = np.min(self.atoms, axis=0) - 5.0  # Add 5 Bohr margin
         max_coords = np.max(self.atoms, axis=0) + 5.0
@@ -317,16 +344,19 @@ class SurfaceAnalyzer:
 
         return grid_origin, grid_dims, n_points
 
-    def _calculate_density_grid(self, x: np.ndarray, y: np.ndarray, z: np.ndarray) -> np.ndarray:
+    def _calculate_density_grid(
+        self, x: np.ndarray, y: np.ndarray, z: np.ndarray
+    ) -> np.ndarray:
         """Calculate electron density on a 3D grid."""
-        X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
+        X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
         grid_coords = np.vstack([X.ravel(), Y.ravel(), Z.ravel()]).T
 
         densities = calc_density(self.wavefunction, grid_coords)
         return densities.reshape(len(x), len(y), len(z))
 
-    def _marching_tetrahedra(self, grid_data: np.ndarray, isovalue: float,
-                           grid_origin: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def _marching_tetrahedra(
+        self, grid_data: np.ndarray, isovalue: float, grid_origin: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Extract isosurface using marching tetrahedra algorithm.
 
@@ -334,15 +364,19 @@ class SurfaceAnalyzer:
         tetrahedron decomposition, proper edge interpolation, and vertex elimination.
         """
         # Find boundary cells (where data crosses isovalue)
-        boundary_mask = (grid_data[:-1, :-1, :-1] < isovalue) != (grid_data[1:, 1:, 1:] >= isovalue)
+        boundary_mask = (grid_data[:-1, :-1, :-1] < isovalue) != (
+            grid_data[1:, 1:, 1:] >= isovalue
+        )
 
         # Generate vertices at boundary cell centers (simplified approach)
         boundary_indices = np.where(boundary_mask)
-        vertices = np.column_stack([
-            boundary_indices[0] * self.grid_spacing + grid_origin[0],
-            boundary_indices[1] * self.grid_spacing + grid_origin[1],
-            boundary_indices[2] * self.grid_spacing + grid_origin[2]
-        ])
+        vertices = np.column_stack(
+            [
+                boundary_indices[0] * self.grid_spacing + grid_origin[0],
+                boundary_indices[1] * self.grid_spacing + grid_origin[1],
+                boundary_indices[2] * self.grid_spacing + grid_origin[2],
+            ]
+        )
 
         # Generate simple triangulation (placeholder - proper marching tetrahedra needed)
         triangles = []
@@ -351,45 +385,57 @@ class SurfaceAnalyzer:
         # Create tetrahedra and triangulate (very simplified)
         for i in range(0, n_cells - 3, 4):
             if i + 3 < n_cells:
-                triangles.extend([
-                    [i, i+1, i+2],
-                    [i, i+2, i+3]
-                ])
+                triangles.extend([[i, i + 1, i + 2], [i, i + 2, i + 3]])
 
         triangles = np.array(triangles) if triangles else np.array([]).reshape(0, 3)
 
         # Eliminate redundant vertices if requested
         if self.eliminate_redundant and len(vertices) > 0:
-            vertices, triangles = self._eliminate_redundant_vertices(vertices, triangles)
+            vertices, triangles = self._eliminate_redundant_vertices(
+                vertices, triangles
+            )
 
         return vertices, triangles
 
-    def _calculate_surface_area(self, vertices: np.ndarray, triangles: np.ndarray) -> float:
+    def _calculate_surface_area(
+        self, vertices: np.ndarray, triangles: np.ndarray
+    ) -> float:
         """Calculate total surface area from vertices and triangles."""
         if len(triangles) == 0:
             return 0.0
 
         # Calculate triangle areas
-        v0, v1, v2 = vertices[triangles[:, 0]], vertices[triangles[:, 1]], vertices[triangles[:, 2]]
+        v0, v1, v2 = (
+            vertices[triangles[:, 0]],
+            vertices[triangles[:, 1]],
+            vertices[triangles[:, 2]],
+        )
         cross_products = np.cross(v1 - v0, v2 - v0)
         triangle_areas = 0.5 * np.linalg.norm(cross_products, axis=1)
 
         return np.sum(triangle_areas)
 
-    def _calculate_enclosed_volume(self, vertices: np.ndarray, triangles: np.ndarray) -> float:
+    def _calculate_enclosed_volume(
+        self, vertices: np.ndarray, triangles: np.ndarray
+    ) -> float:
         """Calculate volume enclosed by surface using divergence theorem."""
         if len(triangles) == 0:
             return 0.0
 
         # Calculate signed volume contributions
-        v0, v1, v2 = vertices[triangles[:, 0]], vertices[triangles[:, 1]], vertices[triangles[:, 2]]
+        v0, v1, v2 = (
+            vertices[triangles[:, 0]],
+            vertices[triangles[:, 1]],
+            vertices[triangles[:, 2]],
+        )
         cross_products = np.cross(v1, v2)
         volumes = np.sum(v0 * cross_products, axis=1) / 6.0
 
         return abs(np.sum(volumes))
 
-    def _interpolate_to_vertices(self, vertices: np.ndarray, grid_data: np.ndarray,
-                                grid_origin: np.ndarray) -> np.ndarray:
+    def _interpolate_to_vertices(
+        self, vertices: np.ndarray, grid_data: np.ndarray, grid_origin: np.ndarray
+    ) -> np.ndarray:
         """Interpolate grid values to surface vertices."""
         # Simple trilinear interpolation (simplified approach)
         vertex_indices = ((vertices - grid_origin) / self.grid_spacing).astype(int)
@@ -400,15 +446,14 @@ class SurfaceAnalyzer:
 
         # Extract values at nearest grid points
         values = grid_data[
-            vertex_indices[:, 0],
-            vertex_indices[:, 1],
-            vertex_indices[:, 2]
+            vertex_indices[:, 0], vertex_indices[:, 1], vertex_indices[:, 2]
         ]
 
         return values
 
-    def _eliminate_redundant_vertices(self, vertices: np.ndarray,
-                                    triangles: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def _eliminate_redundant_vertices(
+        self, vertices: np.ndarray, triangles: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Eliminate redundant surface vertices within threshold distance."""
         if len(vertices) == 0:
             return vertices, triangles
@@ -442,10 +487,11 @@ class SurfaceAnalyzer:
 
         return np.array(unique_vertices), np.array(new_triangles)
 
-    def _calculate_hirshfeld_weights(self, x: np.ndarray, y: np.ndarray, z: np.ndarray,
-                                    fragment_atoms: List[int]) -> np.ndarray:
+    def _calculate_hirshfeld_weights(
+        self, x: np.ndarray, y: np.ndarray, z: np.ndarray, fragment_atoms: List[int]
+    ) -> np.ndarray:
         """Calculate Hirshfeld weight function on grid."""
-        X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
+        X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
         grid_coords = np.vstack([X.ravel(), Y.ravel(), Z.ravel()]).T
 
         # Calculate promolecular densities for molecule and fragment
@@ -453,16 +499,19 @@ class SurfaceAnalyzer:
 
         fragment_mask = np.zeros(len(self.atomic_numbers), dtype=bool)
         fragment_mask[fragment_atoms] = True
-        fragment_density = self._calculate_promolecular_density(grid_coords, fragment_mask)
+        fragment_density = self._calculate_promolecular_density(
+            grid_coords, fragment_mask
+        )
 
         # Hirshfeld weight = fragment_density / total_density
         weights = fragment_density / (total_density + 1e-10)
         return weights.reshape(len(x), len(y), len(z))
 
-    def _calculate_becke_weights(self, x: np.ndarray, y: np.ndarray, z: np.ndarray,
-                                fragment_atoms: List[int]) -> np.ndarray:
+    def _calculate_becke_weights(
+        self, x: np.ndarray, y: np.ndarray, z: np.ndarray, fragment_atoms: List[int]
+    ) -> np.ndarray:
         """Calculate Becke weight function on grid."""
-        X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
+        X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
         grid_coords = np.vstack([X.ravel(), Y.ravel(), Z.ravel()]).T
 
         # Calculate Becke weights for each atom
@@ -475,8 +524,9 @@ class SurfaceAnalyzer:
 
         return fragment_weight.reshape(len(x), len(y), len(z))
 
-    def _calculate_promolecular_density(self, grid_coords: np.ndarray,
-                                      atom_mask: Optional[np.ndarray] = None) -> np.ndarray:
+    def _calculate_promolecular_density(
+        self, grid_coords: np.ndarray, atom_mask: Optional[np.ndarray] = None
+    ) -> np.ndarray:
         """Calculate promolecular electron density at grid points."""
         if atom_mask is None:
             relevant_atoms = self.atomic_numbers
@@ -516,9 +566,9 @@ class SurfaceAnalyzer:
                 p_j = 1.0
                 for k in range(n_atoms):
                     if j != k:
-                        mu_ijk = (point_distances[j] - point_distances[k]) / np.linalg.norm(
-                            self.atoms[j] - self.atoms[k]
-                        )
+                        mu_ijk = (
+                            point_distances[j] - point_distances[k]
+                        ) / np.linalg.norm(self.atoms[j] - self.atoms[k])
                         f_ijk = 0.5 * (1 - mu_ijk + np.abs(mu_ijk))
                         p_j *= f_ijk
                 cell_functions[j] = p_j
@@ -585,11 +635,11 @@ class SurfaceAnalyzer:
         """Get van der Waals radii for atoms."""
         # Simplified van der Waals radii (in Angstrom)
         vdw_lookup = {
-            1: 1.20,   # H
-            6: 1.70,   # C
-            7: 1.55,   # N
-            8: 1.52,   # O
-            9: 1.47,   # F
+            1: 1.20,  # H
+            6: 1.70,  # C
+            7: 1.55,  # N
+            8: 1.52,  # O
+            9: 1.47,  # F
             15: 1.80,  # P
             16: 1.80,  # S
             17: 1.75,  # Cl
@@ -601,8 +651,9 @@ class SurfaceAnalyzer:
 
         return np.array(radii)
 
-    def _calculate_area_by_mask(self, vertices: np.ndarray, triangles: np.ndarray,
-                               mask: np.ndarray) -> float:
+    def _calculate_area_by_mask(
+        self, vertices: np.ndarray, triangles: np.ndarray, mask: np.ndarray
+    ) -> float:
         """Calculate surface area for vertices satisfying a mask condition."""
         if len(triangles) == 0 or np.sum(mask) == 0:
             return 0.0
@@ -617,20 +668,26 @@ class SurfaceAnalyzer:
             return 0.0
 
         valid_triangles = np.array(valid_triangles)
-        v0, v1, v2 = vertices[valid_triangles[:, 0]], vertices[valid_triangles[:, 1]], vertices[valid_triangles[:, 2]]
+        v0, v1, v2 = (
+            vertices[valid_triangles[:, 0]],
+            vertices[valid_triangles[:, 1]],
+            vertices[valid_triangles[:, 2]],
+        )
         cross_products = np.cross(v1 - v0, v2 - v0)
         triangle_areas = 0.5 * np.linalg.norm(cross_products, axis=1)
 
         return np.sum(triangle_areas)
 
-    def _analyze_fragments(self, surface_data: SurfaceData,
-                          fragment_atoms: List[int]) -> Dict[int, Dict[str, float]]:
+    def _analyze_fragments(
+        self, surface_data: SurfaceData, fragment_atoms: List[int]
+    ) -> Dict[int, Dict[str, float]]:
         """Analyze surface properties for different atomic fragments."""
         fragment_stats = {}
 
         # Assign each vertex to nearest atom
         distances = np.linalg.norm(
-            surface_data.vertices[:, np.newaxis, :] - self.atoms[np.newaxis, :, :], axis=2
+            surface_data.vertices[:, np.newaxis, :] - self.atoms[np.newaxis, :, :],
+            axis=2,
         )
         nearest_atoms = np.argmin(distances, axis=1)
 
@@ -645,12 +702,12 @@ class SurfaceAnalyzer:
                 )
 
                 fragment_stats[fragment_id] = {
-                    'area': fragment_area,
-                    'mean_value': np.mean(fragment_values),
-                    'std_value': np.std(fragment_values),
-                    'min_value': np.min(fragment_values),
-                    'max_value': np.max(fragment_values),
-                    'vertex_count': np.sum(fragment_mask)
+                    "area": fragment_area,
+                    "mean_value": np.mean(fragment_values),
+                    "std_value": np.std(fragment_values),
+                    "min_value": np.min(fragment_values),
+                    "max_value": np.max(fragment_values),
+                    "vertex_count": np.sum(fragment_mask),
                 }
 
         return fragment_stats

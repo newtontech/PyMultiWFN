@@ -31,9 +31,7 @@ _cache_max_size = 256
 
 
 def calculate_overlap_matrix(
-    wfn: Wavefunction,
-    use_cache: bool = True,
-    verbose: bool = True
+    wfn: Wavefunction, use_cache: bool = True, verbose: bool = True
 ) -> np.ndarray:
     """
     Calculate the overlap matrix S for a given wavefunction.
@@ -52,7 +50,7 @@ def calculate_overlap_matrix(
     """
     # Extract all basis functions
     basis_functions = _extract_basis_functions(wfn)
-    
+
     if not basis_functions:
         return np.array([])
 
@@ -63,7 +61,9 @@ def calculate_overlap_matrix(
     basis_functions = _extract_basis_functions(wfn)
 
     if verbose:
-        print(f"Calculating overlap matrix for {len(basis_functions)} basis functions...")
+        print(
+            f"Calculating overlap matrix for {len(basis_functions)} basis functions..."
+        )
 
     # Clear cache if disabled
     if not use_cache:
@@ -86,7 +86,9 @@ def calculate_overlap_matrix(
 
     if verbose:
         print(f"Overlap matrix calculated. Trace: {np.trace(overlap_matrix):.6f}")
-        print(f"Max absolute off-diagonal: {np.max(np.abs(overlap_matrix - np.diag(np.diag(overlap_matrix)))):.6f}")
+        print(
+            f"Max absolute off-diagonal: {np.max(np.abs(overlap_matrix - np.diag(np.diag(overlap_matrix)))):.6f}"
+        )
 
     return overlap_matrix
 
@@ -114,10 +116,10 @@ def _extract_basis_functions(wfn: Wavefunction) -> List[dict]:
     # shell_type: (angular_momentum, num_functions)
     shell_info = {
         -1: (1, 4),  # SP shell: has S + P_x, P_y, P_z (4 functions total)
-        0:  (0, 1),  # S shell
-        1:  (1, 3),  # P shell: P_x, P_y, P_z
-        2:  (2, 6),  # D shell (Cartesian: xx, yy, zz, xy, xz, yz)
-        3:  (3, 10), # F shell (Cartesian)
+        0: (0, 1),  # S shell
+        1: (1, 3),  # P shell: P_x, P_y, P_z
+        2: (2, 6),  # D shell (Cartesian: xx, yy, zz, xy, xz, yz)
+        3: (3, 10),  # F shell (Cartesian)
     }
 
     for shell_idx, shell in enumerate(wfn.shells):
@@ -149,80 +151,92 @@ def _extract_basis_functions(wfn: Wavefunction) -> List[dict]:
                 p_coeffs = coeffs
 
             # Add S function
-            basis_functions.append({
-                'type': 0,  # S
-                'center': atom_idx,
-                'coords': coords,
-                'exponents': shell.exponents,
-                'coefficients': s_coeffs,
-                'shell_type': shell_type,
-                'shell_idx': shell_idx,
-            })
+            basis_functions.append(
+                {
+                    "type": 0,  # S
+                    "center": atom_idx,
+                    "coords": coords,
+                    "exponents": shell.exponents,
+                    "coefficients": s_coeffs,
+                    "shell_type": shell_type,
+                    "shell_idx": shell_idx,
+                }
+            )
 
             # Add P_x, P_y, P_z functions
             for p_type in [1, 2, 3]:  # P_x, P_y, P_z
-                basis_functions.append({
-                    'type': p_type,
-                    'center': atom_idx,
-                    'coords': coords,
-                    'exponents': shell.exponents,
-                    'coefficients': p_coeffs,
-                    'shell_type': shell_type,
-                    'shell_idx': shell_idx,
-                })
+                basis_functions.append(
+                    {
+                        "type": p_type,
+                        "center": atom_idx,
+                        "coords": coords,
+                        "exponents": shell.exponents,
+                        "coefficients": p_coeffs,
+                        "shell_type": shell_type,
+                        "shell_idx": shell_idx,
+                    }
+                )
 
         # For regular shells
         elif shell_type == 0:  # S shell
-            basis_functions.append({
-                'type': 0,  # S
-                'center': atom_idx,
-                'coords': coords,
-                'exponents': shell.exponents,
-                'coefficients': shell.coefficients.flatten(),
-                'shell_type': shell_type,
-                'shell_idx': shell_idx,
-            })
+            basis_functions.append(
+                {
+                    "type": 0,  # S
+                    "center": atom_idx,
+                    "coords": coords,
+                    "exponents": shell.exponents,
+                    "coefficients": shell.coefficients.flatten(),
+                    "shell_type": shell_type,
+                    "shell_idx": shell_idx,
+                }
+            )
 
         elif shell_type == 1:  # P shell
             # Add P_x, P_y, P_z functions
             for p_type in [1, 2, 3]:  # P_x, P_y, P_z
-                basis_functions.append({
-                    'type': p_type,
-                    'center': atom_idx,
-                    'coords': coords,
-                    'exponents': shell.exponents,
-                    'coefficients': shell.coefficients.flatten(),
-                    'shell_type': shell_type,
-                    'shell_idx': shell_idx,
-                })
+                basis_functions.append(
+                    {
+                        "type": p_type,
+                        "center": atom_idx,
+                        "coords": coords,
+                        "exponents": shell.exponents,
+                        "coefficients": shell.coefficients.flatten(),
+                        "shell_type": shell_type,
+                        "shell_idx": shell_idx,
+                    }
+                )
 
         elif shell_type == 2:  # D shell (Cartesian)
             # Cartesian D functions: xx, yy, zz, xy, xz, yz
             d_types = [4, 5, 6, 7, 8, 9]
             for d_type in d_types:
-                basis_functions.append({
-                    'type': d_type,
-                    'center': atom_idx,
-                    'coords': coords,
-                    'exponents': shell.exponents,
-                    'coefficients': shell.coefficients.flatten(),
-                    'shell_type': shell_type,
-                    'shell_idx': shell_idx,
-                })
+                basis_functions.append(
+                    {
+                        "type": d_type,
+                        "center": atom_idx,
+                        "coords": coords,
+                        "exponents": shell.exponents,
+                        "coefficients": shell.coefficients.flatten(),
+                        "shell_type": shell_type,
+                        "shell_idx": shell_idx,
+                    }
+                )
 
         elif shell_type == 3:  # F shell (Cartesian)
             # Cartesian F functions: 10 functions
             f_types = list(range(10, 20))
             for f_type in f_types:
-                basis_functions.append({
-                    'type': f_type,
-                    'center': atom_idx,
-                    'coords': coords,
-                    'exponents': shell.exponents,
-                    'coefficients': shell.coefficients.flatten(),
-                    'shell_type': shell_type,
-                    'shell_idx': shell_idx,
-                })
+                basis_functions.append(
+                    {
+                        "type": f_type,
+                        "center": atom_idx,
+                        "coords": coords,
+                        "exponents": shell.exponents,
+                        "coefficients": shell.coefficients.flatten(),
+                        "shell_type": shell_type,
+                        "shell_idx": shell_idx,
+                    }
+                )
 
         else:
             raise NotImplementedError(f"Shell type {shell_type} not yet implemented")
@@ -230,11 +244,7 @@ def _extract_basis_functions(wfn: Wavefunction) -> List[dict]:
     return basis_functions
 
 
-def _calculate_gto_overlap(
-    bf1: dict,
-    bf2: dict,
-    use_cache: bool = True
-) -> float:
+def _calculate_gto_overlap(bf1: dict, bf2: dict, use_cache: bool = True) -> float:
     """
     Calculate overlap integral between two contracted GTOs.
 
@@ -257,10 +267,10 @@ def _calculate_gto_overlap(
         Overlap integral value
     """
     # Get primitive parameters
-    exp1 = bf1['exponents']
-    exp2 = bf2['exponents']
-    coeff1 = bf1['coefficients']
-    coeff2 = bf2['coefficients']
+    exp1 = bf1["exponents"]
+    exp2 = bf2["exponents"]
+    coeff1 = bf1["coefficients"]
+    coeff2 = bf2["coefficients"]
 
     # Vectorized calculation for all primitive pairs
     # Create meshgrid of all (i, j) pairs
@@ -279,10 +289,13 @@ def _calculate_gto_overlap(
 
             # Calculate primitive overlap (with caching)
             S_prim = _calculate_primitive_overlap(
-                bf1['type'], bf2['type'],
-                bf1['coords'], bf2['coords'],
-                alpha, beta,
-                use_cache=use_cache
+                bf1["type"],
+                bf2["type"],
+                bf1["coords"],
+                bf2["coords"],
+                alpha,
+                beta,
+                use_cache=use_cache,
             )
 
             # Add to sum with contraction coefficients
@@ -292,10 +305,12 @@ def _calculate_gto_overlap(
 
 
 def _get_cache_key(
-    type1: int, type2: int,
+    type1: int,
+    type2: int,
     coords1: Tuple[float, float, float],
     coords2: Tuple[float, float, float],
-    alpha: float, beta: float
+    alpha: float,
+    beta: float,
 ) -> Tuple:
     """Generate a cache key for primitive overlap calculation."""
     return (type1, type2, coords1, coords2, alpha, beta)
@@ -303,11 +318,13 @@ def _get_cache_key(
 
 @lru_cache(maxsize=_cache_max_size)
 def _calculate_primitive_overlap(
-    type1: int, type2: int,
+    type1: int,
+    type2: int,
     coords1: Tuple[float, float, float],
     coords2: Tuple[float, float, float],
-    alpha: float, beta: float,
-    use_cache: bool = True
+    alpha: float,
+    beta: float,
+    use_cache: bool = True,
 ) -> float:
     """
     Calculate overlap integral between two primitive GTOs.
@@ -340,7 +357,7 @@ def _calculate_primitive_overlap(
     P = (
         (alpha * coords1[0] + beta * coords2[0]) / p,
         (alpha * coords1[1] + beta * coords2[1]) / p,
-        (alpha * coords1[2] + beta * coords2[2]) / p
+        (alpha * coords1[2] + beta * coords2[2]) / p,
     )
 
     # Displacement vectors
@@ -348,7 +365,11 @@ def _calculate_primitive_overlap(
     PB = (P[0] - coords2[0], P[1] - coords2[1], P[2] - coords2[2])
 
     # Distance squared
-    AB2 = (coords1[0] - coords2[0])**2 + (coords1[1] - coords2[1])**2 + (coords1[2] - coords2[2])**2
+    AB2 = (
+        (coords1[0] - coords2[0]) ** 2
+        + (coords1[1] - coords2[1]) ** 2
+        + (coords1[2] - coords2[2]) ** 2
+    )
 
     # 0D overlap (SS type)
     K = np.exp(-mu * AB2)
@@ -421,11 +442,16 @@ def _type_to_lmn(gto_type: int) -> Tuple[int, int, int]:
 
 
 def _obara_saika_S(
-    l1: int, m1: int, n1: int,
-    l2: int, m2: int, n2: int,
+    l1: int,
+    m1: int,
+    n1: int,
+    l2: int,
+    m2: int,
+    n2: int,
     PA: Tuple[float, float, float],
     PB: Tuple[float, float, float],
-    p: float, S0: float
+    p: float,
+    S0: float,
 ) -> float:
     """
     Obara-Saika recurrence relation for overlap integrals.
@@ -457,41 +483,41 @@ def _obara_saika_S(
 
     # Recursion for l1 (reduce l1 by 1, increase l2 by 1)
     if l1 > 0:
-        term1 = _obara_saika_S(l1-1, m1, n1, l2+1, m2, n2, PA, PB, p, S0)
+        term1 = _obara_saika_S(l1 - 1, m1, n1, l2 + 1, m2, n2, PA, PB, p, S0)
         term1 *= l1 / (2 * p)
         S += term1
 
-        term2 = _obara_saika_S(l1-1, m1, n1, l2, m2, n2, PA, PB, p, S0)
+        term2 = _obara_saika_S(l1 - 1, m1, n1, l2, m2, n2, PA, PB, p, S0)
         term2 += PA[0] * term1  # This is simplified; full formula is more complex
         S += term2
 
     # Recursion for m1 (reduce m1 by 1, increase m2 by 1)
     if m1 > 0:
-        term1 = _obara_saika_S(l1, m1-1, n1, l2, m2+1, n2, PA, PB, p, S0)
+        term1 = _obara_saika_S(l1, m1 - 1, n1, l2, m2 + 1, n2, PA, PB, p, S0)
         term1 *= m1 / (2 * p)
         S += term1
 
     # Recursion for n1 (reduce n1 by 1, increase n2 by 1)
     if n1 > 0:
-        term1 = _obara_saika_S(l1, m1, n1-1, l2, m2+1, n2, PA, PB, p, S0)
+        term1 = _obara_saika_S(l1, m1, n1 - 1, l2, m2 + 1, n2, PA, PB, p, S0)
         term1 *= n1 / (2 * p)
         S += term1
 
     # Recursion for l2 (reduce l2 by 1, increase l1 by 1)
     if l2 > 0:
-        term1 = _obara_saika_S(l1+1, m1, n1, l2-1, m2, n2, PA, PB, p, S0)
+        term1 = _obara_saika_S(l1 + 1, m1, n1, l2 - 1, m2, n2, PA, PB, p, S0)
         term1 *= l2 / (2 * p)
         S += term1
 
     # Recursion for m2 (reduce m2 by 1, increase m1 by 1)
     if m2 > 0:
-        term1 = _obara_saika_S(l1, m1+1, n1, l2, m2-1, n2, PA, PB, p, S0)
+        term1 = _obara_saika_S(l1, m1 + 1, n1, l2, m2 - 1, n2, PA, PB, p, S0)
         term1 *= m2 / (2 * p)
         S += term1
 
     # Recursion for n2 (reduce n2 by 1, increase n1 by 1)
     if n2 > 0:
-        term1 = _obara_saika_S(l1, m1, n1+1, l2, m2, n2-1, PA, PB, p, S0)
+        term1 = _obara_saika_S(l1, m1, n1 + 1, l2, m2, n2 - 1, PA, PB, p, S0)
         term1 *= n2 / (2 * p)
         S += term1
 
@@ -499,11 +525,16 @@ def _obara_saika_S(
 
 
 def _explicit_overlap_SPD(
-    l1: int, m1: int, n1: int,
-    l2: int, m2: int, n2: int,
+    l1: int,
+    m1: int,
+    n1: int,
+    l2: int,
+    m2: int,
+    n2: int,
     PA: Tuple[float, float, float],
     PB: Tuple[float, float, float],
-    p: float, S0: float
+    p: float,
+    S0: float,
 ) -> float:
     """
     Explicit overlap formulas for S, P, and D functions.
@@ -578,8 +609,8 @@ def get_overlap_cache_info() -> Dict:
     """Get information about the overlap cache."""
     cache_info = _calculate_primitive_overlap.cache_info()
     return {
-        'hits': cache_info.hits,
-        'misses': cache_info.misses,
-        'maxsize': cache_info.maxsize,
-        'currsize': cache_info.currsize,
+        "hits": cache_info.hits,
+        "misses": cache_info.misses,
+        "maxsize": cache_info.maxsize,
+        "currsize": cache_info.currsize,
     }

@@ -24,40 +24,138 @@ _HERMITE_ROOTS = [
     [0.0],  # n=1
     [-0.7071067811865475, 0.7071067811865475],  # n=2
     [-1.2247448713915890, 0.0, 1.2247448713915890],  # n=3
-    [-1.6506801238857846, -0.5246476232752903, 0.5246476232752903, 1.6506801238857846],  # n=4
-    [-2.0201828704560856, -0.9585724646138185, 0.0, 0.9585724646138185, 2.0201828704560856],  # n=5
-    [-2.3506049736744922, -1.3358490740136969, -0.4360774119276165, 0.4360774119276165,
-     1.3358490740136969, 2.3506049736744922],  # n=6
-    [-2.6519613568352335, -1.6735516287674714, -0.8162878828589647, 0.0, 0.8162878828589647,
-     1.6735516287674714, 2.6519613568352335],  # n=7
-    [-2.9306374202572440, -1.9816567566958429, -1.1571937124467802, -0.3811869902073221,
-     0.3811869902073221, 1.1571937124467802, 1.9816567566958429, 2.9306374202572440],  # n=8
-    [-3.1909932017815276, -2.2665805845318431, -1.4685532892166679, -0.7235510187528376, 0.0,
-     0.7235510187528376, 1.4685532892166679, 2.2665805845318431, 3.1909932017815276],  # n=9
-    [-3.4361591188377376, -2.5327316742327898, -1.7566836492998818, -1.0366108297895137,
-     -0.3429013272237046, 0.3429013272237046, 1.0366108297895137, 1.7566836492998818,
-     2.5327316742327898, 3.4361591188377376]  # n=10
+    [
+        -1.6506801238857846,
+        -0.5246476232752903,
+        0.5246476232752903,
+        1.6506801238857846,
+    ],  # n=4
+    [
+        -2.0201828704560856,
+        -0.9585724646138185,
+        0.0,
+        0.9585724646138185,
+        2.0201828704560856,
+    ],  # n=5
+    [
+        -2.3506049736744922,
+        -1.3358490740136969,
+        -0.4360774119276165,
+        0.4360774119276165,
+        1.3358490740136969,
+        2.3506049736744922,
+    ],  # n=6
+    [
+        -2.6519613568352335,
+        -1.6735516287674714,
+        -0.8162878828589647,
+        0.0,
+        0.8162878828589647,
+        1.6735516287674714,
+        2.6519613568352335,
+    ],  # n=7
+    [
+        -2.9306374202572440,
+        -1.9816567566958429,
+        -1.1571937124467802,
+        -0.3811869902073221,
+        0.3811869902073221,
+        1.1571937124467802,
+        1.9816567566958429,
+        2.9306374202572440,
+    ],  # n=8
+    [
+        -3.1909932017815276,
+        -2.2665805845318431,
+        -1.4685532892166679,
+        -0.7235510187528376,
+        0.0,
+        0.7235510187528376,
+        1.4685532892166679,
+        2.2665805845318431,
+        3.1909932017815276,
+    ],  # n=9
+    [
+        -3.4361591188377376,
+        -2.5327316742327898,
+        -1.7566836492998818,
+        -1.0366108297895137,
+        -0.3429013272237046,
+        0.3429013272237046,
+        1.0366108297895137,
+        1.7566836492998818,
+        2.5327316742327898,
+        3.4361591188377376,
+    ],  # n=10
 ]
 
 _HERMITE_WEIGHTS = [
     [1.7724538509055160],  # n=1 (sqrt(pi))
     [0.8862269254527580, 0.8862269254527580],  # n=2
     [0.29540897515091934, 1.1816359006036774, 0.29540897515091934],  # n=3
-    [0.08131283544724518, 0.8049140900055128, 0.8049140900055128, 0.08131283544724518],  # n=4
-    [0.019953242059045913, 0.39361932315224116, 0.9453087204829419, 0.39361932315224116,
-     0.019953242059045913],  # n=5
-    [0.004530009905508846, 0.15706732032285664, 0.7246295952243925, 0.7246295952243925,
-     0.15706732032285664, 0.004530009905508846],  # n=6
-    [0.0009717812450995191, 0.05451558281912703, 0.4256072526101278, 0.8102646175568073,
-     0.4256072526101278, 0.05451558281912703, 0.0009717812450995191],  # n=7
-    [0.00019960407221136762, 0.017077983007413475, 0.20780232581489180, 0.6611470125582413,
-     0.6611470125582413, 0.20780232581489180, 0.017077983007413475, 0.00019960407221136762],  # n=8
-    [3.960697726326438e-05, 0.004943624275536947, 0.08847452739437657, 0.4326515590025558,
-     0.7202352156060510, 0.4326515590025558, 0.08847452739437657, 0.004943624275536947,
-     3.960697726326438e-05],  # n=9
-    [7.640432855232621e-06, 0.0013436457467812327, 0.03387439445548106, 0.24013861108231469,
-     0.6108626337353258, 0.6108626337353258, 0.24013861108231469, 0.03387439445548106,
-     0.0013436457467812327, 7.640432855232621e-06]  # n=10
+    [
+        0.08131283544724518,
+        0.8049140900055128,
+        0.8049140900055128,
+        0.08131283544724518,
+    ],  # n=4
+    [
+        0.019953242059045913,
+        0.39361932315224116,
+        0.9453087204829419,
+        0.39361932315224116,
+        0.019953242059045913,
+    ],  # n=5
+    [
+        0.004530009905508846,
+        0.15706732032285664,
+        0.7246295952243925,
+        0.7246295952243925,
+        0.15706732032285664,
+        0.004530009905508846,
+    ],  # n=6
+    [
+        0.0009717812450995191,
+        0.05451558281912703,
+        0.4256072526101278,
+        0.8102646175568073,
+        0.4256072526101278,
+        0.05451558281912703,
+        0.0009717812450995191,
+    ],  # n=7
+    [
+        0.00019960407221136762,
+        0.017077983007413475,
+        0.20780232581489180,
+        0.6611470125582413,
+        0.6611470125582413,
+        0.20780232581489180,
+        0.017077983007413475,
+        0.00019960407221136762,
+    ],  # n=8
+    [
+        3.960697726326438e-05,
+        0.004943624275536947,
+        0.08847452739437657,
+        0.4326515590025558,
+        0.7202352156060510,
+        0.4326515590025558,
+        0.08847452739437657,
+        0.004943624275536947,
+        3.960697726326438e-05,
+    ],  # n=9
+    [
+        7.640432855232621e-06,
+        0.0013436457467812327,
+        0.03387439445548106,
+        0.24013861108231469,
+        0.6108626337353258,
+        0.6108626337353258,
+        0.24013861108231469,
+        0.03387439445548106,
+        0.0013436457467812327,
+        7.640432855232621e-06,
+    ],  # n=10
 ]
 
 
@@ -110,9 +208,14 @@ def hermite_integrate_1d(func: Callable, n_points: int = 10) -> float:
     return np.sum(weights * func(nodes))
 
 
-def overlap_gaussian_primitive(exp1: float, center1: np.ndarray,
-                              power1: np.ndarray, exp2: float,
-                              center2: np.ndarray, power2: np.ndarray) -> float:
+def overlap_gaussian_primitive(
+    exp1: float,
+    center1: np.ndarray,
+    power1: np.ndarray,
+    exp2: float,
+    center2: np.ndarray,
+    power2: np.ndarray,
+) -> float:
     """
     Calculate overlap integral between two unnormalized Gaussian primitive functions.
 
@@ -213,7 +316,9 @@ def boys_function(n: int, t: float) -> float:
         return 0.5 * np.sqrt(np.pi / t) * scipy.special.erf(np.sqrt(t))
     else:
         # Recurrence relation: F_n(t) = (2n-1)F_{n-1}(t) - t^(2n-1) * exp(-t)) / (2t)
-        return (2 * n - 1) * boys_function(n - 1, t) - t**(2 * n - 1) * np.exp(-t) / (2 * t)
+        return (2 * n - 1) * boys_function(n - 1, t) - t ** (2 * n - 1) * np.exp(-t) / (
+            2 * t
+        )
 
 
 def erfc_function(x: float) -> float:
@@ -369,8 +474,13 @@ class BSplineInterpolator:
     but implemented using SciPy's B-spline capabilities for better performance.
     """
 
-    def __init__(self, x_data: np.ndarray, y_data: np.ndarray,
-                 order: int = 4, bc_type: str = 'natural'):
+    def __init__(
+        self,
+        x_data: np.ndarray,
+        y_data: np.ndarray,
+        order: int = 4,
+        bc_type: str = "natural",
+    ):
         """
         Initialize B-spline interpolator.
 
@@ -403,8 +513,7 @@ class BSplineInterpolator:
     def _setup_1d_spline(self):
         """Setup 1D B-spline interpolation."""
         self.spline = interpolate.CubicSpline(
-            self.x_data, self.y_data,
-            bc_type=self.bc_type
+            self.x_data, self.y_data, bc_type=self.bc_type
         )
 
     def _setup_2d_spline(self):
@@ -416,8 +525,11 @@ class BSplineInterpolator:
         x2_grid = np.arange(x2)
 
         self.spline = RectBivariateSpline(
-            x1_grid, x2_grid, self.y_data,
-            kx=min(self.order, x1-1), ky=min(self.order, x2-1)
+            x1_grid,
+            x2_grid,
+            self.y_data,
+            kx=min(self.order, x1 - 1),
+            ky=min(self.order, x2 - 1),
         )
 
     def _setup_3d_spline(self):
@@ -426,7 +538,7 @@ class BSplineInterpolator:
         grid = (np.arange(x1), np.arange(x2), np.arange(x3))
 
         self.spline = interpolate.RegularGridInterpolator(
-            grid, self.y_data, method='cubic'
+            grid, self.y_data, method="cubic"
         )
 
     def __call__(self, *args) -> Union[float, np.ndarray]:
@@ -439,8 +551,9 @@ class BSplineInterpolator:
             return self.spline([args])[0]
 
 
-def bspline_interpolate(x_points: np.ndarray, y_points: np.ndarray,
-                       x_query: np.ndarray, order: int = 4) -> np.ndarray:
+def bspline_interpolate(
+    x_points: np.ndarray, y_points: np.ndarray, x_query: np.ndarray, order: int = 4
+) -> np.ndarray:
     """
     Perform B-spline interpolation of 1D data.
 
@@ -487,11 +600,15 @@ def bspline_interpolate(x_points: np.ndarray, y_points: np.ndarray,
     return spline(x_query)
 
 
-def linear_interpolation_3d(grid_data: np.ndarray,
-                           x: float, y: float, z: float,
-                           x_bounds: Tuple[float, float] = None,
-                           y_bounds: Tuple[float, float] = None,
-                           z_bounds: Tuple[float, float] = None) -> float:
+def linear_interpolation_3d(
+    grid_data: np.ndarray,
+    x: float,
+    y: float,
+    z: float,
+    x_bounds: Tuple[float, float] = None,
+    y_bounds: Tuple[float, float] = None,
+    z_bounds: Tuple[float, float] = None,
+) -> float:
     """
     Perform trilinear interpolation on 3D grid data.
 
@@ -569,9 +686,9 @@ def linear_interpolation_3d(grid_data: np.ndarray,
     return result
 
 
-def find_bond_critical_points(density_grid: np.ndarray,
-                             coords: np.ndarray,
-                             threshold: float = 0.1) -> np.ndarray:
+def find_bond_critical_points(
+    density_grid: np.ndarray, coords: np.ndarray, threshold: float = 0.1
+) -> np.ndarray:
     """
     Find bond critical points in electron density using gradient analysis.
 
@@ -599,7 +716,9 @@ def find_bond_critical_points(density_grid: np.ndarray,
 
     # Find points where gradient is minimal (potential critical points)
     threshold_scaled = threshold * np.max(density_grid)
-    critical_mask = (grad_magnitude < threshold_scaled) & (density_grid > threshold_scaled)
+    critical_mask = (grad_magnitude < threshold_scaled) & (
+        density_grid > threshold_scaled
+    )
 
     # Get coordinates of critical points
     critical_points = np.argwhere(critical_mask)
@@ -607,13 +726,14 @@ def find_bond_critical_points(density_grid: np.ndarray,
     # Convert grid indices to real coordinates
     if len(critical_points) > 0:
         # Simple mapping - in practice, need grid transformation
-        return critical_points * (coords.max(axis=0) - coords.min(axis=0)) / np.array(density_grid.shape) + coords.min(axis=0)
+        return critical_points * (coords.max(axis=0) - coords.min(axis=0)) / np.array(
+            density_grid.shape
+        ) + coords.min(axis=0)
     else:
         return np.array([]).reshape(0, 3)
 
 
-def atomic_radii_valence(electrons: int, period: int,
-                        covalent: bool = True) -> float:
+def atomic_radii_valence(electrons: int, period: int, covalent: bool = True) -> float:
     """
     Estimate atomic radius based on electron count and period.
 
@@ -637,7 +757,9 @@ def atomic_radii_valence(electrons: int, period: int,
     """
     if covalent:
         # Covalent radii approximation
-        base_radii = np.array([0.31, 0.28, 1.28, 0.96, 0.84, 0.73, 0.71, 0.66, 0.57, 0.62])
+        base_radii = np.array(
+            [0.31, 0.28, 1.28, 0.96, 0.84, 0.73, 0.71, 0.66, 0.57, 0.62]
+        )
         if period <= len(base_radii):
             base = base_radii[period - 1]
         else:

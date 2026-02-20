@@ -17,6 +17,7 @@ from pymultiwfn.math.basis import evaluate_basis as evaluate_basis_functions
 @dataclass
 class LSBResult:
     """Container for LSB analysis results."""
+
     atomic_contributions: np.ndarray  # shape: (n_atoms, n_functions, n_quantities)
     function_names: List[str]
     quantity_names: List[str]
@@ -29,9 +30,11 @@ class LSBFunctionCalculator:
     def __init__(self, wavefunction: Wavefunction):
         self.wavefunction = wavefunction
         self.fc_spin_unpolarized = 2.871234000  # Fermi constant for unpolarized
-        self.fc_spin_polarized = 4.557799872    # Fermi constant for polarized
+        self.fc_spin_polarized = 4.557799872  # Fermi constant for polarized
 
-    def calculate_functions(self, x: float, y: float, z: float) -> Tuple[np.ndarray, float, np.ndarray]:
+    def calculate_functions(
+        self, x: float, y: float, z: float
+    ) -> Tuple[np.ndarray, float, np.ndarray]:
         """
         Calculate all LSB real-space functions at a given point.
 
@@ -53,15 +56,17 @@ class LSBFunctionCalculator:
         # Function 2: |∇ρ|/ρ^(4/3)
         grad_norm = np.linalg.norm(grad_rho)
         if rho > 1e-12:
-            func_vals[0] = grad_norm / (rho ** (4.0/3.0))
+            func_vals[0] = grad_norm / (rho ** (4.0 / 3.0))
 
         # Function 3: ∇²ρ/ρ^(5/3)
         laplacian = np.trace(hess_rho)
         if rho > 1e-12:
-            func_vals[1] = laplacian / (rho ** (5.0/3.0))
+            func_vals[1] = laplacian / (rho ** (5.0 / 3.0))
 
         # Functions 4 and 8: (τ - τ_w)/τ_TF and (τ - τ_w)/τ_w
-        tau, tau_w, tau_TF = self._calculate_kinetic_energy_densities(x, y, z, rho, grad_rho)
+        tau, tau_w, tau_TF = self._calculate_kinetic_energy_densities(
+            x, y, z, rho, grad_rho
+        )
         if tau_TF > 1e-12:
             func_vals[2] = (tau - tau_w) / tau_TF
         if tau_w > 1e-12:
@@ -78,7 +83,9 @@ class LSBFunctionCalculator:
 
         return func_vals, rho, grad_rho
 
-    def _calculate_density_derivatives(self, x: float, y: float, z: float) -> Tuple[float, np.ndarray, np.ndarray]:
+    def _calculate_density_derivatives(
+        self, x: float, y: float, z: float
+    ) -> Tuple[float, np.ndarray, np.ndarray]:
         """Calculate electron density and its derivatives."""
         # This is a simplified implementation
         # In practice, this would use the wavefunction's basis functions
@@ -106,7 +113,7 @@ class LSBFunctionCalculator:
             grad_rho[i] = (rho_plus - rho_minus) / (2 * delta)
 
             # Diagonal Hessian elements
-            hess_rho[i, i] = (rho_plus - 2 * rho + rho_minus) / (delta ** 2)
+            hess_rho[i, i] = (rho_plus - 2 * rho + rho_minus) / (delta**2)
 
         # Off-diagonal Hessian elements (cross derivatives)
         for i in range(3):
@@ -116,23 +123,28 @@ class LSBFunctionCalculator:
                 coords_mp = np.array([[x, y, z]])
                 coords_mm = np.array([[x, y, z]])
 
-                coords_pp[0, i] += delta; coords_pp[0, j] += delta
-                coords_pm[0, i] += delta; coords_pm[0, j] -= delta
-                coords_mp[0, i] -= delta; coords_mp[0, j] += delta
-                coords_mm[0, i] -= delta; coords_mm[0, j] -= delta
+                coords_pp[0, i] += delta
+                coords_pp[0, j] += delta
+                coords_pm[0, i] += delta
+                coords_pm[0, j] -= delta
+                coords_mp[0, i] -= delta
+                coords_mp[0, j] += delta
+                coords_mm[0, i] -= delta
+                coords_mm[0, j] -= delta
 
                 rho_pp = calculate_electron_density(self.wavefunction, coords_pp)[0]
                 rho_pm = calculate_electron_density(self.wavefunction, coords_pm)[0]
                 rho_mp = calculate_electron_density(self.wavefunction, coords_mp)[0]
                 rho_mm = calculate_electron_density(self.wavefunction, coords_mm)[0]
 
-                hess_rho[i, j] = (rho_pp - rho_pm - rho_mp + rho_mm) / (4 * delta ** 2)
+                hess_rho[i, j] = (rho_pp - rho_pm - rho_mp + rho_mm) / (4 * delta**2)
                 hess_rho[j, i] = hess_rho[i, j]
 
         return rho, grad_rho, hess_rho
 
-    def _calculate_kinetic_energy_densities(self, x: float, y: float, z: float,
-                                          rho: float, grad_rho: np.ndarray) -> Tuple[float, float, float]:
+    def _calculate_kinetic_energy_densities(
+        self, x: float, y: float, z: float, rho: float, grad_rho: np.ndarray
+    ) -> Tuple[float, float, float]:
         """Calculate kinetic energy densities."""
         # Simplified implementation
         # In practice, this would use the actual kinetic energy density calculation
@@ -140,13 +152,13 @@ class LSBFunctionCalculator:
         # Thomas-Fermi kinetic energy density
         if self.wavefunction.is_unrestricted:
             # For spin-polarized systems
-            tau_TF = self.fc_spin_polarized * (rho ** (5.0/3.0))
+            tau_TF = self.fc_spin_polarized * (rho ** (5.0 / 3.0))
         else:
             # For closed-shell systems
-            tau_TF = self.fc_spin_unpolarized * (rho ** (5.0/3.0))
+            tau_TF = self.fc_spin_unpolarized * (rho ** (5.0 / 3.0))
 
         # Weizsäcker kinetic energy density
-        grad_norm_sq = np.sum(grad_rho ** 2)
+        grad_norm_sq = np.sum(grad_rho**2)
         if rho > 1e-12:
             tau_w = grad_norm_sq / (8.0 * rho)
         else:
@@ -157,45 +169,81 @@ class LSBFunctionCalculator:
 
         return tau, tau_w, tau_TF
 
-    def _calculate_sedd_xi(self, rho: float, grad_rho: np.ndarray, hess_rho: np.ndarray) -> float:
+    def _calculate_sedd_xi(
+        self, rho: float, grad_rho: np.ndarray, hess_rho: np.ndarray
+    ) -> float:
         """Calculate Xi part of SEDD."""
         if rho < 1e-12:
             return 0.0
 
-        grad_norm_sq = np.sum(grad_rho ** 2)
+        grad_norm_sq = np.sum(grad_rho**2)
 
         # Calculate terms for SEDD
-        term1 = rho * (grad_rho[0] * hess_rho[0, 0] + grad_rho[1] * hess_rho[0, 1] + grad_rho[2] * hess_rho[0, 2])
+        term1 = rho * (
+            grad_rho[0] * hess_rho[0, 0]
+            + grad_rho[1] * hess_rho[0, 1]
+            + grad_rho[2] * hess_rho[0, 2]
+        )
         term2 = grad_rho[0] * grad_norm_sq
 
-        term3 = rho * (grad_rho[0] * hess_rho[0, 1] + grad_rho[1] * hess_rho[1, 1] + grad_rho[2] * hess_rho[1, 2])
+        term3 = rho * (
+            grad_rho[0] * hess_rho[0, 1]
+            + grad_rho[1] * hess_rho[1, 1]
+            + grad_rho[2] * hess_rho[1, 2]
+        )
         term4 = grad_rho[1] * grad_norm_sq
 
-        term5 = rho * (grad_rho[0] * hess_rho[0, 2] + grad_rho[1] * hess_rho[1, 2] + grad_rho[2] * hess_rho[2, 2])
+        term5 = rho * (
+            grad_rho[0] * hess_rho[0, 2]
+            + grad_rho[1] * hess_rho[1, 2]
+            + grad_rho[2] * hess_rho[2, 2]
+        )
         term6 = grad_rho[2] * grad_norm_sq
 
-        xi = 4.0 / (rho ** 8) * ((term1 - term2) ** 2 + (term3 - term4) ** 2 + (term5 - term6) ** 2)
+        xi = (
+            4.0
+            / (rho**8)
+            * ((term1 - term2) ** 2 + (term3 - term4) ** 2 + (term5 - term6) ** 2)
+        )
 
         return xi
 
-    def _calculate_dori_theta(self, rho: float, grad_rho: np.ndarray, hess_rho: np.ndarray) -> float:
+    def _calculate_dori_theta(
+        self, rho: float, grad_rho: np.ndarray, hess_rho: np.ndarray
+    ) -> float:
         """Calculate Theta part of DORI."""
-        if np.sum(grad_rho ** 2) < 1e-12:
+        if np.sum(grad_rho**2) < 1e-12:
             return 0.0
 
-        grad_norm_sq = np.sum(grad_rho ** 2)
+        grad_norm_sq = np.sum(grad_rho**2)
 
         # Same terms as SEDD
-        term1 = rho * (grad_rho[0] * hess_rho[0, 0] + grad_rho[1] * hess_rho[0, 1] + grad_rho[2] * hess_rho[0, 2])
+        term1 = rho * (
+            grad_rho[0] * hess_rho[0, 0]
+            + grad_rho[1] * hess_rho[0, 1]
+            + grad_rho[2] * hess_rho[0, 2]
+        )
         term2 = grad_rho[0] * grad_norm_sq
 
-        term3 = rho * (grad_rho[0] * hess_rho[0, 1] + grad_rho[1] * hess_rho[1, 1] + grad_rho[2] * hess_rho[1, 2])
+        term3 = rho * (
+            grad_rho[0] * hess_rho[0, 1]
+            + grad_rho[1] * hess_rho[1, 1]
+            + grad_rho[2] * hess_rho[1, 2]
+        )
         term4 = grad_rho[1] * grad_norm_sq
 
-        term5 = rho * (grad_rho[0] * hess_rho[0, 2] + grad_rho[1] * hess_rho[1, 2] + grad_rho[2] * hess_rho[2, 2])
+        term5 = rho * (
+            grad_rho[0] * hess_rho[0, 2]
+            + grad_rho[1] * hess_rho[1, 2]
+            + grad_rho[2] * hess_rho[2, 2]
+        )
         term6 = grad_rho[2] * grad_norm_sq
 
-        theta = 4.0 / (grad_norm_sq ** 3) * ((term1 - term2) ** 2 + (term3 - term4) ** 2 + (term5 - term6) ** 2)
+        theta = (
+            4.0
+            / (grad_norm_sq**3)
+            * ((term1 - term2) ** 2 + (term3 - term4) ** 2 + (term5 - term6) ** 2)
+        )
 
         return theta
 
@@ -206,17 +254,23 @@ class LSBFunctionCalculator:
 
         # Calculate alpha and beta densities
         # This would use the actual wavefunction data
-        rho_alpha = calculate_electron_density(self.wavefunction, np.array([[x, y, z]]), spin='alpha')[0]
-        rho_beta = calculate_electron_density(self.wavefunction, np.array([[x, y, z]]), spin='beta')[0]
+        rho_alpha = calculate_electron_density(
+            self.wavefunction, np.array([[x, y, z]]), spin="alpha"
+        )[0]
+        rho_beta = calculate_electron_density(
+            self.wavefunction, np.array([[x, y, z]]), spin="beta"
+        )[0]
 
         return rho_alpha - rho_beta
 
 
-def calculate_lsb_analysis(wavefunction: Wavefunction,
-                          partition_method: str = "becke",
-                          radial_points: int = 50,
-                          angular_points: int = 110,
-                          use_reciprocal: bool = False) -> LSBResult:
+def calculate_lsb_analysis(
+    wavefunction: Wavefunction,
+    partition_method: str = "becke",
+    radial_points: int = 50,
+    angular_points: int = 110,
+    use_reciprocal: bool = False,
+) -> LSBResult:
     """
     Perform LSB (Localized Spherical Basis) analysis using fuzzy atomic partitioning.
 
@@ -241,7 +295,7 @@ def calculate_lsb_analysis(wavefunction: Wavefunction,
         "Xi part of SEDD",
         "Theta part of DORI",
         "Spin density",
-        "(τ-τ_w)/τ_w"
+        "(τ-τ_w)/τ_w",
     ]
 
     quantity_names = [
@@ -252,7 +306,7 @@ def calculate_lsb_analysis(wavefunction: Wavefunction,
         "Onicescu information energy of order 3",
         "Information gain",
         "Relative Renyi entropy of order 2",
-        "Relative Renyi entropy of order 3"
+        "Relative Renyi entropy of order 3",
     ]
 
     n_functions = len(function_names)
@@ -298,25 +352,27 @@ def calculate_lsb_analysis(wavefunction: Wavefunction,
                 if f_val > 1e-12:
                     # Use gradient norm from density as approximation
                     grad_norm = np.linalg.norm(grad_rho)
-                    atomic_contributions[i, j, 2] = (grad_norm ** 2 / f_val) / n_atoms
+                    atomic_contributions[i, j, 2] = (grad_norm**2 / f_val) / n_atoms
 
                 # Onicescu information energies
-                atomic_contributions[i, j, 3] = (f_val ** 2) / n_atoms
-                atomic_contributions[i, j, 4] = (f_val ** 3) / n_atoms
+                atomic_contributions[i, j, 3] = (f_val**2) / n_atoms
+                atomic_contributions[i, j, 4] = (f_val**3) / n_atoms
 
                 # Information gain and relative Renyi entropies
                 # For demonstration, use reference value of 1.0
                 f_ref = 1.0
                 if f_val > 1e-12 and f_ref > 1e-12:
-                    atomic_contributions[i, j, 5] = (f_val * np.log(f_val / f_ref)) / n_atoms
-                    atomic_contributions[i, j, 6] = (f_val ** 2 / f_ref) / n_atoms
-                    atomic_contributions[i, j, 7] = (f_val ** 3 / f_ref ** 2) / n_atoms
+                    atomic_contributions[i, j, 5] = (
+                        f_val * np.log(f_val / f_ref)
+                    ) / n_atoms
+                    atomic_contributions[i, j, 6] = (f_val**2 / f_ref) / n_atoms
+                    atomic_contributions[i, j, 7] = (f_val**3 / f_ref**2) / n_atoms
 
     return LSBResult(
         atomic_contributions=atomic_contributions,
         function_names=function_names,
         quantity_names=quantity_names,
-        partition_method=partition_method
+        partition_method=partition_method,
     )
 
 

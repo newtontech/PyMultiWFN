@@ -10,6 +10,7 @@ from typing import Optional, Dict, Any, List
 from pymultiwfn.core.data import Wavefunction, Shell
 from pymultiwfn.core.definitions import ELEMENT_NAMES
 
+
 class FchkLoader:
     """
     Enhanced loader for Gaussian Formatted Checkpoint (.fchk) files.
@@ -30,7 +31,7 @@ class FchkLoader:
             FileNotFoundError: If the file does not exist
             ValueError: If the file extension is not .fchk or .fch
         """
-        if not filename.lower().endswith(('.fchk', '.fch')):
+        if not filename.lower().endswith((".fchk", ".fch")):
             raise ValueError(f"File must have .fchk or .fch extension, got: {filename}")
 
         self.filename = filename
@@ -49,11 +50,11 @@ class FchkLoader:
             Exception: If there are critical parsing errors
         """
         try:
-            with open(self.filename, 'r', encoding='utf-8') as f:
+            with open(self.filename, "r", encoding="utf-8") as f:
                 self.content = f.read()
         except UnicodeDecodeError:
             # Try with different encoding
-            with open(self.filename, 'r', encoding='latin-1') as f:
+            with open(self.filename, "r", encoding="latin-1") as f:
                 self.content = f.read()
 
         if not self.content.strip():
@@ -81,38 +82,40 @@ class FchkLoader:
         Format:
         Label                   Type   N=       Value
         Data...
-        
+
         Handles both scalar and array data.
         """
         escaped_label = re.escape(label)
         # Pattern to capture scalar value on the same line OR N=count on the same line
-        pattern_scalar_or_n = rf"{escaped_label}\s+[IR]\s+(?:N=\s*(\d+)\s*)?(.+)?(?=\n|$)"
-        
+        pattern_scalar_or_n = (
+            rf"{escaped_label}\s+[IR]\s+(?:N=\s*(\d+)\s*)?(.+)?(?=\n|$)"
+        )
+
         match = re.search(pattern_scalar_or_n, self.content)
-        
+
         if not match:
             return np.array([])
-            
+
         count_str = match.group(1)
         scalar_val_str = match.group(2)
-        
-        if count_str: # It's an array with N=count
+
+        if count_str:  # It's an array with N=count
             count = int(count_str)
-            start_idx = self.content.find('\n', match.end()) + 1
-            
+            start_idx = self.content.find("\n", match.end()) + 1
+
             data_str = self.content[start_idx:]
-            
+
             # Find the start of the next label to delimit the current data block
             next_label_match = re.search(r"\n[A-Z][a-zA-Z\s]+\s+[IR]", data_str)
             if next_label_match:
-                data_chunk = data_str[:next_label_match.start()]
+                data_chunk = data_str[: next_label_match.start()]
             else:
                 data_chunk = data_str
-                
+
             # Use more robust parsing that handles scientific notation and Fortran D notation
-            if 'D' in data_chunk:
+            if "D" in data_chunk:
                 # Convert Fortran D notation to Python e notation
-                data_chunk = data_chunk.replace('D+', 'e+').replace('D-', 'e-')
+                data_chunk = data_chunk.replace("D+", "e+").replace("D-", "e-")
 
             # Split by whitespace and convert
             values = []
@@ -128,7 +131,7 @@ class FchkLoader:
                     break
             arr = np.array(values, dtype=dtype)
             return arr
-        elif scalar_val_str: # It's a scalar value on the same line
+        elif scalar_val_str:  # It's a scalar value on the same line
             try:
                 # Need to find the actual scalar value at the end of the matched line
                 # Example: "Number of electrons I 76" -> scalar_val_str will be "76"
@@ -140,7 +143,9 @@ class FchkLoader:
     def _parse_overlap_matrix(self):
         """Enhanced parsing of the overlap matrix from the fchk content."""
         if self.wfn.num_basis == 0:
-            warnings.warn("num_basis is 0, cannot parse Overlap matrix.", RuntimeWarning)
+            warnings.warn(
+                "num_basis is 0, cannot parse Overlap matrix.", RuntimeWarning
+            )
             return
 
         overlap_vals = self._read_section("Overlap matrix", float)
@@ -151,7 +156,10 @@ class FchkLoader:
 
         expected_len = self.wfn.num_basis * (self.wfn.num_basis + 1) // 2
         if len(overlap_vals) != expected_len:
-            warnings.warn(f"Overlap matrix size mismatch. Expected {expected_len}, got {len(overlap_vals)}.", RuntimeWarning)
+            warnings.warn(
+                f"Overlap matrix size mismatch. Expected {expected_len}, got {len(overlap_vals)}.",
+                RuntimeWarning,
+            )
             return
 
         # Reconstruct symmetric matrix from lower triangle
@@ -164,7 +172,7 @@ class FchkLoader:
                 k += 1
 
         self.wfn.overlap_matrix = overlap_mat
-        self.metadata['overlap_matrix_available'] = True
+        self.metadata["overlap_matrix_available"] = True
 
     def _parse_density_matrices(self):
         """Parse density matrices (total, alpha, beta) if available."""
@@ -174,23 +182,27 @@ class FchkLoader:
             expected_len = self.wfn.num_basis * (self.wfn.num_basis + 1) // 2
             if len(total_dens) == expected_len:
                 self.wfn.density_matrix = self._reconstruct_symmetric_matrix(total_dens)
-                self.metadata['total_density_available'] = True
+                self.metadata["total_density_available"] = True
 
         # Alpha density matrix
         alpha_dens = self._read_section("Alpha SCF Density", float)
         if len(alpha_dens) > 0:
             expected_len = self.wfn.num_basis * (self.wfn.num_basis + 1) // 2
             if len(alpha_dens) == expected_len:
-                self.wfn.density_matrix_alpha = self._reconstruct_symmetric_matrix(alpha_dens)
-                self.metadata['alpha_density_available'] = True
+                self.wfn.density_matrix_alpha = self._reconstruct_symmetric_matrix(
+                    alpha_dens
+                )
+                self.metadata["alpha_density_available"] = True
 
         # Beta density matrix
         beta_dens = self._read_section("Beta SCF Density", float)
         if len(beta_dens) > 0:
             expected_len = self.wfn.num_basis * (self.wfn.num_basis + 1) // 2
             if len(beta_dens) == expected_len:
-                self.wfn.density_matrix_beta = self._reconstruct_symmetric_matrix(beta_dens)
-                self.metadata['beta_density_available'] = True
+                self.wfn.density_matrix_beta = self._reconstruct_symmetric_matrix(
+                    beta_dens
+                )
+                self.metadata["beta_density_available"] = True
 
     def _parse_electrostatic_data(self):
         """Parse electrostatic potential and related data."""
@@ -199,22 +211,22 @@ class FchkLoader:
         if len(esp_charges) > 0:
             if len(esp_charges) == self.wfn.num_atoms:
                 self.wfn.esp_charges = esp_charges
-                self.metadata['esp_charges_available'] = True
+                self.metadata["esp_charges_available"] = True
 
         # Mulliken charges
         mulliken_charges = self._read_section("Mulliken Atomic Charges", float)
         if len(mulliken_charges) > 0:
             if len(mulliken_charges) == self.wfn.num_atoms:
                 self.wfn.mulliken_charges = mulliken_charges
-                self.metadata['mulliken_charges_available'] = True
+                self.metadata["mulliken_charges_available"] = True
 
         # Natural charges
         natural_charges = self._read_section("Natural Population Analysis", float)
         if len(natural_charges) > 0:
             # NPA data format: [charge, core, valence, rydberg, total] for each atom
             if len(natural_charges) >= self.wfn.num_atoms:
-                self.wfn.npa_charges = natural_charges[::5][:self.wfn.num_atoms]
-                self.metadata['npa_charges_available'] = True
+                self.wfn.npa_charges = natural_charges[::5][: self.wfn.num_atoms]
+                self.metadata["npa_charges_available"] = True
 
     def _parse_additional_properties(self):
         """Parse additional properties and metadata."""
@@ -222,23 +234,27 @@ class FchkLoader:
         dipole = self._read_section("Dipole Moment", float)
         if len(dipole) >= 3:
             self.wfn.dipole_moment = dipole[:3]
-            self.metadata['dipole_available'] = True
+            self.metadata["dipole_available"] = True
 
         # Quadrupole moment
         quadrupole = self._read_section("Quadrupole Moment", float)
         if len(quadrupole) >= 6:
             self.wfn.quadrupole_moment = quadrupole[:6]
-            self.metadata['quadrupole_available'] = True
+            self.metadata["quadrupole_available"] = True
 
         # SCF energy
         scf_energy = self._read_section("Total Energy", float)
         if len(scf_energy) > 0:
             self.wfn.scf_energy = scf_energy[0]
-            self.metadata['scf_energy_available'] = True
+            self.metadata["scf_energy_available"] = True
 
         # Computational methods details
-        self.metadata['scf_converged'] = self._read_section("SCF Converged", int)[0] if len(self._read_section("SCF Converged", int)) > 0 else None
-        self.metadata['efield'] = self._read_section("Electric Field", float)
+        self.metadata["scf_converged"] = (
+            self._read_section("SCF Converged", int)[0]
+            if len(self._read_section("SCF Converged", int)) > 0
+            else None
+        )
+        self.metadata["efield"] = self._read_section("Electric Field", float)
 
     def _reconstruct_symmetric_matrix(self, packed_array: np.ndarray) -> np.ndarray:
         """
@@ -252,7 +268,10 @@ class FchkLoader:
         """
         n = int((-1 + np.sqrt(1 + 8 * len(packed_array))) // 2)
         if n != self.wfn.num_basis:
-            warnings.warn(f"Matrix reconstruction size mismatch: expected {self.wfn.num_basis}, got {n}", RuntimeWarning)
+            warnings.warn(
+                f"Matrix reconstruction size mismatch: expected {self.wfn.num_basis}, got {n}",
+                RuntimeWarning,
+            )
 
         matrix = np.zeros((self.wfn.num_basis, self.wfn.num_basis))
         k = 0
@@ -279,26 +298,31 @@ class FchkLoader:
             raise ValueError("No basis shells were parsed from the FCHK file")
 
         # Validate MO coefficients
-        if hasattr(self.wfn, 'coefficients') and self.wfn.coefficients.size > 0:
+        if hasattr(self.wfn, "coefficients") and self.wfn.coefficients.size > 0:
             if self.wfn.coefficients.shape[1] != self.wfn.num_basis:
-                warnings.warn(f"MO coefficients shape mismatch: {self.wfn.coefficients.shape}, expected (nmo, {self.wfn.num_basis})", RuntimeWarning)
+                warnings.warn(
+                    f"MO coefficients shape mismatch: {self.wfn.coefficients.shape}, expected (nmo, {self.wfn.num_basis})",
+                    RuntimeWarning,
+                )
 
         # Store validation metadata
-        self.metadata['validation_passed'] = True
-        self.metadata['validation_timestamp'] = np.datetime64('now')
+        self.metadata["validation_passed"] = True
+        self.metadata["validation_timestamp"] = np.datetime64("now")
 
     def _parse_header(self):
         lines = self.content.splitlines()
         self.wfn.title = lines[0].strip()
         method_basis = lines[1].strip()
         self.wfn.method = method_basis.split()[0]
-        self.wfn.basis_set_name = method_basis.split('/')[-1] if '/' in method_basis else "Unknown"
-        
+        self.wfn.basis_set_name = (
+            method_basis.split("/")[-1] if "/" in method_basis else "Unknown"
+        )
+
         # Parse scalar values
         nelec = self._read_section("Number of electrons", float)
         if len(nelec) > 0:
             self.wfn.num_electrons = nelec[0]
-            
+
         # Multiplicity
         mult = self._read_section("Multiplicity", int)
         if len(mult) > 0:
@@ -308,13 +332,15 @@ class FchkLoader:
         atomic_numbers = self._read_section("Atomic numbers", int)
         nuclear_charges = self._read_section("Nuclear charges", float)
         coords = self._read_section("Current cartesian coordinates", float)
-        
+
         num_atoms = len(atomic_numbers)
         if len(coords) == num_atoms * 3:
             coords = coords.reshape((num_atoms, 3))
         else:
-            raise ValueError(f"Coordinate array size mismatch: expected {num_atoms * 3}, got {len(coords)}")
-        
+            raise ValueError(
+                f"Coordinate array size mismatch: expected {num_atoms * 3}, got {len(coords)}"
+            )
+
         for i in range(num_atoms):
             z = atomic_numbers[i]
             ele = ELEMENT_NAMES[z] if z < len(ELEMENT_NAMES) else "X"
@@ -328,47 +354,44 @@ class FchkLoader:
         shell_prims = self._read_section("Number of primitives per shell", int)
         prim_exps = self._read_section("Primitive exponents", float)
         contraction_coeffs = self._read_section("Contraction coefficients", float)
-        
+
         # P(S=P) coefficients for SP shells
         sp_coeffs = self._read_section("P(S=P) Contraction coefficients", float)
-        
+
         num_shells = len(shell_types)
         prim_idx = 0
-        
+
         for i in range(num_shells):
             stype = shell_types[i]
-            atom_idx = shell_to_atom[i] - 1 # FCHK is 1-based
+            atom_idx = shell_to_atom[i] - 1  # FCHK is 1-based
             nprim = shell_prims[i]
-            
-            exps = prim_exps[prim_idx : prim_idx+nprim]
-            coeffs = contraction_coeffs[prim_idx : prim_idx+nprim]
-            
+
+            exps = prim_exps[prim_idx : prim_idx + nprim]
+            coeffs = contraction_coeffs[prim_idx : prim_idx + nprim]
+
             # Handle SP shells (type -1)
             if stype == -1 and len(sp_coeffs) > 0:
-                p_coeffs = sp_coeffs[prim_idx : prim_idx+nprim]
+                p_coeffs = sp_coeffs[prim_idx : prim_idx + nprim]
                 # Combine S and P coeffs
                 coeffs = np.vstack([coeffs, p_coeffs])
-            
+
             shell = Shell(
-                type=stype,
-                center_idx=atom_idx,
-                exponents=exps,
-                coefficients=coeffs
+                type=stype, center_idx=atom_idx, exponents=exps, coefficients=coeffs
             )
             self.wfn.shells.append(shell)
-            
+
             prim_idx += nprim
-            
+
         self.wfn.num_basis = self._read_section("Number of basis functions", int)[0]
 
     def _parse_mo(self):
         # Alpha
         energies = self._read_section("Alpha Orbital Energies", float)
         coeffs = self._read_section("Alpha MO coefficients", float)
-        
+
         if len(energies) > 0:
             self.wfn.energies = energies
-            # FCHK stores coeffs as flattened array. 
+            # FCHK stores coeffs as flattened array.
             # Multiwfn convention: (nmo, nbasis)
             # FCHK convention: (nbasis, nmo) ? No, usually it's blocked by orbital.
             # Let's assume (nmo, nbasis) for now or check size.
@@ -377,7 +400,9 @@ class FchkLoader:
             if len(coeffs) == nmo * nbasis:
                 self.wfn.coefficients = coeffs.reshape((nmo, nbasis))
             else:
-                print(f"Warning: Alpha MO Coeffs size mismatch. Expected {nmo}*{nbasis}={nmo*nbasis}, got {len(coeffs)}")
+                print(
+                    f"Warning: Alpha MO Coeffs size mismatch. Expected {nmo}*{nbasis}={nmo*nbasis}, got {len(coeffs)}"
+                )
 
         # Beta (if exists)
         energies_beta = self._read_section("Beta Orbital Energies", float)
@@ -387,5 +412,6 @@ class FchkLoader:
             coeffs_beta = self._read_section("Beta MO coefficients", float)
             nmo_beta = len(energies_beta)
             if len(coeffs_beta) == nmo_beta * self.wfn.num_basis:
-                self.wfn.coefficients_beta = coeffs_beta.reshape((nmo_beta, self.wfn.num_basis))
-
+                self.wfn.coefficients_beta = coeffs_beta.reshape(
+                    (nmo_beta, self.wfn.num_basis)
+                )

@@ -43,7 +43,7 @@ for i, indices in enumerate(atomic_indices):
 
 print(f"\n=== Calculating Mayer Bond Order ===")
 result = calculate_mayer_bond_order(wfn)
-bond_matrix = result['total']
+bond_matrix = result["total"]
 
 print(f"Bond order matrix:")
 print(bond_matrix)

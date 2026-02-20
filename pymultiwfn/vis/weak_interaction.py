@@ -25,22 +25,24 @@ from ..config import Config
 
 class AnalysisType(Enum):
     """Types of weak interaction analysis"""
-    NCI = "nci"                    # Standard NCI analysis
+
+    NCI = "nci"  # Standard NCI analysis
     NCI_PROMOLECULAR = "nci_promolecular"  # NCI based on promolecular density
-    ANCI = "anci"                  # Averaged NCI analysis
-    IRI = "iri"                    # Interaction region indicator
-    DORI = "dori"                  # Density overlap regions indicator
+    ANCI = "anci"  # Averaged NCI analysis
+    IRI = "iri"  # Interaction region indicator
+    DORI = "dori"  # Density overlap regions indicator
     VDW_POTENTIAL = "vdw_potential"  # van der Waals potential
-    IGM = "igm"                    # Independent gradient model
-    MIGM = "migm"                  # Modified IGM
-    IGMH = "igmh"                  # IGM based on Hirshfeld partition
-    AIGM = "aigm"                  # Averaged IGM
-    AMIGM = "amigm"                # Averaged mIGM
+    IGM = "igm"  # Independent gradient model
+    MIGM = "migm"  # Modified IGM
+    IGMH = "igmh"  # IGM based on Hirshfeld partition
+    AIGM = "aigm"  # Averaged IGM
+    AMIGM = "amigm"  # Averaged mIGM
 
 
 @dataclass
 class Fragment:
     """Definition of a fragment for interaction analysis"""
+
     atom_indices: List[int]
     name: str = ""
 
@@ -48,6 +50,7 @@ class Fragment:
 @dataclass
 class WeakInteractionResult:
     """Results from weak interaction analysis"""
+
     analysis_type: AnalysisType
     grid_data: np.ndarray
     scatter_data: Tuple[np.ndarray, np.ndarray]  # (x, y) for scatter plot
@@ -66,7 +69,11 @@ class WeakInteractionAnalyzer:
     including NCI, IGM, and related approaches.
     """
 
-    def __init__(self, wavefunction: Optional[Wavefunction] = None, config: Optional[Config] = None):
+    def __init__(
+        self,
+        wavefunction: Optional[Wavefunction] = None,
+        config: Optional[Config] = None,
+    ):
         """
         Initialize the weak interaction analyzer.
 
@@ -98,19 +105,25 @@ class WeakInteractionAnalyzer:
         WeakInteractionResult
             Results containing RDG and sign(λ₂)ρ data
         """
-        analysis_type = AnalysisType.NCI_PROMOLECULAR if use_promolecular else AnalysisType.NCI
+        analysis_type = (
+            AnalysisType.NCI_PROMOLECULAR if use_promolecular else AnalysisType.NCI
+        )
 
         # Generate grid
         grid_points = self._generate_grid()
 
         # Calculate density and gradient
-        density, gradient = self._calculate_density_gradient(grid_points, use_promolecular)
+        density, gradient = self._calculate_density_gradient(
+            grid_points, use_promolecular
+        )
 
         # Calculate reduced density gradient (RDG)
         rdg = self._calculate_rdg(density, gradient)
 
         # Calculate sign(λ₂)ρ
-        sign_lambda2_rho = self._calculate_sign_lambda2_rho(grid_points, use_promolecular)
+        sign_lambda2_rho = self._calculate_sign_lambda2_rho(
+            grid_points, use_promolecular
+        )
 
         # Prepare scatter data
         valid_mask = (density > 0) & (np.linalg.norm(gradient, axis=0) > 0)
@@ -118,20 +131,29 @@ class WeakInteractionAnalyzer:
         scatter_y = rdg[valid_mask]
 
         metadata = {
-            'use_promolecular': use_promolecular,
-            'n_points': len(grid_points[0]),
-            'rdg_range': (np.min(rdg), np.max(rdg)),
-            'sign_lambda2_rho_range': (np.min(sign_lambda2_rho), np.max(sign_lambda2_rho))
+            "use_promolecular": use_promolecular,
+            "n_points": len(grid_points[0]),
+            "rdg_range": (np.min(rdg), np.max(rdg)),
+            "sign_lambda2_rho_range": (
+                np.min(sign_lambda2_rho),
+                np.max(sign_lambda2_rho),
+            ),
         }
 
         return WeakInteractionResult(
             analysis_type=analysis_type,
-            grid_data={'rdg': rdg, 'sign_lambda2_rho': sign_lambda2_rho, 'density': density},
+            grid_data={
+                "rdg": rdg,
+                "sign_lambda2_rho": sign_lambda2_rho,
+                "density": density,
+            },
             scatter_data=(scatter_x, scatter_y),
-            metadata=metadata
+            metadata=metadata,
         )
 
-    def analyze_igm(self, fragments: List[Fragment], igm_type: str = "igm") -> WeakInteractionResult:
+    def analyze_igm(
+        self, fragments: List[Fragment], igm_type: str = "igm"
+    ) -> WeakInteractionResult:
         """
         Perform IGM (Independent Gradient Model) analysis.
 
@@ -154,11 +176,17 @@ class WeakInteractionAnalyzer:
         fragment_gradients = []
         for fragment in fragments:
             if igm_type == "igm":
-                grad = self._calculate_fragment_gradient_promolecular(fragment.atom_indices, grid_points)
+                grad = self._calculate_fragment_gradient_promolecular(
+                    fragment.atom_indices, grid_points
+                )
             elif igm_type == "migm":
-                grad = self._calculate_fragment_gradient_hirshfeld_promolecular(fragment.atom_indices, grid_points)
+                grad = self._calculate_fragment_gradient_hirshfeld_promolecular(
+                    fragment.atom_indices, grid_points
+                )
             elif igm_type == "igmh":
-                grad = self._calculate_fragment_gradient_hirshfeld(fragment.atom_indices, grid_points)
+                grad = self._calculate_fragment_gradient_hirshfeld(
+                    fragment.atom_indices, grid_points
+                )
             else:
                 raise ValueError(f"Unknown IGM type: {igm_type}")
             fragment_gradients.append(grad)
@@ -181,25 +209,30 @@ class WeakInteractionAnalyzer:
         scatter_y_delta_g_total = delta_g_total.flatten()
 
         metadata = {
-            'igm_type': igm_type,
-            'n_fragments': len(fragments),
-            'fragment_sizes': [len(f.atom_indices) for f in fragments],
-            'n_points': len(grid_points[0]),
-            'delta_g_inter_range': (np.min(delta_g_inter), np.max(delta_g_inter)),
-            'delta_g_intra_range': (np.min(delta_g_intra), np.max(delta_g_intra)),
-            'delta_g_total_range': (np.min(delta_g_total), np.max(delta_g_total))
+            "igm_type": igm_type,
+            "n_fragments": len(fragments),
+            "fragment_sizes": [len(f.atom_indices) for f in fragments],
+            "n_points": len(grid_points[0]),
+            "delta_g_inter_range": (np.min(delta_g_inter), np.max(delta_g_inter)),
+            "delta_g_intra_range": (np.min(delta_g_intra), np.max(delta_g_intra)),
+            "delta_g_total_range": (np.min(delta_g_total), np.max(delta_g_total)),
         }
 
         return WeakInteractionResult(
             analysis_type=AnalysisType.IGM,
             grid_data={
-                'delta_g_inter': delta_g_inter,
-                'delta_g_intra': delta_g_intra,
-                'delta_g_total': delta_g_total,
-                'sign_lambda2_rho': sign_lambda2_rho
+                "delta_g_inter": delta_g_inter,
+                "delta_g_intra": delta_g_intra,
+                "delta_g_total": delta_g_total,
+                "sign_lambda2_rho": sign_lambda2_rho,
             },
-            scatter_data=(scatter_x, scatter_y_delta_g_inter, scatter_y_delta_g_intra, scatter_y_delta_g_total),
-            metadata=metadata
+            scatter_data=(
+                scatter_x,
+                scatter_y_delta_g_inter,
+                scatter_y_delta_g_intra,
+                scatter_y_delta_g_total,
+            ),
+            metadata=metadata,
         )
 
     def analyze_vdw_potential(self, probe_element: str = "Ar") -> WeakInteractionResult:
@@ -229,25 +262,27 @@ class WeakInteractionAnalyzer:
         )
 
         metadata = {
-            'probe_element': probe_element,
-            'n_points': len(grid_points[0]),
-            'repulsion_range': (np.min(repulsion_grid), np.max(repulsion_grid)),
-            'dispersion_range': (np.min(dispersion_grid), np.max(dispersion_grid)),
-            'vdw_range': (np.min(vdw_grid), np.max(vdw_grid))
+            "probe_element": probe_element,
+            "n_points": len(grid_points[0]),
+            "repulsion_range": (np.min(repulsion_grid), np.max(repulsion_grid)),
+            "dispersion_range": (np.min(dispersion_grid), np.max(dispersion_grid)),
+            "vdw_range": (np.min(vdw_grid), np.max(vdw_grid)),
         }
 
         return WeakInteractionResult(
             analysis_type=AnalysisType.VDW_POTENTIAL,
             grid_data={
-                'repulsion': repulsion_grid,
-                'dispersion': dispersion_grid,
-                'vdw_total': vdw_grid
+                "repulsion": repulsion_grid,
+                "dispersion": dispersion_grid,
+                "vdw_total": vdw_grid,
             },
             scatter_data=(),  # No scatter plot for vdW potential
-            metadata=metadata
+            metadata=metadata,
         )
 
-    def _generate_grid(self, extension: float = 2.0) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def _generate_grid(
+        self, extension: float = 2.0
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Generate 3D grid points for calculation.
 
@@ -267,24 +302,29 @@ class WeakInteractionAnalyzer:
         max_coords = np.max(coords, axis=0) + extension
 
         # Generate grid
-        n_points = self.config.get('grid_points', 50)
+        n_points = self.config.get("grid_points", 50)
         x = np.linspace(min_coords[0], max_coords[0], n_points)
         y = np.linspace(min_coords[1], max_coords[1], n_points)
         z = np.linspace(min_coords[2], max_coords[2], n_points)
 
-        X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
+        X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
 
         return X.flatten(), Y.flatten(), Z.flatten()
 
-    def _calculate_density_gradient(self, grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
-                                   use_promolecular: bool = False) -> Tuple[np.ndarray, np.ndarray]:
+    def _calculate_density_gradient(
+        self,
+        grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
+        use_promolecular: bool = False,
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Calculate electron density and its gradient on grid points."""
         if use_promolecular:
             return self._calculate_promolecular_density_gradient(grid_points)
         else:
             return self.density_calc.calculate_density_and_gradient(grid_points)
 
-    def _calculate_promolecular_density_gradient(self, grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
+    def _calculate_promolecular_density_gradient(
+        self, grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray]
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Calculate promolecular density and gradient."""
         density = np.zeros(len(grid_points[0]))
         gradient = np.zeros((3, len(grid_points[0])))
@@ -298,8 +338,9 @@ class WeakInteractionAnalyzer:
 
         return density, gradient
 
-    def _calculate_atomic_density_gradient(self, grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
-                                         atom_index: int) -> Tuple[np.ndarray, np.ndarray]:
+    def _calculate_atomic_density_gradient(
+        self, grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray], atom_index: int
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Calculate atomic density and gradient for isolated atom."""
         # This is a simplified implementation
         # In practice, this would use atomic density fitting parameters
@@ -307,7 +348,7 @@ class WeakInteractionAnalyzer:
         atom = self.wfn.atoms[atom_index]
 
         # Distance from atom center
-        r = np.sqrt((x - atom.x)**2 + (y - atom.y)**2 + (z - atom.z)**2)
+        r = np.sqrt((x - atom.x) ** 2 + (y - atom.y) ** 2 + (z - atom.z) ** 2)
 
         # Simplified atomic density (exponential decay)
         # In practice, this would use fitted STO parameters
@@ -333,16 +374,19 @@ class WeakInteractionAnalyzer:
 
         # RDG = |∇ρ| / (2 * (3π²)^(1/3) * ρ^(4/3))
         constant = 0.161620459673995  # 1 / (2 * (3π²)^(1/3))
-        rdg[mask] = constant * grad_norm[mask] / (density[mask] ** (4.0/3.0))
+        rdg[mask] = constant * grad_norm[mask] / (density[mask] ** (4.0 / 3.0))
 
         # Handle special cases
-        rdg[density >= self.config.get('RDG_max_density', 0.0)] = 100.0
+        rdg[density >= self.config.get("RDG_max_density", 0.0)] = 100.0
         rdg[(grad_norm == 0) | (density == 0)] = 999.0
 
         return rdg
 
-    def _calculate_sign_lambda2_rho(self, grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
-                                   use_promolecular: bool = False) -> np.ndarray:
+    def _calculate_sign_lambda2_rho(
+        self,
+        grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
+        use_promolecular: bool = False,
+    ) -> np.ndarray:
         """Calculate sign(λ₂)ρ where λ₂ is the second eigenvalue of Hessian."""
         # Calculate Hessian of density
         hessian = self._calculate_density_hessian(grid_points, use_promolecular)
@@ -365,8 +409,11 @@ class WeakInteractionAnalyzer:
 
         return sign_lambda2_rho
 
-    def _calculate_density_hessian(self, grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
-                                  use_promolecular: bool = False) -> np.ndarray:
+    def _calculate_density_hessian(
+        self,
+        grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
+        use_promolecular: bool = False,
+    ) -> np.ndarray:
         """Calculate Hessian matrix of electron density."""
         n_points = len(grid_points[0])
         hessian = np.zeros((3, 3, n_points))
@@ -378,7 +425,9 @@ class WeakInteractionAnalyzer:
             x, y, z = grid_points[0][i], grid_points[1][i], grid_points[2][i]
 
             # Calculate density at displaced points
-            density_center = self._calculate_density_at_point(grid_points, i, use_promolecular)
+            density_center = self._calculate_density_at_point(
+                grid_points, i, use_promolecular
+            )
 
             # Second derivatives
             for j, coord in enumerate([x, y, z]):
@@ -391,24 +440,36 @@ class WeakInteractionAnalyzer:
                 grid_plus[j][i] = coord_plus
                 grid_minus[j][i] = coord_minus
 
-                density_plus = self._calculate_density_at_point(grid_plus, i, use_promolecular)
-                density_minus = self._calculate_density_at_point(grid_minus, i, use_promolecular)
+                density_plus = self._calculate_density_at_point(
+                    grid_plus, i, use_promolecular
+                )
+                density_minus = self._calculate_density_at_point(
+                    grid_minus, i, use_promolecular
+                )
 
-                hessian[j, j, i] = (density_plus - 2 * density_center + density_minus) / (delta ** 2)
+                hessian[j, j, i] = (
+                    density_plus - 2 * density_center + density_minus
+                ) / (delta**2)
 
         return hessian
 
-    def _calculate_density_at_point(self, grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
-                                   index: int, use_promolecular: bool = False) -> float:
+    def _calculate_density_at_point(
+        self,
+        grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
+        index: int,
+        use_promolecular: bool = False,
+    ) -> float:
         """Calculate density at a specific grid point."""
         if use_promolecular:
             density = 0.0
             for atom in self.wfn.atoms:
                 atom_density, _ = self._calculate_atomic_density_gradient(
-                    (grid_points[0][index:index+1],
-                     grid_points[1][index:index+1],
-                     grid_points[2][index:index+1]),
-                    atom.index
+                    (
+                        grid_points[0][index : index + 1],
+                        grid_points[1][index : index + 1],
+                        grid_points[2][index : index + 1],
+                    ),
+                    atom.index,
                 )
                 density += atom_density[0]
             return density
@@ -417,28 +478,40 @@ class WeakInteractionAnalyzer:
                 grid_points[0][index], grid_points[1][index], grid_points[2][index]
             )
 
-    def _calculate_fragment_gradient_promolecular(self, atom_indices: List[int],
-                                                grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray]) -> np.ndarray:
+    def _calculate_fragment_gradient_promolecular(
+        self,
+        atom_indices: List[int],
+        grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    ) -> np.ndarray:
         """Calculate gradient for a fragment using promolecular approximation."""
         gradient = np.zeros((3, len(grid_points[0])))
 
         for atom_idx in atom_indices:
-            _, atom_gradient = self._calculate_atomic_density_gradient(grid_points, atom_idx)
+            _, atom_gradient = self._calculate_atomic_density_gradient(
+                grid_points, atom_idx
+            )
             gradient += atom_gradient
 
         return gradient
 
-    def _calculate_fragment_gradient_hirshfeld_promolecular(self, atom_indices: List[int],
-                                                           grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray]) -> np.ndarray:
+    def _calculate_fragment_gradient_hirshfeld_promolecular(
+        self,
+        atom_indices: List[int],
+        grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    ) -> np.ndarray:
         """Calculate gradient for fragment using Hirshfeld partition of promolecular density."""
         # Calculate promolecular density
-        promol_density, promol_gradient = self._calculate_promolecular_density_gradient(grid_points)
+        promol_density, promol_gradient = self._calculate_promolecular_density_gradient(
+            grid_points
+        )
 
         # Calculate atomic densities for partitioning
         fragment_gradient = np.zeros((3, len(grid_points[0])))
 
         for atom_idx in atom_indices:
-            atom_density, atom_gradient = self._calculate_atomic_density_gradient(grid_points, atom_idx)
+            atom_density, atom_gradient = self._calculate_atomic_density_gradient(
+                grid_points, atom_idx
+            )
 
             # Hirshfeld weight
             mask = promol_density > 0
@@ -450,11 +523,16 @@ class WeakInteractionAnalyzer:
 
         return fragment_gradient
 
-    def _calculate_fragment_gradient_hirshfeld(self, atom_indices: List[int],
-                                             grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray]) -> np.ndarray:
+    def _calculate_fragment_gradient_hirshfeld(
+        self,
+        atom_indices: List[int],
+        grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
+    ) -> np.ndarray:
         """Calculate gradient for fragment using Hirshfeld partition of actual density."""
         # Calculate actual molecular density and gradient
-        mol_density, mol_gradient = self.density_calc.calculate_density_and_gradient(grid_points)
+        mol_density, mol_gradient = self.density_calc.calculate_density_and_gradient(
+            grid_points
+        )
 
         # Calculate promolecular density for weighting
         promol_density, _ = self._calculate_promolecular_density_gradient(grid_points)
@@ -463,7 +541,9 @@ class WeakInteractionAnalyzer:
         fragment_gradient = np.zeros((3, len(grid_points[0])))
 
         for atom_idx in atom_indices:
-            atom_density, atom_gradient = self._calculate_atomic_density_gradient(grid_points, atom_idx)
+            atom_density, atom_gradient = self._calculate_atomic_density_gradient(
+                grid_points, atom_idx
+            )
 
             # Hirshfeld weight
             mask = promol_density > 0
@@ -474,17 +554,22 @@ class WeakInteractionAnalyzer:
             mask2 = promol_density > 0
             weighted_grad = np.zeros((3, len(grid_points[0])))
 
-            weighted_grad[:, mask2] = (weight[:, mask2] * mol_gradient[:, mask2] -
-                                      mol_density[mask2] * atom_gradient[:, mask2] / promol_density[mask2] +
-                                      mol_density[mask2] * atom_density[mask2] *
-                                      np.sum(atom_gradient[:, mask2], axis=0) / promol_density[mask2]**2)
+            weighted_grad[:, mask2] = (
+                weight[:, mask2] * mol_gradient[:, mask2]
+                - mol_density[mask2] * atom_gradient[:, mask2] / promol_density[mask2]
+                + mol_density[mask2]
+                * atom_density[mask2]
+                * np.sum(atom_gradient[:, mask2], axis=0)
+                / promol_density[mask2] ** 2
+            )
 
             fragment_gradient += weighted_grad
 
         return fragment_gradient
 
-    def _calculate_molecular_gradient(self, grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
-                                   igm_type: str) -> np.ndarray:
+    def _calculate_molecular_gradient(
+        self, grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray], igm_type: str
+    ) -> np.ndarray:
         """Calculate molecular gradient based on IGM type."""
         if igm_type in ["igm", "migm"]:
             _, gradient = self._calculate_promolecular_density_gradient(grid_points)
@@ -492,8 +577,9 @@ class WeakInteractionAnalyzer:
             _, gradient = self.density_calc.calculate_density_and_gradient(grid_points)
         return gradient
 
-    def _calculate_delta_g(self, fragment_gradients: List[np.ndarray],
-                          mol_gradient: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def _calculate_delta_g(
+        self, fragment_gradients: List[np.ndarray], mol_gradient: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Calculate δg values from fragment and molecular gradients."""
         # δg_inter: contribution from inter-fragment interactions
         # δg_intra: contribution from intra-fragment interactions
@@ -525,24 +611,27 @@ class WeakInteractionAnalyzer:
         # Simplified UFF parameters (A, B) for well depth and radius
         # In practice, this should contain all 103 elements
         uff_params = {
-            'H': (0.044, 2.886),
-            'C': (0.105, 3.851),
-            'N': (0.069, 3.660),
-            'O': (0.060, 3.500),
-            'F': (0.050, 3.364),
-            'P': (0.200, 4.044),
-            'S': (0.198, 4.000),
-            'Cl': (0.265, 3.947),
-            'Br': (0.322, 4.220),
-            'I': (0.350, 4.477),
-            'Ar': (0.237, 3.823),  # Probe atom
+            "H": (0.044, 2.886),
+            "C": (0.105, 3.851),
+            "N": (0.069, 3.660),
+            "O": (0.060, 3.500),
+            "F": (0.050, 3.364),
+            "P": (0.200, 4.044),
+            "S": (0.198, 4.000),
+            "Cl": (0.265, 3.947),
+            "Br": (0.322, 4.220),
+            "I": (0.350, 4.477),
+            "Ar": (0.237, 3.823),  # Probe atom
         }
 
         return uff_params.get(element, (0.100, 4.000))  # Default values
 
-    def _calculate_vdw_potential(self, grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
-                               atom_params: List[Tuple[float, float]],
-                               probe_params: Tuple[float, float]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def _calculate_vdw_potential(
+        self,
+        grid_points: Tuple[np.ndarray, np.ndarray, np.ndarray],
+        atom_params: List[Tuple[float, float]],
+        probe_params: Tuple[float, float],
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Calculate van der Waals potential on grid points."""
         x, y, z = grid_points
         n_points = len(x)
@@ -554,7 +643,10 @@ class WeakInteractionAnalyzer:
 
         for i, (atom, (atom_A, atom_B)) in enumerate(zip(self.wfn.atoms, atom_params)):
             # Distance from atom
-            r = np.sqrt((x - atom.x)**2 + (y - atom.y)**2 + (z - atom.z)**2) * 0.529  # Convert to Angstrom
+            r = (
+                np.sqrt((x - atom.x) ** 2 + (y - atom.y) ** 2 + (z - atom.z) ** 2)
+                * 0.529
+            )  # Convert to Angstrom
 
             # Avoid singularities
             r = np.maximum(r, 0.1)
@@ -565,8 +657,8 @@ class WeakInteractionAnalyzer:
 
             # Calculate potential (only for atoms within 25 Angstrom)
             mask = r <= 25.0
-            repulsion_grid[mask] += D_ij * (X_ij / r[mask])**12
-            dispersion_grid[mask] -= 2 * D_ij * (X_ij / r[mask])**6
+            repulsion_grid[mask] += D_ij * (X_ij / r[mask]) ** 12
+            dispersion_grid[mask] -= 2 * D_ij * (X_ij / r[mask]) ** 6
 
         vdw_grid = repulsion_grid + dispersion_grid
 

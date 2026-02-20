@@ -29,10 +29,10 @@ from pymultiwfn.math.gradient import (
 )
 from pymultiwfn.math.density import calc_density
 
-
 # ============================================================================
 # Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def hydrogen_sto3g_restricted():
@@ -55,7 +55,7 @@ def hydrogen_sto3g_restricted():
         type=0,
         center_idx=0,
         exponents=np.array([3.4252509, 0.6239137, 0.1688554]),
-        coefficients=np.array([0.1543290, 0.5353281, 0.4446345])
+        coefficients=np.array([0.1543290, 0.5353281, 0.4446345]),
     )
     wfn.shells.append(shell)
 
@@ -85,7 +85,7 @@ def hydrogen_sto3g_p_shell():
         type=1,  # P shell
         center_idx=0,
         exponents=np.array([1.0, 0.5]),
-        coefficients=np.array([[1.0, 1.0], [1.0, 1.0], [1.0, 1.0]])
+        coefficients=np.array([[1.0, 1.0], [1.0, 1.0], [1.0, 1.0]]),
     )
     wfn.shells.append(shell)
 
@@ -117,7 +117,7 @@ def h2_sto3g():
         type=0,
         center_idx=0,
         exponents=np.array([3.4252509, 0.6239137, 0.1688554]),
-        coefficients=np.array([0.1543290, 0.5353281, 0.4446345])
+        coefficients=np.array([0.1543290, 0.5353281, 0.4446345]),
     )
     wfn.shells.append(shell1)
 
@@ -126,7 +126,7 @@ def h2_sto3g():
         type=0,
         center_idx=1,
         exponents=np.array([3.4252509, 0.6239137, 0.1688554]),
-        coefficients=np.array([0.1543290, 0.5353281, 0.4446345])
+        coefficients=np.array([0.1543290, 0.5353281, 0.4446345]),
     )
     wfn.shells.append(shell2)
 
@@ -142,6 +142,7 @@ def h2_sto3g():
 # ============================================================================
 # Unit Tests: Contraction Gradient
 # ============================================================================
+
 
 class TestContractionGradient:
     """Tests for radial contraction gradient evaluation."""
@@ -194,10 +195,7 @@ class TestContractionGradient:
         grad = _eval_contraction_gradient(exps, coeffs, r2, r_vec)
 
         # Sum of contributions from both primitives
-        expected = (
-            -2.0 * 1.0 * 0.5 * np.exp(-1.0) +
-            -2.0 * 2.0 * 0.5 * np.exp(-2.0)
-        )
+        expected = -2.0 * 1.0 * 0.5 * np.exp(-1.0) + -2.0 * 2.0 * 0.5 * np.exp(-2.0)
         np.testing.assert_allclose(grad[0, 0], expected, rtol=1e-6)
 
     def test_gradient_at_origin(self):
@@ -217,6 +215,7 @@ class TestContractionGradient:
 # ============================================================================
 # Unit Tests: Contraction Laplacian
 # ============================================================================
+
 
 class TestContractionLaplacian:
     """Tests for radial contraction Laplacian evaluation."""
@@ -266,6 +265,7 @@ class TestContractionLaplacian:
 # Unit Tests: Gradient Contraction
 # ============================================================================
 
+
 class TestGradientContraction:
     """Tests for gradient contraction with density matrix."""
 
@@ -286,18 +286,19 @@ class TestGradientContraction:
     def test_two_basis_gradient(self):
         """Test gradient with two basis functions."""
         phi = np.array([[1.0, 1.0]])
-        grad_phi = np.array([
-            [[1.0, 0.0, 0.0],   # ∇φ₁ = [1, 0, 0]
-             [0.0, 1.0, 0.0]]   # ∇φ₂ = [0, 1, 0]
-        ])  # (1, 2, 3) but we need (1, 3, 2)
+        grad_phi = np.array(
+            [[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]]  # ∇φ₁ = [1, 0, 0]  # ∇φ₂ = [0, 1, 0]
+        )  # (1, 2, 3) but we need (1, 3, 2)
         grad_phi = grad_phi.transpose(0, 2, 1)  # Now (1, 3, 2)
         P = np.array([[1.0, 0.0], [0.0, 1.0]])
 
         grad = _contract_gradient(phi, grad_phi, P)
 
         # For diagonal P: ∇ρ = 2 * Σ_i P_ii φ_i ∇φ_i
-        expected = 2 * (1.0 * 1.0 * np.array([1.0, 0.0, 0.0]) +
-                        1.0 * 1.0 * np.array([0.0, 1.0, 0.0]))
+        expected = 2 * (
+            1.0 * 1.0 * np.array([1.0, 0.0, 0.0])
+            + 1.0 * 1.0 * np.array([0.0, 1.0, 0.0])
+        )
         expected = expected.reshape(1, 3)
         np.testing.assert_allclose(grad, expected, rtol=1e-6)
 
@@ -305,6 +306,7 @@ class TestGradientContraction:
 # ============================================================================
 # Integration Tests: Full Gradient Calculation
 # ============================================================================
+
 
 class TestGradientCalculation:
     """Integration tests for full gradient calculation."""
@@ -314,12 +316,14 @@ class TestGradientCalculation:
         wfn = hydrogen_sto3g_restricted
 
         # Test at several points symmetric about origin
-        coords = np.array([
-            [1.0, 0.0, 0.0],
-            [-1.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0],
-            [0.0, -1.0, 0.0],
-        ])
+        coords = np.array(
+            [
+                [1.0, 0.0, 0.0],
+                [-1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, -1.0, 0.0],
+            ]
+        )
 
         grad = calc_density_gradient(wfn, coords)
 
@@ -364,11 +368,13 @@ class TestGradientCalculation:
         wfn = h2_sto3g
 
         # Points along bond axis
-        coords = np.array([
-            [-1.0, 0.0, 0.0],  # Left of left H
-            [0.0, 0.0, 0.0],   # Between atoms
-            [1.0, 0.0, 0.0],   # Right of right H
-        ])
+        coords = np.array(
+            [
+                [-1.0, 0.0, 0.0],  # Left of left H
+                [0.0, 0.0, 0.0],  # Between atoms
+                [1.0, 0.0, 0.0],  # Right of right H
+            ]
+        )
 
         grad = calc_density_gradient(wfn, coords)
 
@@ -386,6 +392,7 @@ class TestGradientCalculation:
 # ============================================================================
 # Validation Tests: Numerical Differentiation
 # ============================================================================
+
 
 class TestNumericalValidation:
     """Validate gradient against numerical differentiation."""
@@ -425,11 +432,13 @@ class TestNumericalValidation:
         wfn = h2_sto3g
 
         # Test at several points
-        test_points = np.array([
-            [0.0, 0.0, 0.0],
-            [0.5, 0.0, 0.0],
-            [0.0, 0.5, 0.0],
-        ])
+        test_points = np.array(
+            [
+                [0.0, 0.0, 0.0],
+                [0.5, 0.0, 0.0],
+                [0.0, 0.5, 0.0],
+            ]
+        )
 
         for i, coord in enumerate(test_points):
             grad_analytical = calc_density_gradient(wfn, coord.reshape(1, 3))[0]
@@ -450,14 +459,18 @@ class TestNumericalValidation:
                 grad_numerical[d] = (rho_plus - rho_minus) / (2 * h)
 
             np.testing.assert_allclose(
-                grad_analytical, grad_numerical, rtol=1e-3, atol=1e-5,
-                err_msg=f"Failed at point {i}: {coord}"
+                grad_analytical,
+                grad_numerical,
+                rtol=1e-3,
+                atol=1e-5,
+                err_msg=f"Failed at point {i}: {coord}",
             )
 
 
 # ============================================================================
 # Laplacian Tests
 # ============================================================================
+
 
 class TestLaplacianCalculation:
     """Tests for Laplacian calculation."""
@@ -486,10 +499,12 @@ class TestLaplacianCalculation:
         """Test Laplacian symmetry for H2."""
         wfn = h2_sto3g
 
-        coords = np.array([
-            [-0.5, 0.0, 0.0],
-            [0.5, 0.0, 0.0],
-        ])
+        coords = np.array(
+            [
+                [-0.5, 0.0, 0.0],
+                [0.5, 0.0, 0.0],
+            ]
+        )
 
         lap = calc_density_laplacian(wfn, coords)
 
@@ -500,6 +515,7 @@ class TestLaplacianCalculation:
 # ============================================================================
 # Edge Case Tests
 # ============================================================================
+
 
 class TestEdgeCases:
     """Tests for edge cases and boundary conditions."""
@@ -531,7 +547,7 @@ class TestEdgeCases:
             type=0,
             center_idx=0,
             exponents=np.array([100.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
         wfn.shells.append(shell)
 
@@ -553,6 +569,7 @@ class TestEdgeCases:
 # Performance Tests
 # ============================================================================
 
+
 class TestPerformance:
     """Performance and vectorization tests."""
 
@@ -566,6 +583,7 @@ class TestPerformance:
 
         # Should complete quickly
         import time
+
         start = time.time()
         grad = calc_density_gradient(wfn, coords)
         elapsed = time.time() - start
@@ -581,7 +599,7 @@ class TestPerformance:
         wfn = h2_sto3g
 
         # Generate points on a sphere
-        theta = np.linspace(0, 2*np.pi, 10)
+        theta = np.linspace(0, 2 * np.pi, 10)
         phi = np.linspace(0, np.pi, 10)
         coords = []
 

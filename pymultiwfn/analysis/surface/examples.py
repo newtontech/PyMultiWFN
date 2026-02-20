@@ -13,7 +13,7 @@ from pymultiwfn.analysis.surface import (
     MappedFunction,
     extract_isosurface,
     calculate_surface_descriptors,
-    export_surface_to_obj
+    export_surface_to_obj,
 )
 
 
@@ -26,9 +26,9 @@ def example_water_molecule():
 
     # Create a simple water molecule wavefunction (placeholder)
     atoms = [
-        Atom(element='O', index=8, x=0.0, y=0.0, z=0.0, charge=8.0),
-        Atom(element='H', index=1, x=0.957, y=0.0, z=0.0, charge=1.0),
-        Atom(element='H', index=1, x=-0.239, y=0.927, z=0.0, charge=1.0)
+        Atom(element="O", index=8, x=0.0, y=0.0, z=0.0, charge=8.0),
+        Atom(element="H", index=1, x=0.957, y=0.0, z=0.0, charge=1.0),
+        Atom(element="H", index=1, x=-0.239, y=0.927, z=0.0, charge=1.0),
     ]
 
     # Create wavefunction (this would normally be loaded from file)
@@ -41,7 +41,7 @@ def example_water_molecule():
     surface_data = analyzer.generate_surface(
         SurfaceType.ELECTRON_DENSITY,
         isovalue=0.001,  # Common vdW surface definition
-        grid_spacing=0.2
+        grid_spacing=0.2,
     )
 
     print(f"Surface generated successfully!")
@@ -60,16 +60,16 @@ def example_water_molecule():
             print(f"  {key}: {value}")
 
     # Map ESP onto surface
-    surface_data = analyzer.map_function_to_surface(
-        surface_data, MappedFunction.ESP
-    )
+    surface_data = analyzer.map_function_to_surface(surface_data, MappedFunction.ESP)
 
     print(f"\nESP mapped onto surface:")
     print(f"  Mean ESP: {np.mean(surface_data.vertex_values):.6f}")
-    print(f"  ESP range: [{np.min(surface_data.vertex_values):.6f}, {np.max(surface_data.vertex_values):.6f}]")
+    print(
+        f"  ESP range: [{np.min(surface_data.vertex_values):.6f}, {np.max(surface_data.vertex_values):.6f}]"
+    )
 
     # Export surface to OBJ file
-    export_surface_to_obj(surface_data, 'water_surface.obj', include_values=True)
+    export_surface_to_obj(surface_data, "water_surface.obj", include_values=True)
     print(f"Surface exported to 'water_surface.obj'")
 
     return surface_data
@@ -84,14 +84,14 @@ def example_hirshfeld_surface():
 
     # Create a simple organic molecule (ethanol)
     atoms = [
-        Atom(element='C', index=6, x=0.0, y=0.0, z=0.0, charge=6.0),
-        Atom(element='C', index=6, x=1.54, y=0.0, z=0.0, charge=6.0),
-        Atom(element='O', index=8, x=2.50, y=0.0, z=0.0, charge=8.0),
-        Atom(element='H', index=1, x=-0.54, y=0.89, z=0.0, charge=1.0),
-        Atom(element='H', index=1, x=-0.54, y=-0.89, z=0.0, charge=1.0),
-        Atom(element='H', index=1, x=1.54, y=0.94, z=0.0, charge=1.0),
-        Atom(element='H', index=1, x=1.54, y=-0.94, z=0.0, charge=1.0),
-        Atom(element='H', index=1, x=3.07, y=0.89, z=0.0, charge=1.0),
+        Atom(element="C", index=6, x=0.0, y=0.0, z=0.0, charge=6.0),
+        Atom(element="C", index=6, x=1.54, y=0.0, z=0.0, charge=6.0),
+        Atom(element="O", index=8, x=2.50, y=0.0, z=0.0, charge=8.0),
+        Atom(element="H", index=1, x=-0.54, y=0.89, z=0.0, charge=1.0),
+        Atom(element="H", index=1, x=-0.54, y=-0.89, z=0.0, charge=1.0),
+        Atom(element="H", index=1, x=1.54, y=0.94, z=0.0, charge=1.0),
+        Atom(element="H", index=1, x=1.54, y=-0.94, z=0.0, charge=1.0),
+        Atom(element="H", index=1, x=3.07, y=0.89, z=0.0, charge=1.0),
     ]
 
     wfn = Wavefunction(atoms=atoms, num_electrons=26)
@@ -105,7 +105,7 @@ def example_hirshfeld_surface():
         SurfaceType.HIRSHFELD,
         isovalue=0.5,  # Standard Hirshfeld surface isovalue
         fragment_atoms=oh_fragment_atoms,
-        grid_spacing=0.15
+        grid_spacing=0.15,
     )
 
     print(f"Hirshfeld surface generated for OH fragment!")
@@ -118,8 +118,8 @@ def example_hirshfeld_surface():
     )
 
     print(f"\nFragment Statistics:")
-    if 'fragment_stats' in stats:
-        for atom_idx, atom_stats in stats['fragment_stats'].items():
+    if "fragment_stats" in stats:
+        for atom_idx, atom_stats in stats["fragment_stats"].items():
             element = atoms[atom_idx].element
             print(f"  Atom {element}{atom_idx}:")
             print(f"    Area: {atom_stats['area']:.3f} Bohr²")
@@ -138,12 +138,12 @@ def example_surface_property_mapping():
 
     # Create a slightly larger molecule
     atoms = [
-        Atom(element='C', index=6, x=0.0, y=0.0, z=0.0, charge=6.0),
-        Atom(element='C', index=6, x=1.40, y=0.0, z=0.0, charge=6.0),
-        Atom(element='C', index=6, x=2.10, y=1.21, z=0.0, charge=6.0),
-        Atom(element='C', index=6, x=1.40, y=2.42, z=0.0, charge=6.0),
-        Atom(element='C', index=6, x=0.0, y=2.42, z=0.0, charge=6.0),
-        Atom(element='C', index=6, x=-0.70, y=1.21, z=0.0, charge=6.0),
+        Atom(element="C", index=6, x=0.0, y=0.0, z=0.0, charge=6.0),
+        Atom(element="C", index=6, x=1.40, y=0.0, z=0.0, charge=6.0),
+        Atom(element="C", index=6, x=2.10, y=1.21, z=0.0, charge=6.0),
+        Atom(element="C", index=6, x=1.40, y=2.42, z=0.0, charge=6.0),
+        Atom(element="C", index=6, x=0.0, y=2.42, z=0.0, charge=6.0),
+        Atom(element="C", index=6, x=-0.70, y=1.21, z=0.0, charge=6.0),
     ]
 
     wfn = Wavefunction(atoms=atoms, num_electrons=30)
@@ -151,9 +151,7 @@ def example_surface_property_mapping():
 
     # Generate base surface
     base_surface = analyzer.generate_surface(
-        SurfaceType.ELECTRON_DENSITY,
-        isovalue=0.002,
-        grid_spacing=0.2
+        SurfaceType.ELECTRON_DENSITY, isovalue=0.002, grid_spacing=0.2
     )
 
     print(f"Base surface generated: {len(base_surface.vertices)} vertices")
@@ -192,8 +190,8 @@ def example_surface_comparison():
 
     # Use a simple molecule
     atoms = [
-        Atom(element='C', index=6, x=0.0, y=0.0, z=0.0, charge=6.0),
-        Atom(element='O', index=8, x=1.20, y=0.0, z=0.0, charge=8.0),
+        Atom(element="C", index=6, x=0.0, y=0.0, z=0.0, charge=6.0),
+        Atom(element="O", index=8, x=1.20, y=0.0, z=0.0, charge=8.0),
     ]
 
     wfn = Wavefunction(atoms=atoms, num_electrons=14)
@@ -221,24 +219,30 @@ def example_surface_comparison():
             else:
                 surface = analyzer.generate_surface(surf_type, isovalue)
 
-            results.append({
-                'type': description,
-                'area': surface.surface_area,
-                'volume': surface.surface_volume,
-                'vertices': len(surface.vertices),
-                'triangles': len(surface.triangles)
-            })
+            results.append(
+                {
+                    "type": description,
+                    "area": surface.surface_area,
+                    "volume": surface.surface_volume,
+                    "vertices": len(surface.vertices),
+                    "triangles": len(surface.triangles),
+                }
+            )
 
         except Exception as e:
             print(f"Error generating {description}: {e}")
 
     # Display comparison
-    print(f"{'Surface Type':<30} {'Area (Bohr²)':<15} {'Volume (Bohr³)':<15} {'Vertices':<10} {'Triangles':<10}")
+    print(
+        f"{'Surface Type':<30} {'Area (Bohr²)':<15} {'Volume (Bohr³)':<15} {'Vertices':<10} {'Triangles':<10}"
+    )
     print("-" * 85)
 
     for result in results:
-        print(f"{result['type']:<30} {result['area']:<15.3f} {result['volume']:<15.3f} "
-              f"{result['vertices']:<10} {result['triangles']:<10}")
+        print(
+            f"{result['type']:<30} {result['area']:<15.3f} {result['volume']:<15.3f} "
+            f"{result['vertices']:<10} {result['triangles']:<10}"
+        )
 
     return results
 
@@ -260,15 +264,12 @@ def example_direct_isosurface_extraction():
     y = grid_origin[1] + np.arange(grid_shape[1]) * grid_spacing
     z = grid_origin[2] + np.arange(grid_shape[2]) * grid_spacing
 
-    X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
+    X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
     scalar_field = np.sqrt(X**2 + Y**2 + Z**2)  # Distance from origin
 
     # Extract isosurface at radius = 2.0
     vertices, triangles, normals = extract_isosurface(
-        scalar_field,
-        isovalue=2.0,
-        grid_origin=grid_origin,
-        grid_spacing=grid_spacing
+        scalar_field, isovalue=2.0, grid_origin=grid_origin, grid_spacing=grid_spacing
     )
 
     print(f"Isosurface extracted from scalar field:")
@@ -280,10 +281,11 @@ def example_direct_isosurface_extraction():
     if len(vertices) > 0:
         # Calculate expected surface area and volume for sphere with radius 2.0
         expected_area = 4 * np.pi * 2.0**2
-        expected_volume = (4/3) * np.pi * 2.0**3
+        expected_volume = (4 / 3) * np.pi * 2.0**3
 
         # Calculate actual surface area
         from pymultiwfn.analysis.surface.utils import _calculate_surface_area
+
         actual_area = _calculate_surface_area(vertices, triangles)
 
         print(f"\nComparison with analytical sphere (r=2.0):")
@@ -316,6 +318,7 @@ def run_all_examples():
     except Exception as e:
         print(f"\nError running examples: {e}")
         import traceback
+
         traceback.print_exc()
 
 

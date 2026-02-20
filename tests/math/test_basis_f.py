@@ -19,7 +19,7 @@ class TestFBasisEvaluation:
             type=3,
             center_idx=0,
             exponents=np.array([1.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
 
         atom = Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)
@@ -32,7 +32,7 @@ class TestFBasisEvaluation:
             num_atomic_orbitals=10,
             num_primitives=1,
             num_shells=1,
-            shells=[f_shell]
+            shells=[f_shell],
         )
 
         assert wfn.num_basis == 10, "F shell should have 10 Cartesian basis functions"
@@ -43,7 +43,7 @@ class TestFBasisEvaluation:
             type=3,
             center_idx=0,
             exponents=np.array([1.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
 
         atom = Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)
@@ -56,7 +56,7 @@ class TestFBasisEvaluation:
             num_atomic_orbitals=10,
             num_primitives=1,
             num_shells=1,
-            shells=[f_shell]
+            shells=[f_shell],
         )
 
         coords = np.array([[0.0, 0.0, 0.0]])
@@ -65,6 +65,7 @@ class TestFBasisEvaluation:
         # At origin, radial = 1.0
         # All F basis functions should be zero at origin (r=0 => x*y*z=0)
         from pymultiwfn.math.basis import evaluate_basis
+
         result = evaluate_basis(wfn, coords)
 
         # All F functions involve x, y, z components, so at origin they should be 0
@@ -76,7 +77,7 @@ class TestFBasisEvaluation:
             type=3,
             center_idx=0,
             exponents=np.array([1.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
 
         atom = Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)
@@ -89,7 +90,7 @@ class TestFBasisEvaluation:
             num_atomic_orbitals=10,
             num_primitives=1,
             num_shells=1,
-            shells=[f_shell]
+            shells=[f_shell],
         )
 
         from pymultiwfn.math.basis import evaluate_basis
@@ -110,7 +111,7 @@ class TestFBasisEvaluation:
             type=3,
             center_idx=0,
             exponents=np.array([2.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
 
         atom = Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)
@@ -123,7 +124,7 @@ class TestFBasisEvaluation:
             num_atomic_orbitals=10,
             num_primitives=1,
             num_shells=1,
-            shells=[f_shell]
+            shells=[f_shell],
         )
 
         from pymultiwfn.math.basis import evaluate_basis
@@ -167,7 +168,7 @@ class TestFBasisEvaluation:
             type=3,
             center_idx=0,
             exponents=np.array([1.0, 2.0]),
-            coefficients=np.array([0.5, 0.5])
+            coefficients=np.array([0.5, 0.5]),
         )
 
         atom = Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)
@@ -180,7 +181,7 @@ class TestFBasisEvaluation:
             num_atomic_orbitals=10,
             num_primitives=2,
             num_shells=1,
-            shells=[f_shell]
+            shells=[f_shell],
         )
 
         from pymultiwfn.math.basis import evaluate_basis
@@ -200,7 +201,7 @@ class TestFBasisEvaluation:
             type=3,
             center_idx=0,
             exponents=np.array([1.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
 
         atom = Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)
@@ -213,21 +214,21 @@ class TestFBasisEvaluation:
             num_atomic_orbitals=10,
             num_primitives=1,
             num_shells=1,
-            shells=[f_shell]
+            shells=[f_shell],
         )
 
         from pymultiwfn.math.basis import evaluate_basis
 
-        coords = np.array([
-            [0.0, 0.0, 0.0],
-            [1.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0],
-            [1.0, 1.0, 1.0]
-        ])
+        coords = np.array(
+            [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [1.0, 1.0, 1.0]]
+        )
 
         result = evaluate_basis(wfn, coords)
 
-        assert result.shape == (4, 10), "Should return array of shape (n_points, n_basis)"
+        assert result.shape == (
+            4,
+            10,
+        ), "Should return array of shape (n_points, n_basis)"
 
         # At origin, all should be zero
         np.testing.assert_allclose(result[0], np.zeros(10), atol=1e-10)
@@ -243,7 +244,7 @@ class TestFBasisEvaluation:
             type=3,
             center_idx=0,
             exponents=np.array([1.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
 
         atom = Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)
@@ -256,7 +257,7 @@ class TestFBasisEvaluation:
             num_atomic_orbitals=10,
             num_primitives=1,
             num_shells=1,
-            shells=[f_shell]
+            shells=[f_shell],
         )
 
         from pymultiwfn.math.basis import evaluate_basis

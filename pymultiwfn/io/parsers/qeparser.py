@@ -4,6 +4,7 @@ Parser for Quantum ESPRESSO input files.
 
 from pymultiwfn.core.data import Wavefunction
 
+
 class QEParser:
     def __init__(self, filename: str):
         self.filename = filename

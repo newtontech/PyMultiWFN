@@ -2,9 +2,14 @@ import numpy as np
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.math.density import calc_density
 
-def calc_density_on_grid(wfn: Wavefunction, 
-                         x_range: tuple[float, float], y_range: tuple[float, float], z_range: tuple[float, float],
-                         n_points: tuple[int, int, int]) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+
+def calc_density_on_grid(
+    wfn: Wavefunction,
+    x_range: tuple[float, float],
+    y_range: tuple[float, float],
+    z_range: tuple[float, float],
+    n_points: tuple[int, int, int],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculates the electron density on a 3D grid.
 
@@ -23,29 +28,30 @@ def calc_density_on_grid(wfn: Wavefunction,
     y = np.linspace(y_range[0], y_range[1], n_points[1])
     z = np.linspace(z_range[0], z_range[1], n_points[2])
 
-    X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
-    
+    X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
+
     # Reshape grid coordinates for calc_density
     grid_coords = np.vstack([X.ravel(), Y.ravel(), Z.ravel()]).T
-    
+
     # Calculate density at all grid points
     densities = calc_density(wfn, grid_coords)
-    
+
     # Reshape back to 3D grid
     density_grid = densities.reshape(n_points)
-    
+
     return x, y, z, density_grid
+
 
 def find_extrema(density_grid: np.ndarray) -> tuple:
     """
     Finds local maxima and minima in a 3D density grid.
-    
+
     This is a placeholder function. Actual implementation would involve
     numerical differentiation and checking neighbors.
-    
+
     Args:
         density_grid: 3D array of electron density values.
-        
+
     Returns:
         A tuple containing arrays of (maxima_coords, maxima_values, minima_coords, minima_values).
     """
@@ -54,8 +60,10 @@ def find_extrema(density_grid: np.ndarray) -> tuple:
     # For now, just return empty arrays.
     return (np.array([]), np.array([]), np.array([]), np.array([]))
 
-def integrate_density(density_grid: np.ndarray, 
-                      x_spacing: float, y_spacing: float, z_spacing: float) -> float:
+
+def integrate_density(
+    density_grid: np.ndarray, x_spacing: float, y_spacing: float, z_spacing: float
+) -> float:
     """
     Integrates the electron density over the grid volume.
 

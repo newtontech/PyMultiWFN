@@ -3,11 +3,13 @@
 import re
 from typing import Dict, List, Any
 
+
 class FortranParser:
     """
     A parser for Fortran source files, primarily aimed at extracting information
     relevant for migrating Fortran code to Python, such as COMMON blocks and PARAMETER statements.
     """
+
     def __init__(self, filename: str):
         self.filename = filename
         self.content = ""
@@ -18,7 +20,7 @@ class FortranParser:
         Returns a dictionary containing extracted data.
         """
         print(f"Parsing Fortran source file: {self.filename}")
-        with open(self.filename, 'r') as f:
+        with open(self.filename, "r") as f:
             self.content = f.read()
 
         extracted_data = {
@@ -46,7 +48,7 @@ class FortranParser:
                 variables_str = match.group(2)
                 variables = []
                 # Split variables by comma, handle array dimensions
-                for var_str in variables_str.split(','):
+                for var_str in variables_str.split(","):
                     var_str = var_str.strip()
                     if var_str:
                         # Basic attempt to separate name and potential dimension
@@ -77,11 +79,13 @@ class FortranParser:
             if match:
                 definitions_str = match.group(1)
                 # Split by comma, handling multiple assignments on one line
-                for definition in definitions_str.split(','):
+                for definition in definitions_str.split(","):
                     definition = definition.strip()
-                    if '=' in definition:
-                        name, value = definition.split('=', 1)
-                        parameters.append({"name": name.strip(), "value": value.strip()})
+                    if "=" in definition:
+                        name, value = definition.split("=", 1)
+                        parameters.append(
+                            {"name": name.strip(), "value": value.strip()}
+                        )
         return parameters
 
     # Additional methods could be added for:

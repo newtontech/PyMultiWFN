@@ -13,7 +13,9 @@ from scipy.interpolate import RegularGridInterpolator
 from .surface_analysis import SurfaceData
 
 
-def calculate_surface_curvature(surface_data: SurfaceData) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def calculate_surface_curvature(
+    surface_data: SurfaceData,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Calculate principal curvatures and mean curvature at surface vertices.
 
@@ -76,8 +78,12 @@ def calculate_surface_curvature(surface_data: SurfaceData) -> Tuple[np.ndarray, 
                 gaussian_curvature[i] = (2 * np.pi) / area_sum
 
             # Principal curvatures (approximation)
-            principal_curvatures[i, 0] = mean_curvature[i] + np.sqrt(max(0, mean_curvature[i]**2 - gaussian_curvature[i]))
-            principal_curvatures[i, 1] = mean_curvature[i] - np.sqrt(max(0, mean_curvature[i]**2 - gaussian_curvature[i]))
+            principal_curvatures[i, 0] = mean_curvature[i] + np.sqrt(
+                max(0, mean_curvature[i] ** 2 - gaussian_curvature[i])
+            )
+            principal_curvatures[i, 1] = mean_curvature[i] - np.sqrt(
+                max(0, mean_curvature[i] ** 2 - gaussian_curvature[i])
+            )
 
     return mean_curvature, gaussian_curvature, principal_curvatures
 
@@ -100,21 +106,23 @@ def calculate_surface_descriptors(surface_data: SurfaceData) -> Dict[str, float]
     values = surface_data.vertex_values
 
     descriptors = {
-        'surface_area': surface_data.surface_area,
-        'surface_volume': surface_data.surface_volume,
-        'vertex_count': len(vertices),
-        'triangle_count': len(triangles),
+        "surface_area": surface_data.surface_area,
+        "surface_volume": surface_data.surface_volume,
+        "vertex_count": len(vertices),
+        "triangle_count": len(triangles),
     }
 
     # Calculate basic statistical descriptors
     if len(values) > 0:
-        descriptors.update({
-            'value_mean': np.mean(values),
-            'value_std': np.std(values),
-            'value_min': np.min(values),
-            'value_max': np.max(values),
-            'value_range': np.max(values) - np.min(values),
-        })
+        descriptors.update(
+            {
+                "value_mean": np.mean(values),
+                "value_std": np.std(values),
+                "value_min": np.min(values),
+                "value_max": np.max(values),
+                "value_range": np.max(values) - np.min(values),
+            }
+        )
 
     # Calculate geometric descriptors
     if len(vertices) > 0:
@@ -124,25 +132,32 @@ def calculate_surface_descriptors(surface_data: SurfaceData) -> Dict[str, float]
         bbox_dimensions = max_coords - min_coords
         bbox_volume = np.prod(bbox_dimensions)
 
-        descriptors.update({
-            'bbox_dimensions_x': bbox_dimensions[0],
-            'bbox_dimensions_y': bbox_dimensions[1],
-            'bbox_dimensions_z': bbox_dimensions[2],
-            'bbox_volume': bbox_volume,
-            'surface_to_volume_ratio': surface_data.surface_area / max(surface_data.surface_volume, 1e-10),
-        })
+        descriptors.update(
+            {
+                "bbox_dimensions_x": bbox_dimensions[0],
+                "bbox_dimensions_y": bbox_dimensions[1],
+                "bbox_dimensions_z": bbox_dimensions[2],
+                "bbox_volume": bbox_volume,
+                "surface_to_volume_ratio": surface_data.surface_area
+                / max(surface_data.surface_volume, 1e-10),
+            }
+        )
 
         # Sphericity (measure of how sphere-like the surface is)
         if surface_data.surface_area > 0:
             equivalent_radius = np.sqrt(surface_data.surface_area / (4 * np.pi))
-            sphericity = (np.pi**(1/3) * (6 * surface_data.surface_volume)**(2/3)) / surface_data.surface_area
-            descriptors['sphericity'] = sphericity
-            descriptors['equivalent_radius'] = equivalent_radius
+            sphericity = (
+                np.pi ** (1 / 3) * (6 * surface_data.surface_volume) ** (2 / 3)
+            ) / surface_data.surface_area
+            descriptors["sphericity"] = sphericity
+            descriptors["equivalent_radius"] = equivalent_radius
 
     return descriptors
 
 
-def smooth_surface(surface_data: SurfaceData, iterations: int = 1, alpha: float = 0.1) -> SurfaceData:
+def smooth_surface(
+    surface_data: SurfaceData, iterations: int = 1, alpha: float = 0.1
+) -> SurfaceData:
     """
     Apply Laplacian smoothing to surface vertices.
 
@@ -183,11 +198,13 @@ def smooth_surface(surface_data: SurfaceData, iterations: int = 1, alpha: float 
         surface_area=_calculate_surface_area(vertices, triangles),
         surface_volume=_calculate_enclosed_volume(vertices, triangles),
         fragment_areas=surface_data.fragment_areas,
-        fragment_stats=surface_data.fragment_stats
+        fragment_stats=surface_data.fragment_stats,
     )
 
 
-def resample_surface(surface_data: SurfaceData, target_density: Optional[float] = None) -> SurfaceData:
+def resample_surface(
+    surface_data: SurfaceData, target_density: Optional[float] = None
+) -> SurfaceData:
     """
     Resample surface to achieve desired vertex density.
 
@@ -226,7 +243,11 @@ def resample_surface(surface_data: SurfaceData, target_density: Optional[float] 
             new_triangles = []
             for triangle in triangles:
                 # Subdivide triangle into 4 smaller triangles
-                v0, v1, v2 = vertices[triangle[0]], vertices[triangle[1]], vertices[triangle[2]]
+                v0, v1, v2 = (
+                    vertices[triangle[0]],
+                    vertices[triangle[1]],
+                    vertices[triangle[2]],
+                )
 
                 # Calculate edge midpoints
                 mid01 = (v0 + v1) / 2
@@ -248,12 +269,14 @@ def resample_surface(surface_data: SurfaceData, target_density: Optional[float] 
 
                 # Create new triangles
                 base_idx = triangle[0]
-                new_triangles.extend([
-                    [base_idx, idx_mid01, idx_mid20],
-                    [idx_mid01, triangle[1], idx_mid12],
-                    [idx_mid20, idx_mid12, triangle[2]],
-                    [idx_mid01, idx_mid12, idx_mid20]
-                ])
+                new_triangles.extend(
+                    [
+                        [base_idx, idx_mid01, idx_mid20],
+                        [idx_mid01, triangle[1], idx_mid12],
+                        [idx_mid20, idx_mid12, triangle[2]],
+                        [idx_mid01, idx_mid12, idx_mid20],
+                    ]
+                )
 
             # Update for next iteration
             vertices = np.array(new_vertices)
@@ -265,14 +288,16 @@ def resample_surface(surface_data: SurfaceData, target_density: Optional[float] 
         triangles=triangles,
         vertex_values=values,
         surface_area=_calculate_surface_area(vertices, triangles),
-        surface_volume=_calculate_enclosed_volume(vertices, triangles)
+        surface_volume=_calculate_enclosed_volume(vertices, triangles),
     )
 
 
-def interpolate_to_grid(surface_data: SurfaceData,
-                       grid_shape: Tuple[int, int, int],
-                       grid_origin: np.ndarray,
-                       grid_spacing: float) -> np.ndarray:
+def interpolate_to_grid(
+    surface_data: SurfaceData,
+    grid_shape: Tuple[int, int, int],
+    grid_origin: np.ndarray,
+    grid_spacing: float,
+) -> np.ndarray:
     """
     Interpolate surface values to a regular 3D grid.
 
@@ -301,7 +326,7 @@ def interpolate_to_grid(surface_data: SurfaceData,
     tree = cKDTree(vertices)
 
     # Create grid mesh
-    X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
+    X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
     grid_points = np.vstack([X.ravel(), Y.ravel(), Z.ravel()]).T
 
     # Find nearest vertices and interpolate values
@@ -315,7 +340,9 @@ def interpolate_to_grid(surface_data: SurfaceData,
         if np.any(valid_distances):
             weights = 1.0 / distances[i][valid_distances]
             weights /= np.sum(weights)
-            interpolated_values[i] = np.sum(weights * values[indices[i][valid_distances]])
+            interpolated_values[i] = np.sum(
+                weights * values[indices[i][valid_distances]]
+            )
         else:
             # If point coincides with vertex, use that value
             interpolated_values[i] = values[indices[i][0]]
@@ -323,7 +350,9 @@ def interpolate_to_grid(surface_data: SurfaceData,
     return interpolated_values.reshape(grid_shape)
 
 
-def export_surface_to_obj(surface_data: SurfaceData, filename: str, include_values: bool = True):
+def export_surface_to_obj(
+    surface_data: SurfaceData, filename: str, include_values: bool = True
+):
     """
     Export surface data to OBJ file format.
 
@@ -332,7 +361,7 @@ def export_surface_to_obj(surface_data: SurfaceData, filename: str, include_valu
         filename: Output filename
         include_values: Whether to include vertex values as vertex colors
     """
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         f.write("# Surface exported from PyMultiWFN\n")
         f.write(f"# Vertices: {len(surface_data.vertices)}\n")
         f.write(f"# Triangles: {len(surface_data.triangles)}\n")
@@ -348,14 +377,18 @@ def export_surface_to_obj(surface_data: SurfaceData, filename: str, include_valu
                 value = surface_data.vertex_values[i]
                 # Normalize value to [0, 1] range for color
                 if len(surface_data.vertex_values) > 1:
-                    vmin, vmax = np.min(surface_data.vertex_values), np.max(surface_data.vertex_values)
+                    vmin, vmax = np.min(surface_data.vertex_values), np.max(
+                        surface_data.vertex_values
+                    )
                     if vmax > vmin:
                         normalized_value = (value - vmin) / (vmax - vmin)
                     else:
                         normalized_value = 0.5
                 else:
                     normalized_value = 0.5
-                f.write(f" {normalized_value:.6f} {normalized_value:.6f} {normalized_value:.6f}")
+                f.write(
+                    f" {normalized_value:.6f} {normalized_value:.6f} {normalized_value:.6f}"
+                )
 
             f.write("\n")
 
@@ -366,7 +399,10 @@ def export_surface_to_obj(surface_data: SurfaceData, filename: str, include_valu
 
 # Private helper functions
 
-def _build_vertex_triangle_adjacency(vertices: np.ndarray, triangles: np.ndarray) -> List[List[int]]:
+
+def _build_vertex_triangle_adjacency(
+    vertices: np.ndarray, triangles: np.ndarray
+) -> List[List[int]]:
     """Build list of triangles adjacent to each vertex."""
     adjacency = [[] for _ in range(len(vertices))]
     for tri_idx, triangle in enumerate(triangles):
@@ -375,7 +411,9 @@ def _build_vertex_triangle_adjacency(vertices: np.ndarray, triangles: np.ndarray
     return adjacency
 
 
-def _build_vertex_adjacency(vertices: np.ndarray, triangles: np.ndarray) -> List[List[int]]:
+def _build_vertex_adjacency(
+    vertices: np.ndarray, triangles: np.ndarray
+) -> List[List[int]]:
     """Build list of neighboring vertices for each vertex."""
     adjacency = [[] for _ in range(len(vertices))]
     edge_set = set()
@@ -384,7 +422,7 @@ def _build_vertex_adjacency(vertices: np.ndarray, triangles: np.ndarray) -> List
         edges = [
             (min(triangle[0], triangle[1]), max(triangle[0], triangle[1])),
             (min(triangle[1], triangle[2]), max(triangle[1], triangle[2])),
-            (min(triangle[2], triangle[0]), max(triangle[2], triangle[0]))
+            (min(triangle[2], triangle[0]), max(triangle[2], triangle[0])),
         ]
 
         for edge in edges:
@@ -405,7 +443,11 @@ def _calculate_surface_area(vertices: np.ndarray, triangles: np.ndarray) -> floa
     if len(triangles) == 0:
         return 0.0
 
-    v0, v1, v2 = vertices[triangles[:, 0]], vertices[triangles[:, 1]], vertices[triangles[:, 2]]
+    v0, v1, v2 = (
+        vertices[triangles[:, 0]],
+        vertices[triangles[:, 1]],
+        vertices[triangles[:, 2]],
+    )
     cross_products = np.cross(v1 - v0, v2 - v0)
     triangle_areas = 0.5 * np.linalg.norm(cross_products, axis=1)
 
@@ -417,7 +459,11 @@ def _calculate_enclosed_volume(vertices: np.ndarray, triangles: np.ndarray) -> f
     if len(triangles) == 0:
         return 0.0
 
-    v0, v1, v2 = vertices[triangles[:, 0]], vertices[triangles[:, 1]], vertices[triangles[:, 2]]
+    v0, v1, v2 = (
+        vertices[triangles[:, 0]],
+        vertices[triangles[:, 1]],
+        vertices[triangles[:, 2]],
+    )
     cross_products = np.cross(v1, v2)
     volumes = np.sum(v0 * cross_products, axis=1) / 6.0
 

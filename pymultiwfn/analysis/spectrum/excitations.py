@@ -18,6 +18,7 @@ from ...core.data import Wavefunction
 
 class ExcitationFileType(Enum):
     """Supported excitation file formats."""
+
     GAUSSIAN = 1
     ORCA = 2
     PLAIN_TEXT = 3
@@ -29,6 +30,7 @@ class ExcitationFileType(Enum):
 @dataclass
 class ExcitedState:
     """Represents a single electronic excited state."""
+
     index: int
     energy: float  # eV
     oscillator_strength: float
@@ -36,7 +38,7 @@ class ExcitedState:
     spin: str  # "Singlet", "Doublet", "Triplet", etc.
 
     # MO transition information
-    transitions: List['MOTransition'] = field(default_factory=list)
+    transitions: List["MOTransition"] = field(default_factory=list)
 
     # Transition density matrix in AO basis
     transition_density: Optional[np.ndarray] = None
@@ -48,14 +50,17 @@ class ExcitedState:
     # Analysis results
     hole_density: Optional[np.ndarray] = None
     electron_density: Optional[np.ndarray] = None
-    ntos: Optional[Dict[str, Tuple[np.ndarray, float]]] = None  # {'hole': (orbital, weight), 'electron': (orbital, weight)}
+    ntos: Optional[Dict[str, Tuple[np.ndarray, float]]] = (
+        None  # {'hole': (orbital, weight), 'electron': (orbital, weight)}
+    )
 
 
 @dataclass
 class MOTransition:
     """Represents a single MO-to-MO transition."""
+
     from_mo: int  # MO index (1-based)
-    to_mo: int    # MO index (1-based)
+    to_mo: int  # MO index (1-based)
     coefficient: float
     direction: str  # "de-excitation" or "excitation"
 
@@ -67,7 +72,7 @@ class MOTransition:
     @property
     def contribution(self) -> float:
         """Return the contribution to the excitation (coefficient squared)."""
-        return self.coefficient ** 2
+        return self.coefficient**2
 
 
 @dataclass
@@ -95,7 +100,9 @@ class ExcitationAnalysis:
             return self.states[index - 1]
         return None
 
-    def get_state_by_energy(self, energy: float, tolerance: float = 0.01) -> Optional[ExcitedState]:
+    def get_state_by_energy(
+        self, energy: float, tolerance: float = 0.01
+    ) -> Optional[ExcitedState]:
         """Get excited state by energy (eV) within tolerance."""
         for state in self.states:
             if abs(state.energy - energy) < tolerance:
@@ -119,16 +126,18 @@ class ExcitationLoader:
 
     def load_gaussian_output(self, filename: str) -> ExcitationAnalysis:
         """Load TD-DFT data from Gaussian output file."""
-        analysis = ExcitationAnalysis(filename=filename,
-                                    file_type=ExcitationFileType.GAUSSIAN,
-                                    wavefunction=self.wavefunction)
+        analysis = ExcitationAnalysis(
+            filename=filename,
+            file_type=ExcitationFileType.GAUSSIAN,
+            wavefunction=self.wavefunction,
+        )
 
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             content = f.read()
 
         # Extract excitation data using regex patterns
         # This is a simplified implementation - full Gaussian parsing is complex
-        excitation_pattern = r'Excited State\s+(\d+):\s+([A-Z\-\s]+)\s+([\d\.]+)\s+a\.u\.\s+([\d\.]+)\s+eV\s+([\d\.]+)\s+f=([\d\.]+)'
+        excitation_pattern = r"Excited State\s+(\d+):\s+([A-Z\-\s]+)\s+([\d\.]+)\s+a\.u\.\s+([\d\.]+)\s+eV\s+([\d\.]+)\s+f=([\d\.]+)"
 
         state_matches = re.findall(excitation_pattern, content)
 
@@ -140,10 +149,10 @@ class ExcitationLoader:
             oscillator_strength = float(match[5])
 
             # Determine multiplicity from symmetry label
-            if 'Singlet' in symmetry or 'Singlet-A' in symmetry:
+            if "Singlet" in symmetry or "Singlet-A" in symmetry:
                 multiplicity = 1
                 spin = "Singlet"
-            elif 'Triplet' in symmetry or 'Triplet-A' in symmetry:
+            elif "Triplet" in symmetry or "Triplet-A" in symmetry:
                 multiplicity = 3
                 spin = "Triplet"
             else:
@@ -155,7 +164,7 @@ class ExcitationLoader:
                 energy=energy_ev,
                 oscillator_strength=oscillator_strength,
                 multiplicity=multiplicity,
-                spin=spin
+                spin=spin,
             )
 
             # Extract MO transitions (simplified)
@@ -172,15 +181,17 @@ class ExcitationLoader:
 
     def load_orca_output(self, filename: str) -> ExcitationAnalysis:
         """Load TD-DFT/TDA data from ORCA output file."""
-        analysis = ExcitationAnalysis(filename=filename,
-                                    file_type=ExcitationFileType.ORCA,
-                                    wavefunction=self.wavefunction)
+        analysis = ExcitationAnalysis(
+            filename=filename,
+            file_type=ExcitationFileType.ORCA,
+            wavefunction=self.wavefunction,
+        )
 
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             content = f.read()
 
         # ORCA TD-DFT output pattern (simplified)
-        excitation_pattern = r'(\d+)\s+([\d\.]+)\s+([\d\.]+)\s+([A-Z]+)\s+([\d\.]+)'
+        excitation_pattern = r"(\d+)\s+([\d\.]+)\s+([\d\.]+)\s+([A-Z]+)\s+([\d\.]+)"
 
         state_matches = re.findall(excitation_pattern, content)
 
@@ -191,9 +202,9 @@ class ExcitationLoader:
             spin = match[3]
 
             # Determine multiplicity
-            if spin == 'SINGLET':
+            if spin == "SINGLET":
                 multiplicity = 1
-            elif spin == 'TRIPLET':
+            elif spin == "TRIPLET":
                 multiplicity = 3
             else:
                 multiplicity = 1
@@ -203,7 +214,7 @@ class ExcitationLoader:
                 energy=energy_ev,
                 oscillator_strength=oscillator_strength,
                 multiplicity=multiplicity,
-                spin=spin
+                spin=spin,
             )
 
             # Extract ORCA-specific transitions
@@ -218,11 +229,13 @@ class ExcitationLoader:
 
     def load_plain_text(self, filename: str) -> ExcitationAnalysis:
         """Load excitation data from plain text file."""
-        analysis = ExcitationAnalysis(filename=filename,
-                                    file_type=ExcitationFileType.PLAIN_TEXT,
-                                    wavefunction=self.wavefunction)
+        analysis = ExcitationAnalysis(
+            filename=filename,
+            file_type=ExcitationFileType.PLAIN_TEXT,
+            wavefunction=self.wavefunction,
+        )
 
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             lines = f.readlines()
 
         state_num = 0
@@ -230,11 +243,11 @@ class ExcitationLoader:
 
         for line in lines:
             line = line.strip()
-            if not line or line.startswith('#'):
+            if not line or line.startswith("#"):
                 continue
 
             # Try to parse state header
-            if re.match(r'^\d+\s+', line):
+            if re.match(r"^\d+\s+", line):
                 parts = line.split()
                 if len(parts) >= 4:
                     state_num = int(parts[0])
@@ -245,7 +258,7 @@ class ExcitationLoader:
                     multiplicity = 1  # Default
                     spin = "Singlet"
                     if len(parts) > 4:
-                        if 'triplet' in parts[4].lower():
+                        if "triplet" in parts[4].lower():
                             multiplicity = 3
                             spin = "Triplet"
 
@@ -257,11 +270,11 @@ class ExcitationLoader:
                         energy=energy_ev,
                         oscillator_strength=oscillator_strength,
                         multiplicity=multiplicity,
-                        spin=spin
+                        spin=spin,
                     )
 
             # Parse transition data
-            elif current_state is not None and re.match(r'^\s*\d+\s+\d+', line):
+            elif current_state is not None and re.match(r"^\s*\d+\s+\d+", line):
                 parts = line.split()
                 if len(parts) >= 3:
                     from_mo = int(parts[0])
@@ -272,7 +285,7 @@ class ExcitationLoader:
                         from_mo=from_mo,
                         to_mo=to_mo,
                         coefficient=coeff,
-                        direction="excitation" if coeff > 0 else "de-excitation"
+                        direction="excitation" if coeff > 0 else "de-excitation",
                     )
                     current_state.transitions.append(transition)
 
@@ -284,17 +297,19 @@ class ExcitationLoader:
 
         return analysis
 
-    def _extract_gaussian_transitions(self, content: str, state: ExcitedState, state_num: int):
+    def _extract_gaussian_transitions(
+        self, content: str, state: ExcitedState, state_num: int
+    ):
         """Extract MO transitions from Gaussian output (simplified)."""
         # This is a simplified implementation
         # Full implementation would parse the "CI Singles" section
-        transition_pattern = rf'Excited State\s+{state_num}:.*?\n(?:.*\n)*?(\s+\d+\s+\>\s+\d+\s+[\d\.\-]+)'
+        transition_pattern = rf"Excited State\s+{state_num}:.*?\n(?:.*\n)*?(\s+\d+\s+\>\s+\d+\s+[\d\.\-]+)"
         matches = re.findall(transition_pattern, content, re.DOTALL)
 
         for match in matches:
             # Parse transition like "  10   >   12    0.123"
             parts = match.split()
-            if len(parts) >= 4 and '>' in parts:
+            if len(parts) >= 4 and ">" in parts:
                 from_mo = int(parts[0])
                 to_mo = int(parts[2])
                 coeff = float(parts[3])
@@ -303,11 +318,13 @@ class ExcitationLoader:
                     from_mo=from_mo,
                     to_mo=to_mo,
                     coefficient=coeff,
-                    direction="excitation"
+                    direction="excitation",
                 )
                 state.transitions.append(transition)
 
-    def _extract_orca_transitions(self, content: str, state: ExcitedState, state_num: int):
+    def _extract_orca_transitions(
+        self, content: str, state: ExcitedState, state_num: int
+    ):
         """Extract MO transitions from ORCA output (simplified)."""
         # Simplified ORCA transition extraction
         # Full implementation would parse the "SINGLE EXCITATIONS" section
@@ -342,8 +359,10 @@ class ExcitationAnalyzer:
             raise ValueError("MO coefficients not available in wavefunction")
 
         for transition in state.transitions:
-            if (1 <= transition.from_mo <= mo_coeff.shape[0] and
-                1 <= transition.to_mo <= mo_coeff.shape[0]):
+            if (
+                1 <= transition.from_mo <= mo_coeff.shape[0]
+                and 1 <= transition.to_mo <= mo_coeff.shape[0]
+            ):
 
                 # Convert to 0-based indexing
                 i = transition.from_mo - 1
@@ -393,7 +412,9 @@ class ExcitationAnalyzer:
         state.transition_dipole = transition_dipole
         return transition_dipole
 
-    def generate_ntos(self, state: ExcitedState, num_pairs: int = 5) -> Dict[str, np.ndarray]:
+    def generate_ntos(
+        self, state: ExcitedState, num_pairs: int = 5
+    ) -> Dict[str, np.ndarray]:
         """
         Generate Natural Transition Orbitals (NTOs) for an excited state.
 
@@ -412,8 +433,8 @@ class ExcitationAnalyzer:
         U, singular_values, Vh = np.linalg.svd(tdm)
 
         ntos = {}
-        ntos['hole'] = []
-        ntos['electron'] = []
+        ntos["hole"] = []
+        ntos["electron"] = []
 
         # Store NTO pairs with their weights (singular values)
         for i in range(min(num_pairs, len(singular_values))):
@@ -421,14 +442,15 @@ class ExcitationAnalyzer:
             hole_orbital = U[:, i]
             electron_orbital = Vh[i, :]
 
-            ntos['hole'].append((hole_orbital, weight))
-            ntos['electron'].append((electron_orbital, weight))
+            ntos["hole"].append((hole_orbital, weight))
+            ntos["electron"].append((electron_orbital, weight))
 
         state.ntos = ntos
         return ntos
 
-    def analyze_charge_transfer(self, state: ExcitedState,
-                               fragments: Optional[Dict[str, List[int]]] = None) -> Dict[str, float]:
+    def analyze_charge_transfer(
+        self, state: ExcitedState, fragments: Optional[Dict[str, List[int]]] = None
+    ) -> Dict[str, float]:
         """
         Analyze charge transfer character using the hole-electron analysis method.
 
@@ -446,10 +468,10 @@ class ExcitationAnalyzer:
         # Full implementation would use grid-based integration
 
         ct_results = {
-            'charge_transfer_distance': 0.0,
-            'hole_center': np.array([0.0, 0.0, 0.0]),
-            'electron_center': np.array([0.0, 0.0, 0.0]),
-            'fragment_charge_transfer': {}
+            "charge_transfer_distance": 0.0,
+            "hole_center": np.array([0.0, 0.0, 0.0]),
+            "electron_center": np.array([0.0, 0.0, 0.0]),
+            "fragment_charge_transfer": {},
         }
 
         # If fragments are provided, calculate fragment contributions
@@ -467,7 +489,9 @@ class ExcitationAnalyzer:
                     # Calculate fragment contribution to hole and electron
                     # This is a simplified calculation
                     frag_contribution = 0.0
-                    ct_results['fragment_charge_transfer'][frag_name] = frag_contribution
+                    ct_results["fragment_charge_transfer"][
+                        frag_name
+                    ] = frag_contribution
 
         return ct_results
 
@@ -494,9 +518,11 @@ class ExcitationAnalyzer:
         return f_osc
 
 
-def load_excitation_data(filename: str,
-                       file_type: Optional[ExcitationFileType] = None,
-                       wavefunction: Optional[Wavefunction] = None) -> ExcitationAnalysis:
+def load_excitation_data(
+    filename: str,
+    file_type: Optional[ExcitationFileType] = None,
+    wavefunction: Optional[Wavefunction] = None,
+) -> ExcitationAnalysis:
     """
     Convenience function to load electronic excitation data.
 
@@ -512,13 +538,13 @@ def load_excitation_data(filename: str,
 
     # Auto-detect file type if not specified
     if file_type is None:
-        if filename.lower().endswith('.out') or filename.lower().endswith('.log'):
+        if filename.lower().endswith(".out") or filename.lower().endswith(".log"):
             # Try to detect from content
-            with open(filename, 'r') as f:
-                first_lines = ''.join(f.readlines()[:10])
-            if 'Gaussian' in first_lines:
+            with open(filename, "r") as f:
+                first_lines = "".join(f.readlines()[:10])
+            if "Gaussian" in first_lines:
                 file_type = ExcitationFileType.GAUSSIAN
-            elif 'ORCA' in first_lines:
+            elif "ORCA" in first_lines:
                 file_type = ExcitationFileType.ORCA
             else:
                 file_type = ExcitationFileType.PLAIN_TEXT

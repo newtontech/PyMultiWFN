@@ -10,9 +10,9 @@ from .becke import BeckeAnalyzer
 from .fragment import FragmentAnalyzer
 
 __all__ = [
-    'MullikenAnalyzer',
-    'SCPAAnalyzer',
-    'HirshfeldAnalyzer',
-    'BeckeAnalyzer',
-    'FragmentAnalyzer'
+    "MullikenAnalyzer",
+    "SCPAAnalyzer",
+    "HirshfeldAnalyzer",
+    "BeckeAnalyzer",
+    "FragmentAnalyzer",
 ]

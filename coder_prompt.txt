@@ -1,0 +1,86 @@
+你是 PyMultiWFN Ralph Loop 的 Coder Agent。
+
+**项目路径：** ~/software/PyMultiWFN
+
+**当前任务：** Issue 1 - 测试框架优化（高优先级）
+
+**任务描述：**
+优化 PyMultiWFN 的测试框架，提高测试效率和质量。
+
+**具体子任务：**
+1. **优化 pytest 配置**
+   - 当前配置检查 pytest.ini 和 setup.cfg
+   - 添加并行测试支持（pytest-xdist）
+   - 配置测试覆盖率报告（pytest-cov）
+   - 优化测试发现机制
+
+2. **添加测试覆盖率报告**
+   - 配置 pytest-cov 插件
+   - 生成覆盖率报告（HTML + terminal）
+   - 设置最低覆盖率阈值（建议 70%+）
+   - 添加覆盖率报告到 CI
+
+3. **实现并行测试**
+   - 安装和配置 pytest-xdist
+   - 使用 pytest -n auto 实现自动并行化
+   - 确保测试之间的独立性（无共享状态）
+
+4. **添加测试隔离机制**
+   - 创建 conftest.py（如果不存在）
+   - 添加 fixtures 用于测试隔离
+   - 确保每个测试使用独立的测试数据
+   - 清理临时文件
+
+**文件位置：**
+- pytest.ini: pytest 配置文件
+- setup.cfg: 项目配置文件
+- tests/conftest.py: pytest fixtures 和钩子（如果存在）
+- pyproject.toml: 项目依赖
+
+**测试框架要求：**
+- pytest（已安装）
+- pytest-xdist（并行测试）
+- pytest-cov（覆盖率报告）
+- pytest-timeout（超时控制，可选）
+
+**成功标准：**
+- [ ] pytest.ini 配置优化完成
+- [ ] 并行测试工作正常（pytest -n 4）
+- [ ] 覆盖率报告生成正常（pytest --cov=pymultiwfn --cov-report=html）
+- [ ] 覆盖率达到 70%+
+- [ ] 所有测试仍然通过
+- [ ] Git commit
+
+**执行步骤：**
+1. 检查当前的 pytest.ini 和 setup.cfg 配置
+2. 安装所需的 pytest 插件（pytest-xdist, pytest-cov）
+3. 优化 pytest.ini 配置
+4. 创建或更新 tests/conftest.py
+5. 运行 pytest --cov=pymultiwfn 检查覆盖率
+6. 如果覆盖率 < 70%，识别缺失的测试
+7. 添加缺失的测试用例
+8. 验证所有测试通过
+9. Git commit
+
+**重要提醒：**
+- 不要修改核心业务逻辑代码（只修改测试相关文件）
+- 确保测试之间的独立性
+- 测试数据应该是隔离的（不共享状态）
+- 每个子任务完成后立即验证
+
+**输出要求：**
+- 问题诊断报告
+- 优化方案说明
+- 修改后的配置文件
+- 测试结果（包括覆盖率）
+- Git commit 信息
+
+请开始工作：
+1. 切换到 ~/software/PyMultiWFN 目录
+2. 读取 pytest.ini 和 setup.cfg 文件
+3. 安装必要的 pytest 插件
+4. 优化配置
+5. 运行测试验证
+6. Git commit
+
+完成后，报告你的工作成果。

@@ -63,6 +63,7 @@ def check_overlap_matrix(wfn_file: str):
     except Exception as e:
         print(f"❌ Failed to calculate overlap matrix: {e}")
         import traceback
+
         traceback.print_exc()
         return
 
@@ -102,7 +103,9 @@ def check_overlap_matrix(wfn_file: str):
         print(f"✅ Trace PASS ({trace:.4f}, expected: ~{expected_electrons} electrons)")
         print(f"   Difference: {trace_diff:.4f}")
     else:
-        print(f"⚠️  Trace WARNING ({trace:.4f}, expected: ~{expected_electrons} electrons)")
+        print(
+            f"⚠️  Trace WARNING ({trace:.4f}, expected: ~{expected_electrons} electrons)"
+        )
         print(f"   Difference: {trace_diff:.4f}")
         print(f"   Note: Trace may not equal electrons due to basis set normalization")
     print()
@@ -142,7 +145,9 @@ def check_overlap_matrix(wfn_file: str):
     print()
 
     # Step 9: Check if overlap matrix is identity
-    is_identity = np.allclose(overlap_matrix, np.eye(overlap_matrix.shape[0]), atol=1e-6)
+    is_identity = np.allclose(
+        overlap_matrix, np.eye(overlap_matrix.shape[0]), atol=1e-6
+    )
     if is_identity:
         print("⚠️  WARNING: Overlap matrix is identity matrix!")
         print("   This means overlap calculation is not working correctly.")

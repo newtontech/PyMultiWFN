@@ -25,7 +25,7 @@ class TestConsistencyDensity:
             type=0,  # S shell
             center_idx=0,
             exponents=np.array([3.42525091]),
-            coefficients=np.array([0.15432897])
+            coefficients=np.array([0.15432897]),
         )
         wfn = Wavefunction(
             atoms=[atom],
@@ -38,17 +38,20 @@ class TestConsistencyDensity:
             num_shells=1,
             shells=[shell],
             occupations=np.array([1.0]),
-            coefficients=np.array([[1.0]])
+            coefficients=np.array([[1.0]]),
         )
 
         # Evaluate density at various points
         from pymultiwfn.math.density import calc_density
-        coords = np.array([
-            [0.0, 0.0, 0.0],  # At nucleus
-            [0.5, 0.0, 0.0],
-            [1.0, 1.0, 1.0],
-            [2.0, 2.0, 2.0],
-        ])
+
+        coords = np.array(
+            [
+                [0.0, 0.0, 0.0],  # At nucleus
+                [0.5, 0.0, 0.0],
+                [1.0, 1.0, 1.0],
+                [2.0, 2.0, 2.0],
+            ]
+        )
 
         density = calc_density(wfn, coords)
 
@@ -65,8 +68,18 @@ class TestConsistencyDensity:
             Atom(element="H", index=1, x=0.0, y=0.0, z=0.7, charge=1.0),
         ]
         shells = [
-            Shell(type=0, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([1.0])),
-            Shell(type=0, center_idx=1, exponents=np.array([1.0]), coefficients=np.array([1.0])),
+            Shell(
+                type=0,
+                center_idx=0,
+                exponents=np.array([1.0]),
+                coefficients=np.array([1.0]),
+            ),
+            Shell(
+                type=0,
+                center_idx=1,
+                exponents=np.array([1.0]),
+                coefficients=np.array([1.0]),
+            ),
         ]
         wfn = Wavefunction(
             atoms=atoms,
@@ -79,7 +92,7 @@ class TestConsistencyDensity:
             num_shells=2,
             shells=shells,
             occupations=np.array([1.0, 1.0]),
-            coefficients=np.array([[0.707, 0.707], [0.707, -0.707]])
+            coefficients=np.array([[0.707, 0.707], [0.707, -0.707]]),
         )
 
         from pymultiwfn.math.density import calc_density
@@ -103,7 +116,7 @@ class TestConsistencyDensity:
             type=0,
             center_idx=0,
             exponents=np.array([1.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
         wfn = Wavefunction(
             atoms=[atom],
@@ -116,14 +129,16 @@ class TestConsistencyDensity:
             num_shells=1,
             shells=[shell],
             occupations=np.array([1.0]),
-            coefficients=np.array([[1.0]])
+            coefficients=np.array([[1.0]]),
         )
 
         from pymultiwfn.math.density import calc_density
 
         # Test at increasing distances
         distances = np.array([0.0, 1.0, 2.0, 5.0, 10.0])
-        coords = np.column_stack([distances, np.zeros_like(distances), np.zeros_like(distances)])
+        coords = np.column_stack(
+            [distances, np.zeros_like(distances), np.zeros_like(distances)]
+        )
 
         density = calc_density(wfn, coords)
 
@@ -146,7 +161,7 @@ class TestConsistencyGradient:
             type=0,
             center_idx=0,
             exponents=np.array([1.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
         wfn = Wavefunction(
             atoms=[atom],
@@ -159,7 +174,7 @@ class TestConsistencyGradient:
             num_shells=1,
             shells=[shell],
             occupations=np.array([1.0]),
-            coefficients=np.array([[1.0]])
+            coefficients=np.array([[1.0]]),
         )
 
         from pymultiwfn.math.gradient import calc_density_gradient
@@ -181,7 +196,7 @@ class TestConsistencyGradient:
             type=0,
             center_idx=0,
             exponents=np.array([2.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
         wfn = Wavefunction(
             atoms=[atom],
@@ -194,7 +209,7 @@ class TestConsistencyGradient:
             num_shells=1,
             shells=[shell],
             occupations=np.array([1.0]),
-            coefficients=np.array([[1.0]])
+            coefficients=np.array([[1.0]]),
         )
 
         coords = np.array([[1.0, 0.5, -0.3]])
@@ -234,7 +249,7 @@ class TestConsistencyBasis:
             type=0,
             center_idx=0,
             exponents=np.array([1.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
         wfn = Wavefunction(
             atoms=[atom],
@@ -245,16 +260,18 @@ class TestConsistencyBasis:
             num_atomic_orbitals=1,
             num_primitives=1,
             num_shells=1,
-            shells=[shell]
+            shells=[shell],
         )
 
         # Test at several points
-        coords = np.array([
-            [0.0, 0.0, 0.0],
-            [1.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0],
-            [1.0, 1.0, 1.0],
-        ])
+        coords = np.array(
+            [
+                [0.0, 0.0, 0.0],
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [1.0, 1.0, 1.0],
+            ]
+        )
 
         basis = evaluate_basis(wfn, coords)
 
@@ -269,10 +286,30 @@ class TestConsistencyBasis:
 
         # Create shells for each angular momentum
         shells = [
-            Shell(type=0, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([1.0])),  # S: 1 func
-            Shell(type=1, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([1.0])),  # P: 3 funcs
-            Shell(type=2, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([1.0])),  # D: 6 funcs
-            Shell(type=3, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([1.0])),  # F: 10 funcs
+            Shell(
+                type=0,
+                center_idx=0,
+                exponents=np.array([1.0]),
+                coefficients=np.array([1.0]),
+            ),  # S: 1 func
+            Shell(
+                type=1,
+                center_idx=0,
+                exponents=np.array([1.0]),
+                coefficients=np.array([1.0]),
+            ),  # P: 3 funcs
+            Shell(
+                type=2,
+                center_idx=0,
+                exponents=np.array([1.0]),
+                coefficients=np.array([1.0]),
+            ),  # D: 6 funcs
+            Shell(
+                type=3,
+                center_idx=0,
+                exponents=np.array([1.0]),
+                coefficients=np.array([1.0]),
+            ),  # F: 10 funcs
         ]
 
         atom = Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)
@@ -285,14 +322,17 @@ class TestConsistencyBasis:
             num_atomic_orbitals=20,
             num_primitives=4,
             num_shells=4,
-            shells=shells
+            shells=shells,
         )
 
         coords = np.array([[1.0, 0.0, 0.0]])
         basis = evaluate_basis(wfn, coords)
 
         # Should have 20 basis functions
-        assert basis.shape == (1, 20), f"Expected 20 basis functions, got {basis.shape[1]}"
+        assert basis.shape == (
+            1,
+            20,
+        ), f"Expected 20 basis functions, got {basis.shape[1]}"
 
         # S function (index 0) should be non-zero
         assert basis[0, 0] > 0, "S function should be non-zero at (1,0,0)"
@@ -321,7 +361,7 @@ class TestConsistencyIntegration:
             type=0,
             center_idx=0,
             exponents=np.array([1.0]),
-            coefficients=np.array([1.0])
+            coefficients=np.array([1.0]),
         )
         wfn = Wavefunction(
             atoms=[atom],
@@ -334,14 +374,14 @@ class TestConsistencyIntegration:
             num_shells=1,
             shells=[shell],
             occupations=np.array([1.0]),
-            coefficients=np.array([[1.0]])
+            coefficients=np.array([[1.0]]),
         )
 
         # Create a simple grid for integration (very coarse for speed)
         # In practice, use a proper integration scheme
         r_range = np.linspace(0, 5, 50)
         theta = np.linspace(0, np.pi, 20)
-        phi = np.linspace(0, 2*np.pi, 20)
+        phi = np.linspace(0, 2 * np.pi, 20)
 
         # This is just a simplified test
         # Real integration would use proper grid weights

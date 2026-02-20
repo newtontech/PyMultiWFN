@@ -27,10 +27,17 @@ class PipekMezeyLocalizer:
         if self.wfn.overlap_matrix is None:
             raise ValueError("Overlap matrix is required for Pipek-Mezey localization")
         if self.wfn.coefficients is None:
-            raise ValueError("MO coefficients are required for Pipek-Mezey localization")
+            raise ValueError(
+                "MO coefficients are required for Pipek-Mezey localization"
+            )
 
-    def localize_orbitals(self, orbital_indices: List[int], max_iterations: int = 100,
-                         convergence_threshold: float = 1e-8, is_beta: bool = False) -> Dict:
+    def localize_orbitals(
+        self,
+        orbital_indices: List[int],
+        max_iterations: int = 100,
+        convergence_threshold: float = 1e-8,
+        is_beta: bool = False,
+    ) -> Dict:
         """
         Localize a set of molecular orbitals using Pipek-Mezey method.
 
@@ -76,7 +83,9 @@ class PipekMezeyLocalizer:
             for i in range(n_orbitals):
                 for j in range(i + 1, n_orbitals):
                     # Calculate rotation angle for this pair
-                    angle = self._calculate_rotation_angle(C_local[i, :], C_local[j, :], S)
+                    angle = self._calculate_rotation_angle(
+                        C_local[i, :], C_local[j, :], S
+                    )
 
                     if abs(angle) > 1e-12:
                         # Apply rotation
@@ -108,13 +117,15 @@ class PipekMezeyLocalizer:
             full_coefficients[local_idx, :] = C_local[idx, :]
 
         return {
-            'localized_coefficients': full_coefficients,
-            'transformation_matrix': U,
-            'iterations': iteration + 1,
-            'converged': converged
+            "localized_coefficients": full_coefficients,
+            "transformation_matrix": U,
+            "iterations": iteration + 1,
+            "converged": converged,
         }
 
-    def _calculate_rotation_angle(self, C_i: np.ndarray, C_j: np.ndarray, S: np.ndarray) -> float:
+    def _calculate_rotation_angle(
+        self, C_i: np.ndarray, C_j: np.ndarray, S: np.ndarray
+    ) -> float:
         """
         Calculate optimal rotation angle for Pipek-Mezey localization.
 
@@ -137,13 +148,13 @@ class PipekMezeyLocalizer:
 
         for atom_idx in range(len(self.wfn.atoms)):
             grad += 2 * P_ij[atom_idx] * (P_i[atom_idx] - P_j[atom_idx])
-            hess += 2 * (P_ij[atom_idx]**2 - (P_i[atom_idx] - P_j[atom_idx])**2)
+            hess += 2 * (P_ij[atom_idx] ** 2 - (P_i[atom_idx] - P_j[atom_idx]) ** 2)
 
         # Calculate rotation angle
         if abs(hess) > 1e-12:
             angle = -grad / hess
             # Limit rotation angle
-            angle = np.clip(angle, -np.pi/4, np.pi/4)
+            angle = np.clip(angle, -np.pi / 4, np.pi / 4)
         else:
             angle = 0.0
 
@@ -163,14 +174,15 @@ class PipekMezeyLocalizer:
             for shell in atom.basis_functions:
                 n_functions = shell.get_n_functions()
                 populations[atom_idx] += np.sum(
-                    basis_contributions[basis_idx:basis_idx + n_functions]
+                    basis_contributions[basis_idx : basis_idx + n_functions]
                 )
                 basis_idx += n_functions
 
         return populations
 
-    def _calculate_atomic_populations_mixed(self, C_i: np.ndarray, C_j: np.ndarray,
-                                          S: np.ndarray) -> np.ndarray:
+    def _calculate_atomic_populations_mixed(
+        self, C_i: np.ndarray, C_j: np.ndarray, S: np.ndarray
+    ) -> np.ndarray:
         """Calculate mixed atomic populations for two orbitals."""
         n_atoms = len(self.wfn.atoms)
         populations = np.zeros(n_atoms)
@@ -184,7 +196,7 @@ class PipekMezeyLocalizer:
             for shell in atom.basis_functions:
                 n_functions = shell.get_n_functions()
                 populations[atom_idx] += np.sum(
-                    mixed_contributions[basis_idx:basis_idx + n_functions]
+                    mixed_contributions[basis_idx : basis_idx + n_functions]
                 )
                 basis_idx += n_functions
 

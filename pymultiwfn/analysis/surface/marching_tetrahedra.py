@@ -52,12 +52,14 @@ TETRAHEDRON_EDGES = [
     [2, 3],  # Edge 5
 ]
 
+
 @dataclass
 class MarchingTetrahedraConfig:
     """Configuration for Marching Tetrahedra algorithm."""
+
     merge_threshold: float = 1e-6  # Threshold for merging duplicate vertices
-    optimize_mesh: bool = True     # Enable mesh optimization
-    calculate_normals: bool = False # Calculate surface normals
+    optimize_mesh: bool = True  # Enable mesh optimization
+    calculate_normals: bool = False  # Calculate surface normals
 
 
 class MarchingTetrahedra:
@@ -81,11 +83,13 @@ class MarchingTetrahedra:
         self.triangles = []
         self.normals = []
 
-    def extract_surface(self,
-                       scalar_field: np.ndarray,
-                       isovalue: float,
-                       grid_origin: np.ndarray,
-                       grid_spacing: float = 1.0) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
+    def extract_surface(
+        self,
+        scalar_field: np.ndarray,
+        isovalue: float,
+        grid_origin: np.ndarray,
+        grid_spacing: float = 1.0,
+    ) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
         """
         Extract isosurface from scalar field using Marching Tetrahedra algorithm.
 
@@ -123,8 +127,12 @@ class MarchingTetrahedra:
                     )
 
         # Convert to numpy arrays
-        vertices = np.array(self.vertices) if self.vertices else np.array([]).reshape(0, 3)
-        triangles = np.array(self.triangles) if self.triangles else np.array([]).reshape(0, 3)
+        vertices = (
+            np.array(self.vertices) if self.vertices else np.array([]).reshape(0, 3)
+        )
+        triangles = (
+            np.array(self.triangles) if self.triangles else np.array([]).reshape(0, 3)
+        )
 
         # Optimize mesh if requested
         if self.config.optimize_mesh and len(vertices) > 0:
@@ -137,34 +145,45 @@ class MarchingTetrahedra:
 
         return vertices, triangles, normals
 
-    def _process_cubic_cell(self, scalar_field: np.ndarray, isovalue: float,
-                           grid_origin: np.ndarray, grid_spacing: float,
-                           i: int, j: int, k: int):
+    def _process_cubic_cell(
+        self,
+        scalar_field: np.ndarray,
+        isovalue: float,
+        grid_origin: np.ndarray,
+        grid_spacing: float,
+        i: int,
+        j: int,
+        k: int,
+    ):
         """Process a single cubic cell and its constituent tetrahedra."""
         # Get the 8 corner values of the cubic cell
-        cell_values = np.array([
-            scalar_field[i, j, k],       # Corner 0
-            scalar_field[i+1, j, k],     # Corner 1
-            scalar_field[i, j+1, k],     # Corner 2
-            scalar_field[i+1, j+1, k],   # Corner 3
-            scalar_field[i, j, k+1],     # Corner 4
-            scalar_field[i+1, j, k+1],   # Corner 5
-            scalar_field[i, j+1, k+1],   # Corner 6
-            scalar_field[i+1, j+1, k+1], # Corner 7
-        ])
+        cell_values = np.array(
+            [
+                scalar_field[i, j, k],  # Corner 0
+                scalar_field[i + 1, j, k],  # Corner 1
+                scalar_field[i, j + 1, k],  # Corner 2
+                scalar_field[i + 1, j + 1, k],  # Corner 3
+                scalar_field[i, j, k + 1],  # Corner 4
+                scalar_field[i + 1, j, k + 1],  # Corner 5
+                scalar_field[i, j + 1, k + 1],  # Corner 6
+                scalar_field[i + 1, j + 1, k + 1],  # Corner 7
+            ]
+        )
 
         # Get the 8 corner coordinates of the cubic cell
         base_coord = grid_origin + grid_spacing * np.array([i, j, k])
-        cell_coords = np.array([
-            base_coord + grid_spacing * np.array([0, 0, 0]),  # Corner 0
-            base_coord + grid_spacing * np.array([1, 0, 0]),  # Corner 1
-            base_coord + grid_spacing * np.array([0, 1, 0]),  # Corner 2
-            base_coord + grid_spacing * np.array([1, 1, 0]),  # Corner 3
-            base_coord + grid_spacing * np.array([0, 0, 1]),  # Corner 4
-            base_coord + grid_spacing * np.array([1, 0, 1]),  # Corner 5
-            base_coord + grid_spacing * np.array([0, 1, 1]),  # Corner 6
-            base_coord + grid_spacing * np.array([1, 1, 1]),  # Corner 7
-        ])
+        cell_coords = np.array(
+            [
+                base_coord + grid_spacing * np.array([0, 0, 0]),  # Corner 0
+                base_coord + grid_spacing * np.array([1, 0, 0]),  # Corner 1
+                base_coord + grid_spacing * np.array([0, 1, 0]),  # Corner 2
+                base_coord + grid_spacing * np.array([1, 1, 0]),  # Corner 3
+                base_coord + grid_spacing * np.array([0, 0, 1]),  # Corner 4
+                base_coord + grid_spacing * np.array([1, 0, 1]),  # Corner 5
+                base_coord + grid_spacing * np.array([0, 1, 1]),  # Corner 6
+                base_coord + grid_spacing * np.array([1, 1, 1]),  # Corner 7
+            ]
+        )
 
         # Process each tetrahedron in the cubic cell
         for tetrahedron_pattern in TETRAHEDRON_PATTERNS:
@@ -176,7 +195,9 @@ class MarchingTetrahedra:
                 tetrahedron_values, tetrahedron_coords, isovalue
             )
 
-    def _extract_from_tetrahedron(self, values: np.ndarray, coords: np.ndarray, isovalue: float):
+    def _extract_from_tetrahedron(
+        self, values: np.ndarray, coords: np.ndarray, isovalue: float
+    ):
         """Extract surface from a single tetrahedron."""
         # Determine which vertices are inside the isosurface
         inside_mask = values <= isovalue
@@ -216,8 +237,8 @@ class MarchingTetrahedra:
                 if i + 2 < len(edge_vertices):
                     triangle = [
                         self._add_vertex(edge_vertices[i]),
-                        self._add_vertex(edge_vertices[i+1]),
-                        self._add_vertex(edge_vertices[i+2])
+                        self._add_vertex(edge_vertices[i + 1]),
+                        self._add_vertex(edge_vertices[i + 2]),
                     ]
                     self.triangles.append(triangle)
 
@@ -235,7 +256,9 @@ class MarchingTetrahedra:
         self.vertices.append(vertex.copy())
         return vertex_index
 
-    def _optimize_mesh(self, vertices: np.ndarray, triangles: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def _optimize_mesh(
+        self, vertices: np.ndarray, triangles: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Optimize the mesh by removing unused vertices and degenerate triangles."""
         # Find used vertices
         used_vertices = np.zeros(len(vertices), dtype=bool)
@@ -252,14 +275,22 @@ class MarchingTetrahedra:
 
         return filtered_vertices, filtered_triangles
 
-    def _calculate_normals(self, vertices: np.ndarray, triangles: np.ndarray) -> np.ndarray:
+    def _calculate_normals(
+        self, vertices: np.ndarray, triangles: np.ndarray
+    ) -> np.ndarray:
         """Calculate vertex normals using triangle averaging."""
         normals = np.zeros_like(vertices)
 
         # Calculate triangle normals
-        v0, v1, v2 = vertices[triangles[:, 0]], vertices[triangles[:, 1]], vertices[triangles[:, 2]]
+        v0, v1, v2 = (
+            vertices[triangles[:, 0]],
+            vertices[triangles[:, 1]],
+            vertices[triangles[:, 2]],
+        )
         triangle_normals = np.cross(v1 - v0, v2 - v0)
-        triangle_normals = triangle_normals / (np.linalg.norm(triangle_normals, axis=1, keepdims=True) + 1e-10)
+        triangle_normals = triangle_normals / (
+            np.linalg.norm(triangle_normals, axis=1, keepdims=True) + 1e-10
+        )
 
         # Accumulate normals at vertices
         for i, triangle in enumerate(triangles):
@@ -272,11 +303,13 @@ class MarchingTetrahedra:
         return normals
 
 
-def extract_isosurface(scalar_field: np.ndarray,
-                      isovalue: float,
-                      grid_origin: np.ndarray,
-                      grid_spacing: float = 1.0,
-                      config: Optional[MarchingTetrahedraConfig] = None) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
+def extract_isosurface(
+    scalar_field: np.ndarray,
+    isovalue: float,
+    grid_origin: np.ndarray,
+    grid_spacing: float = 1.0,
+    config: Optional[MarchingTetrahedraConfig] = None,
+) -> Tuple[np.ndarray, np.ndarray, Optional[np.ndarray]]:
     """
     Convenience function to extract isosurface from scalar field.
 

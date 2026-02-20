@@ -15,18 +15,20 @@ This test suite follows TDD principles and covers:
 import pytest
 import numpy as np
 from pymultiwfn.core.data import Wavefunction, Atom, Shell
-from pymultiwfn.analysis.population.mulliken import calculate_mulliken_population_and_charges
+from pymultiwfn.analysis.population.mulliken import (
+    calculate_mulliken_population_and_charges,
+)
 from pymultiwfn.analysis.population.fuzzy_atoms import (
     FuzzyAtomsAnalyzer,
     FuzzyAnalysisConfig,
-    perform_fuzzy_analysis
+    perform_fuzzy_analysis,
 )
 from pymultiwfn.analysis.population.population import perform_population_analysis
-
 
 # ============================================================================
 # Pytest Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def hydrogen_molecule():
@@ -52,17 +54,29 @@ def hydrogen_molecule():
     wf.num_basis = 2
     wf.num_shells = 2
     wf.shells = [
-        Shell(type=0, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),
-        Shell(type=0, center_idx=1, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),
+        Shell(
+            type=0,
+            center_idx=0,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        ),
+        Shell(
+            type=0,
+            center_idx=1,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        ),
     ]
 
     # Simple MO coefficients (bonding and antibonding)
     # Bonding orbital: (1/sqrt(2)) * (phi_1 + phi_2)
     # Antibonding orbital: (1/sqrt(2)) * (phi_1 - phi_2)
-    wf.coefficients = np.array([
-        [1.0/np.sqrt(2), 1.0/np.sqrt(2)],  # Bonding
-        [1.0/np.sqrt(2), -1.0/np.sqrt(2)]  # Antibonding
-    ])
+    wf.coefficients = np.array(
+        [
+            [1.0 / np.sqrt(2), 1.0 / np.sqrt(2)],  # Bonding
+            [1.0 / np.sqrt(2), -1.0 / np.sqrt(2)],  # Antibonding
+        ]
+    )
     wf.energies = np.array([-0.5, 0.5])
     wf.occupations = np.array([2.0, 0.0])  # Only bonding occupied
 
@@ -101,11 +115,36 @@ def water_molecule():
     # Simplified basis: 7 basis functions (O: 1s, 2s, 2px, 2py, 2pz; H: 1s each)
     wf.num_basis = 7
     wf.shells = [
-        Shell(type=0, center_idx=0, exponents=np.array([20.0]), coefficients=np.array([[1.0]])),  # O 1s
-        Shell(type=0, center_idx=0, exponents=np.array([2.0]), coefficients=np.array([[1.0]])),   # O 2s
-        Shell(type=1, center_idx=0, exponents=np.array([2.0]), coefficients=np.array([[1.0]])),   # O 2p
-        Shell(type=0, center_idx=1, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),   # H 1s
-        Shell(type=0, center_idx=2, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),   # H 1s
+        Shell(
+            type=0,
+            center_idx=0,
+            exponents=np.array([20.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # O 1s
+        Shell(
+            type=0,
+            center_idx=0,
+            exponents=np.array([2.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # O 2s
+        Shell(
+            type=1,
+            center_idx=0,
+            exponents=np.array([2.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # O 2p
+        Shell(
+            type=0,
+            center_idx=1,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # H 1s
+        Shell(
+            type=0,
+            center_idx=2,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # H 1s
     ]
     wf.num_shells = 5
 
@@ -151,11 +190,36 @@ def methyl_radical():
     # Minimal basis set
     wf.num_basis = 7  # C: 2s, 2px, 2py, 2pz (4) + 3*H (3) = 7
     wf.shells = [
-        Shell(type=0, center_idx=0, exponents=np.array([2.0]), coefficients=np.array([[1.0]])),  # C 2s
-        Shell(type=1, center_idx=0, exponents=np.array([2.0]), coefficients=np.array([[1.0]])),  # C 2p
-        Shell(type=0, center_idx=1, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),  # H 1s
-        Shell(type=0, center_idx=2, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),  # H 1s
-        Shell(type=0, center_idx=3, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),  # H 1s
+        Shell(
+            type=0,
+            center_idx=0,
+            exponents=np.array([2.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # C 2s
+        Shell(
+            type=1,
+            center_idx=0,
+            exponents=np.array([2.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # C 2p
+        Shell(
+            type=0,
+            center_idx=1,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # H 1s
+        Shell(
+            type=0,
+            center_idx=2,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # H 1s
+        Shell(
+            type=0,
+            center_idx=3,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # H 1s
     ]
     wf.num_shells = 5
 
@@ -207,7 +271,12 @@ def single_atom():
 
     wf.num_basis = 1
     wf.shells = [
-        Shell(type=0, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([[1.0]]))
+        Shell(
+            type=0,
+            center_idx=0,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        )
     ]
     wf.num_shells = 1
 
@@ -240,18 +309,48 @@ def charged_molecule():
     # H atoms at ~1.0 Angstrom in tetrahedral arrangement
     r_nh = 1.0 * 1.889726
     wf.add_atom("H", 1, r_nh, 0.0, 0.0)
-    wf.add_atom("H", 1, -r_nh/3, r_nh*np.sqrt(8/9), 0.0)
-    wf.add_atom("H", 1, -r_nh/3, -r_nh*np.sqrt(2/9), r_nh*np.sqrt(2/3))
-    wf.add_atom("H", 1, -r_nh/3, -r_nh*np.sqrt(2/9), -r_nh*np.sqrt(2/3))
+    wf.add_atom("H", 1, -r_nh / 3, r_nh * np.sqrt(8 / 9), 0.0)
+    wf.add_atom("H", 1, -r_nh / 3, -r_nh * np.sqrt(2 / 9), r_nh * np.sqrt(2 / 3))
+    wf.add_atom("H", 1, -r_nh / 3, -r_nh * np.sqrt(2 / 9), -r_nh * np.sqrt(2 / 3))
 
     wf.num_basis = 8  # N: 5 orbitals, 4H: 4 orbitals
     wf.shells = [
-        Shell(type=0, center_idx=0, exponents=np.array([3.0]), coefficients=np.array([[1.0]])),  # N 2s
-        Shell(type=1, center_idx=0, exponents=np.array([3.0]), coefficients=np.array([[1.0]])),  # N 2p
-        Shell(type=0, center_idx=1, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),  # H 1s
-        Shell(type=0, center_idx=2, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),  # H 1s
-        Shell(type=0, center_idx=3, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),  # H 1s
-        Shell(type=0, center_idx=4, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),  # H 1s
+        Shell(
+            type=0,
+            center_idx=0,
+            exponents=np.array([3.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # N 2s
+        Shell(
+            type=1,
+            center_idx=0,
+            exponents=np.array([3.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # N 2p
+        Shell(
+            type=0,
+            center_idx=1,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # H 1s
+        Shell(
+            type=0,
+            center_idx=2,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # H 1s
+        Shell(
+            type=0,
+            center_idx=3,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # H 1s
+        Shell(
+            type=0,
+            center_idx=4,
+            exponents=np.array([1.0]),
+            coefficients=np.array([[1.0]]),
+        ),  # H 1s
     ]
     wf.num_shells = 6
 
@@ -277,6 +376,7 @@ def charged_molecule():
 # Tests for Mulliken Population Analysis
 # ============================================================================
 
+
 class TestMullikenPopulation:
     """Test suite for Mulliken population analysis."""
 
@@ -298,20 +398,24 @@ class TestMullikenPopulation:
         assert total_charges.shape == (2,)
 
         # Total population should equal total electrons
-        assert np.abs(np.sum(total_pop) - 2.0) < 1e-10, \
-            f"Total population {np.sum(total_pop)} != total electrons {2.0}"
+        assert (
+            np.abs(np.sum(total_pop) - 2.0) < 1e-10
+        ), f"Total population {np.sum(total_pop)} != total electrons {2.0}"
 
         # Both H atoms should have equal population (symmetry)
-        assert np.abs(total_pop[0] - total_pop[1]) < 1e-10, \
-            f"H atoms have unequal populations: {total_pop[0]} vs {total_pop[1]}"
+        assert (
+            np.abs(total_pop[0] - total_pop[1]) < 1e-10
+        ), f"H atoms have unequal populations: {total_pop[0]} vs {total_pop[1]}"
 
         # Each H should have approximately 1 electron
-        assert np.abs(total_pop[0] - 1.0) < 0.1, \
-            f"H population {total_pop[0]} deviates significantly from expected 1.0"
+        assert (
+            np.abs(total_pop[0] - 1.0) < 0.1
+        ), f"H population {total_pop[0]} deviates significantly from expected 1.0"
 
         # Charges should be zero (neutral molecule)
-        assert np.all(np.abs(total_charges) < 0.1), \
-            f"Charges too large for neutral H2: {total_charges}"
+        assert np.all(
+            np.abs(total_charges) < 0.1
+        ), f"Charges too large for neutral H2: {total_charges}"
 
     def test_mulliken_water_molecule(self, water_molecule):
         """
@@ -331,8 +435,9 @@ class TestMullikenPopulation:
         assert total_charges.shape == (3,)
 
         # Total population should equal total electrons
-        assert np.abs(np.sum(total_pop) - 10.0) < 1e-10, \
-            f"Total population {np.sum(total_pop)} != total electrons {10.0}"
+        assert (
+            np.abs(np.sum(total_pop) - 10.0) < 1e-10
+        ), f"Total population {np.sum(total_pop)} != total electrons {10.0}"
 
         # Oxygen should have higher population than each H (may fail with random coefficients)
         # Note: This is not guaranteed with random coefficients, so we skip this check
@@ -340,13 +445,15 @@ class TestMullikenPopulation:
         #     f"O population {total_pop[0]} should be > H population {total_pop[1]}"
 
         # Charges should be reasonable for neutral molecule (sum to zero)
-        assert np.abs(np.sum(total_charges)) < 0.01, \
-            f"Sum of charges {np.sum(total_charges)} != 0 for neutral molecule"
+        assert (
+            np.abs(np.sum(total_charges)) < 0.01
+        ), f"Sum of charges {np.sum(total_charges)} != 0 for neutral molecule"
 
         # Individual charges should be reasonable (-5 to +5 for random coefficients)
         # Note: Using a wider range because random coefficients may produce unrealistic charges
-        assert np.all(np.abs(total_charges) < 5.0), \
-            f"Charges exceed reasonable range: {total_charges}"
+        assert np.all(
+            np.abs(total_charges) < 5.0
+        ), f"Charges exceed reasonable range: {total_charges}"
 
     def test_mulliken_methyl_radical_spin(self, methyl_radical):
         """
@@ -357,15 +464,22 @@ class TestMullikenPopulation:
         - Spin densities are present
         - Total population equals total electrons
         """
-        total_pop, total_charges, alpha_pop, beta_pop, spin_densities = \
+        total_pop, total_charges, alpha_pop, beta_pop, spin_densities = (
             calculate_mulliken_population_and_charges(
                 methyl_radical, methyl_radical.overlap_matrix
             )
+        )
 
         # Check that alpha and beta populations are returned
-        assert alpha_pop is not None, "Alpha population should not be None for unrestricted"
-        assert beta_pop is not None, "Beta population should not be None for unrestricted"
-        assert spin_densities is not None, "Spin densities should not be None for unrestricted"
+        assert (
+            alpha_pop is not None
+        ), "Alpha population should not be None for unrestricted"
+        assert (
+            beta_pop is not None
+        ), "Beta population should not be None for unrestricted"
+        assert (
+            spin_densities is not None
+        ), "Spin densities should not be None for unrestricted"
 
         # Check dimensions
         assert alpha_pop.shape == (4,)
@@ -373,12 +487,14 @@ class TestMullikenPopulation:
         assert spin_densities.shape == (4,)
 
         # Total population should equal total electrons
-        assert np.abs(np.sum(total_pop) - 9.0) < 1e-10, \
-            f"Total population {np.sum(total_pop)} != total electrons {9.0}"
+        assert (
+            np.abs(np.sum(total_pop) - 9.0) < 1e-10
+        ), f"Total population {np.sum(total_pop)} != total electrons {9.0}"
 
         # Spin densities should sum to total unpaired electrons (1)
-        assert np.abs(np.sum(spin_densities) - 1.0) < 0.1, \
-            f"Sum of spin densities {np.sum(spin_densities)} != 1.0 for doublet"
+        assert (
+            np.abs(np.sum(spin_densities) - 1.0) < 0.1
+        ), f"Sum of spin densities {np.sum(spin_densities)} != 1.0 for doublet"
 
         # Note: With random coefficients, we cannot guarantee spin density is on carbon
         # In a real calculation with proper MOs, spin density should be on the radical center
@@ -392,22 +508,25 @@ class TestMullikenPopulation:
         - Population equals number of electrons
         - Charge is zero for neutral atom
         """
-        total_pop, total_charges, alpha_pop, beta_pop, spin_densities = \
+        total_pop, total_charges, alpha_pop, beta_pop, spin_densities = (
             calculate_mulliken_population_and_charges(
                 single_atom, single_atom.overlap_matrix
             )
+        )
 
         # Check dimensions
         assert total_pop.shape == (1,)
         assert total_charges.shape == (1,)
 
         # Population should equal 1 electron
-        assert np.abs(total_pop[0] - 1.0) < 1e-10, \
-            f"Single H atom population {total_pop[0]} != 1.0"
+        assert (
+            np.abs(total_pop[0] - 1.0) < 1e-10
+        ), f"Single H atom population {total_pop[0]} != 1.0"
 
         # Charge should be zero for neutral atom
-        assert np.abs(total_charges[0]) < 1e-10, \
-            f"Single H atom charge {total_charges[0]} != 0.0"
+        assert (
+            np.abs(total_charges[0]) < 1e-10
+        ), f"Single H atom charge {total_charges[0]} != 0.0"
 
         # Alpha and beta populations should be present
         assert alpha_pop is not None, "Alpha population should be present"
@@ -427,21 +546,26 @@ class TestMullikenPopulation:
         )
 
         # Total population should equal total electrons
-        assert np.abs(np.sum(total_pop) - 10.0) < 1e-10, \
-            f"Total population {np.sum(total_pop)} != total electrons {10.0}"
+        assert (
+            np.abs(np.sum(total_pop) - 10.0) < 1e-10
+        ), f"Total population {np.sum(total_pop)} != total electrons {10.0}"
 
         # Sum of atomic charges should equal molecular charge (+1)
         # Charge = Z_nuclear - population
         expected_charge_sum = charged_molecule.charge
         actual_charge_sum = np.sum(total_charges)
-        assert np.abs(actual_charge_sum - expected_charge_sum) < 0.01, \
-            f"Sum of atomic charges {actual_charge_sum} != molecular charge {expected_charge_sum}"
+        assert (
+            np.abs(actual_charge_sum - expected_charge_sum) < 0.01
+        ), f"Sum of atomic charges {actual_charge_sum} != molecular charge {expected_charge_sum}"
 
-    @pytest.mark.parametrize("num_electrons,charge", [
-        (2.0, 0),    # Neutral H2
-        (1.0, +1),   # H2+ cation
-        (3.0, -1),   # H2- anion (hypothetical)
-    ])
+    @pytest.mark.parametrize(
+        "num_electrons,charge",
+        [
+            (2.0, 0),  # Neutral H2
+            (1.0, +1),  # H2+ cation
+            (3.0, -1),  # H2- anion (hypothetical)
+        ],
+    )
     def test_mulliken_various_charges(self, num_electrons, charge):
         """
         Parametrized test for molecules with different total charges.
@@ -454,22 +578,34 @@ class TestMullikenPopulation:
         wf.num_electrons = num_electrons
 
         # Set unrestricted flag based on multiplicity
-        wf.is_unrestricted = (wf.multiplicity != 1)
+        wf.is_unrestricted = wf.multiplicity != 1
 
         wf.add_atom("H", 1, 0.0, 0.0, 0.0)
         wf.add_atom("H", 1, 1.4, 0.0, 0.0)
 
         wf.num_basis = 2
         wf.shells = [
-            Shell(type=0, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),
-            Shell(type=0, center_idx=1, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),
+            Shell(
+                type=0,
+                center_idx=0,
+                exponents=np.array([1.0]),
+                coefficients=np.array([[1.0]]),
+            ),
+            Shell(
+                type=0,
+                center_idx=1,
+                exponents=np.array([1.0]),
+                coefficients=np.array([[1.0]]),
+            ),
         ]
         wf.num_shells = 2
 
-        wf.coefficients = np.array([
-            [1.0/np.sqrt(2), 1.0/np.sqrt(2)],
-            [1.0/np.sqrt(2), -1.0/np.sqrt(2)]
-        ])
+        wf.coefficients = np.array(
+            [
+                [1.0 / np.sqrt(2), 1.0 / np.sqrt(2)],
+                [1.0 / np.sqrt(2), -1.0 / np.sqrt(2)],
+            ]
+        )
         wf.energies = np.array([-0.5, 0.5])
 
         # Adjust occupations based on number of electrons
@@ -499,17 +635,20 @@ class TestMullikenPopulation:
         )
 
         # Total population should equal total electrons
-        assert np.abs(np.sum(total_pop) - num_electrons) < 1e-10, \
-            f"Total population {np.sum(total_pop)} != total electrons {num_electrons}"
+        assert (
+            np.abs(np.sum(total_pop) - num_electrons) < 1e-10
+        ), f"Total population {np.sum(total_pop)} != total electrons {num_electrons}"
 
         # Sum of charges should equal molecular charge
-        assert np.abs(np.sum(total_charges) - charge) < 0.01, \
-            f"Sum of charges {np.sum(total_charges)} != molecular charge {charge}"
+        assert (
+            np.abs(np.sum(total_charges) - charge) < 0.01
+        ), f"Sum of charges {np.sum(total_charges)} != molecular charge {charge}"
 
 
 # ============================================================================
 # Tests for Fuzzy Atoms (Hirshfeld) Population Analysis
 # ============================================================================
+
 
 class TestFuzzyAtomsPopulation:
     """Test suite for fuzzy atoms (Hirshfeld) population analysis."""
@@ -528,7 +667,7 @@ class TestFuzzyAtomsPopulation:
 
         assert analyzer.wavefunction == hydrogen_molecule
         assert analyzer.config.partition_method == "becke"
-        assert hasattr(analyzer, 'covalent_radii_bohr')
+        assert hasattr(analyzer, "covalent_radii_bohr")
         assert len(analyzer.covalent_radii_bohr) > 0
 
     def test_becke_weights_calculation(self, hydrogen_molecule):
@@ -543,11 +682,13 @@ class TestFuzzyAtomsPopulation:
         analyzer = FuzzyAtomsAnalyzer(hydrogen_molecule)
 
         # Create a few test points
-        test_points = np.array([
-            [0.0, 0.0, 0.0],  # At H1
-            [1.4, 0.0, 0.0],  # At H2
-            [0.7, 0.0, 0.0],  # Midpoint
-        ])
+        test_points = np.array(
+            [
+                [0.0, 0.0, 0.0],  # At H1
+                [1.4, 0.0, 0.0],  # At H2
+                [0.7, 0.0, 0.0],  # Midpoint
+            ]
+        )
 
         weights = analyzer.calculate_atomic_weights(test_points)
 
@@ -556,8 +697,7 @@ class TestFuzzyAtomsPopulation:
 
         # Weights should sum to 1.0 for each point
         weight_sums = np.sum(weights, axis=0)
-        assert np.allclose(weight_sums, 1.0), \
-            f"Weights don't sum to 1.0: {weight_sums}"
+        assert np.allclose(weight_sums, 1.0), f"Weights don't sum to 1.0: {weight_sums}"
 
         # Weights should be non-negative
         assert np.all(weights >= 0.0), "Negative weights found"
@@ -574,11 +714,13 @@ class TestFuzzyAtomsPopulation:
         config = FuzzyAnalysisConfig(partition_method="hirshfeld")
         analyzer = FuzzyAtomsAnalyzer(hydrogen_molecule, config)
 
-        test_points = np.array([
-            [0.0, 0.0, 0.0],
-            [1.4, 0.0, 0.0],
-            [0.7, 0.0, 0.0],
-        ])
+        test_points = np.array(
+            [
+                [0.0, 0.0, 0.0],
+                [1.4, 0.0, 0.0],
+                [0.7, 0.0, 0.0],
+            ]
+        )
 
         weights = analyzer.calculate_atomic_weights(test_points)
 
@@ -586,8 +728,9 @@ class TestFuzzyAtomsPopulation:
 
         # Weights should sum to 1.0 for each point
         weight_sums = np.sum(weights, axis=0)
-        assert np.allclose(weight_sums, 1.0), \
-            f"Hirshfeld weights don't sum to 1.0: {weight_sums}"
+        assert np.allclose(
+            weight_sums, 1.0
+        ), f"Hirshfeld weights don't sum to 1.0: {weight_sums}"
 
     def test_atomic_overlap_matrix(self, hydrogen_molecule):
         """
@@ -609,11 +752,11 @@ class TestFuzzyAtomsPopulation:
 
         # Each matrix should be square
         for atom_key, matrix in aom.items():
-            assert matrix.shape[0] == matrix.shape[1], \
-                f"AOM for {atom_key} is not square: {matrix.shape}"
+            assert (
+                matrix.shape[0] == matrix.shape[1]
+            ), f"AOM for {atom_key} is not square: {matrix.shape}"
             # Check symmetry
-            assert np.allclose(matrix, matrix.T), \
-                f"AOM for {atom_key} is not symmetric"
+            assert np.allclose(matrix, matrix.T), f"AOM for {atom_key} is not symmetric"
 
     def test_delocalization_index(self, hydrogen_molecule):
         """
@@ -653,14 +796,14 @@ class TestFuzzyAtomsPopulation:
         multipoles = analyzer.calculate_multipole_moments()
 
         # Check that we have the expected keys
-        assert 'atomic_charges' in multipoles
-        assert 'atomic_dipoles' in multipoles
-        assert 'atomic_quadrupoles' in multipoles
+        assert "atomic_charges" in multipoles
+        assert "atomic_dipoles" in multipoles
+        assert "atomic_quadrupoles" in multipoles
 
         # Check shapes
-        assert multipoles['atomic_charges'].shape == (2,)
-        assert multipoles['atomic_dipoles'].shape == (2, 3)
-        assert multipoles['atomic_quadrupoles'].shape == (2, 3, 3)
+        assert multipoles["atomic_charges"].shape == (2,)
+        assert multipoles["atomic_dipoles"].shape == (2, 3)
+        assert multipoles["atomic_quadrupoles"].shape == (2, 3, 3)
 
     def test_atomic_properties(self, hydrogen_molecule):
         """
@@ -676,18 +819,18 @@ class TestFuzzyAtomsPopulation:
         properties = analyzer.calculate_atomic_properties()
 
         # Check expected keys
-        assert 'atomic_volumes' in properties
-        assert 'atomic_polarizabilities' in properties
-        assert 'atomic_c6_coefficients' in properties
+        assert "atomic_volumes" in properties
+        assert "atomic_polarizabilities" in properties
+        assert "atomic_c6_coefficients" in properties
 
         # Check shapes
-        assert properties['atomic_volumes'].shape == (2,)
-        assert properties['atomic_polarizabilities'].shape == (2,)
-        assert properties['atomic_c6_coefficients'].shape == (2,)
+        assert properties["atomic_volumes"].shape == (2,)
+        assert properties["atomic_polarizabilities"].shape == (2,)
+        assert properties["atomic_c6_coefficients"].shape == (2,)
 
         # Polarizabilities and C6 should be positive for H
-        assert np.all(properties['atomic_polarizabilities'] >= 0)
-        assert np.all(properties['atomic_c6_coefficients'] >= 0)
+        assert np.all(properties["atomic_polarizabilities"] >= 0)
+        assert np.all(properties["atomic_c6_coefficients"] >= 0)
 
     def test_perform_fuzzy_analysis_di_li(self, hydrogen_molecule):
         """
@@ -699,11 +842,11 @@ class TestFuzzyAtomsPopulation:
         """
         result = perform_fuzzy_analysis(hydrogen_molecule, analysis_type="di_li")
 
-        assert 'delocalization_index' in result
-        assert 'localization_index' in result
+        assert "delocalization_index" in result
+        assert "localization_index" in result
 
-        DI = result['delocalization_index']
-        LI = result['localization_index']
+        DI = result["delocalization_index"]
+        LI = result["localization_index"]
 
         assert DI.shape == (2, 2)
         assert LI.shape == (2,)
@@ -718,11 +861,11 @@ class TestFuzzyAtomsPopulation:
         """
         result = perform_fuzzy_analysis(hydrogen_molecule, analysis_type="multipole")
 
-        assert 'multipole_moments' in result
-        multipoles = result['multipole_moments']
+        assert "multipole_moments" in result
+        multipoles = result["multipole_moments"]
 
-        assert 'atomic_charges' in multipoles
-        assert 'atomic_dipoles' in multipoles
+        assert "atomic_charges" in multipoles
+        assert "atomic_dipoles" in multipoles
 
     def test_perform_fuzzy_analysis_atomic_properties(self, hydrogen_molecule):
         """
@@ -732,13 +875,15 @@ class TestFuzzyAtomsPopulation:
         - Function returns atomic properties
         - Correct structure
         """
-        result = perform_fuzzy_analysis(hydrogen_molecule, analysis_type="atomic_properties")
+        result = perform_fuzzy_analysis(
+            hydrogen_molecule, analysis_type="atomic_properties"
+        )
 
-        assert 'atomic_properties' in result
-        properties = result['atomic_properties']
+        assert "atomic_properties" in result
+        properties = result["atomic_properties"]
 
-        assert 'atomic_volumes' in properties
-        assert 'atomic_polarizabilities' in properties
+        assert "atomic_volumes" in properties
+        assert "atomic_polarizabilities" in properties
 
     def test_fragment_delocalization(self, water_molecule):
         """
@@ -753,18 +898,17 @@ class TestFuzzyAtomsPopulation:
         # Fragment 1: O atom
         # Fragment 2: Two H atoms
         result = analyzer.calculate_fragment_delocalization(
-            fragment1_indices=[0],  # O
-            fragment2_indices=[1, 2]  # H atoms
+            fragment1_indices=[0], fragment2_indices=[1, 2]  # O  # H atoms
         )
 
-        assert 'fragment1_li' in result
-        assert 'fragment2_li' in result
-        assert 'interfragment_di' in result
+        assert "fragment1_li" in result
+        assert "fragment2_li" in result
+        assert "interfragment_di" in result
 
         # All should be non-negative
-        assert result['fragment1_li'] >= 0
-        assert result['fragment2_li'] >= 0
-        assert result['interfragment_di'] >= 0
+        assert result["fragment1_li"] >= 0
+        assert result["fragment2_li"] >= 0
+        assert result["interfragment_di"] >= 0
 
     def test_invalid_partition_method(self, hydrogen_molecule):
         """
@@ -796,6 +940,7 @@ class TestFuzzyAtomsPopulation:
 # Tests for General Population Analysis Functions
 # ============================================================================
 
+
 class TestGeneralPopulationAnalysis:
     """Test suite for general population analysis functions."""
 
@@ -812,13 +957,14 @@ class TestGeneralPopulationAnalysis:
         assert isinstance(result, dict)
 
         # Should have charges and bond_orders keys (placeholder)
-        assert 'charges' in result
-        assert 'bond_orders' in result
+        assert "charges" in result
+        assert "bond_orders" in result
 
 
 # ============================================================================
 # Tests for Edge Cases and Validation
 # ============================================================================
+
 
 class TestPopulationEdgeCases:
     """Test suite for edge cases and validation."""
@@ -845,8 +991,8 @@ class TestPopulationEdgeCases:
         # Note: Behavior depends on implementation
         # For now, we just test it doesn't raise an exception
         try:
-            total_pop, total_charges, _, _, _ = calculate_mulliken_population_and_charges(
-                wf, wf.overlap_matrix
+            total_pop, total_charges, _, _, _ = (
+                calculate_mulliken_population_and_charges(wf, wf.overlap_matrix)
             )
             # If it succeeds, check arrays
             assert len(total_pop) == 0
@@ -877,8 +1023,12 @@ class TestPopulationEdgeCases:
         wf.num_basis = 10
         for i in range(10):
             wf.shells.append(
-                Shell(type=0, center_idx=i, exponents=np.array([1.0]),
-                     coefficients=np.array([[1.0]]))
+                Shell(
+                    type=0,
+                    center_idx=i,
+                    exponents=np.array([1.0]),
+                    coefficients=np.array([[1.0]]),
+                )
             )
         wf.num_shells = 10
 
@@ -944,6 +1094,7 @@ class TestPopulationEdgeCases:
 # Tests for Charge Validation
 # ============================================================================
 
+
 class TestChargeValidation:
     """Test suite for charge calculation validation."""
 
@@ -961,16 +1112,18 @@ class TestChargeValidation:
         )
 
         # All charges should be in reasonable range
-        assert np.all(np.abs(total_charges) < 3.0), \
-            f"Charges outside reasonable range: {total_charges}"
+        assert np.all(
+            np.abs(total_charges) < 3.0
+        ), f"Charges outside reasonable range: {total_charges}"
 
         # Methyl radical
         _, total_charges, _, _, _ = calculate_mulliken_population_and_charges(
             methyl_radical, methyl_radical.overlap_matrix
         )
 
-        assert np.all(np.abs(total_charges) < 3.0), \
-            f"Charges outside reasonable range: {total_charges}"
+        assert np.all(
+            np.abs(total_charges) < 3.0
+        ), f"Charges outside reasonable range: {total_charges}"
 
     def test_charge_conservation(self, charged_molecule):
         """
@@ -989,8 +1142,9 @@ class TestChargeValidation:
         # For our test: sum(charges) should equal wf.charge
         charge_sum = np.sum(total_charges)
 
-        assert np.abs(charge_sum - charged_molecule.charge) < 0.01, \
-            f"Sum of atomic charges {charge_sum} != molecular charge {charged_molecule.charge}"
+        assert (
+            np.abs(charge_sum - charged_molecule.charge) < 0.01
+        ), f"Sum of atomic charges {charge_sum} != molecular charge {charged_molecule.charge}"
 
     @pytest.mark.parametrize("charge", [-1, 0, +1, +2])
     def test_various_molecular_charges(self, charge):
@@ -1012,15 +1166,27 @@ class TestChargeValidation:
 
         wf.num_basis = 2
         wf.shells = [
-            Shell(type=0, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),
-            Shell(type=0, center_idx=1, exponents=np.array([1.0]), coefficients=np.array([[1.0]])),
+            Shell(
+                type=0,
+                center_idx=0,
+                exponents=np.array([1.0]),
+                coefficients=np.array([[1.0]]),
+            ),
+            Shell(
+                type=0,
+                center_idx=1,
+                exponents=np.array([1.0]),
+                coefficients=np.array([[1.0]]),
+            ),
         ]
         wf.num_shells = 2
 
-        wf.coefficients = np.array([
-            [1.0/np.sqrt(2), 1.0/np.sqrt(2)],
-            [1.0/np.sqrt(2), -1.0/np.sqrt(2)]
-        ])
+        wf.coefficients = np.array(
+            [
+                [1.0 / np.sqrt(2), 1.0 / np.sqrt(2)],
+                [1.0 / np.sqrt(2), -1.0 / np.sqrt(2)],
+            ]
+        )
         wf.energies = np.array([-0.5, 0.5])
 
         # Adjust occupations for restricted calculation
@@ -1051,6 +1217,7 @@ class TestChargeValidation:
 # Tests for Spin Population
 # ============================================================================
 
+
 class TestSpinPopulation:
     """Test suite for spin population analysis."""
 
@@ -1067,12 +1234,15 @@ class TestSpinPopulation:
             methyl_radical, methyl_radical.overlap_matrix
         )
 
-        assert spin_densities is not None, "Spin densities should be calculated for unrestricted"
+        assert (
+            spin_densities is not None
+        ), "Spin densities should be calculated for unrestricted"
 
         # Total spin density should equal number of unpaired electrons
         total_spin = np.sum(spin_densities)
-        assert np.abs(total_spin - 1.0) < 0.1, \
-            f"Total spin density {total_spin} != 1.0 for doublet"
+        assert (
+            np.abs(total_spin - 1.0) < 0.1
+        ), f"Total spin density {total_spin} != 1.0 for doublet"
 
     def test_no_spin_density_restricted(self, hydrogen_molecule):
         """
@@ -1086,8 +1256,9 @@ class TestSpinPopulation:
         )
 
         # Should be None for restricted (closed-shell)
-        assert spin_densities is None, \
-            "Spin densities should be None for restricted calculation"
+        assert (
+            spin_densities is None
+        ), "Spin densities should be None for restricted calculation"
 
     def test_alpha_beta_population_consistency(self, methyl_radical):
         """
@@ -1097,10 +1268,11 @@ class TestSpinPopulation:
         - Total = alpha + beta
         - Spin = alpha - beta
         """
-        total_pop, _, alpha_pop, beta_pop, spin_densities = \
+        total_pop, _, alpha_pop, beta_pop, spin_densities = (
             calculate_mulliken_population_and_charges(
                 methyl_radical, methyl_radical.overlap_matrix
             )
+        )
 
         # Check that all are present
         assert alpha_pop is not None
@@ -1109,13 +1281,15 @@ class TestSpinPopulation:
 
         # Total should equal alpha + beta
         calculated_total = alpha_pop + beta_pop
-        assert np.allclose(total_pop, calculated_total), \
-            f"Total population != alpha + beta"
+        assert np.allclose(
+            total_pop, calculated_total
+        ), f"Total population != alpha + beta"
 
         # Spin should equal alpha - beta
         calculated_spin = alpha_pop - beta_pop
-        assert np.allclose(spin_densities, calculated_spin), \
-            f"Spin density != alpha - beta"
+        assert np.allclose(
+            spin_densities, calculated_spin
+        ), f"Spin density != alpha - beta"
 
 
 # ============================================================================

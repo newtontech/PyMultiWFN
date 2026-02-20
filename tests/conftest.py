@@ -30,14 +30,7 @@ def sample_atom():
 
     Creates a hydrogen atom at origin.
     """
-    return Atom(
-        element="H",
-        index=1,
-        x=0.0,
-        y=0.0,
-        z=0.0,
-        charge=1.0
-    )
+    return Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)
 
 
 @pytest.fixture
@@ -65,7 +58,7 @@ def sample_shell():
         type=0,  # S shell
         center_idx=0,
         exponents=np.array([3.42525091, 0.62391373]),
-        coefficients=np.array([0.15432897, 0.53532814])
+        coefficients=np.array([0.15432897, 0.53532814]),
     )
 
 
@@ -84,7 +77,7 @@ def sample_wavefunction(sample_atoms):
         num_basis=7,
         num_atomic_orbitals=7,
         num_primitives=14,
-        num_shells=5
+        num_shells=5,
     )
 
 
@@ -119,7 +112,7 @@ def numpy_rng(parallel_safe):
             assert len(data) == 10
     """
     # Use seed from parallel_safe fixture
-    seed = parallel_safe['seed']
+    seed = parallel_safe["seed"]
     return np.random.default_rng(seed=seed)
 
 
@@ -172,22 +165,23 @@ def parallel_safe():
     import os
 
     # Try to get pytest-xdist worker ID
-    worker_id = os.getenv('PYTEST_XDIST_WORKER', 'master')
+    worker_id = os.getenv("PYTEST_XDIST_WORKER", "master")
 
     # Create unique temp directory for this worker
-    temp_dir = tempfile.mkdtemp(prefix=f'pymultiwfn_test_{worker_id}_')
+    temp_dir = tempfile.mkdtemp(prefix=f"pymultiwfn_test_{worker_id}_")
 
     # Generate unique random seed based on worker ID and process ID
-    seed = hash(f'{worker_id}_{os.getpid()}') % (2**32)
+    seed = hash(f"{worker_id}_{os.getpid()}") % (2**32)
 
     yield {
-        'worker_id': worker_id,
-        'temp_dir': temp_dir,
-        'seed': seed,
+        "worker_id": worker_id,
+        "temp_dir": temp_dir,
+        "seed": seed,
     }
 
     # Cleanup temp directory
     import shutil
+
     try:
         shutil.rmtree(temp_dir)
     except Exception:
@@ -219,10 +213,7 @@ def isolated_environment():
     import gc
 
     # Get all modules to reload (before test)
-    modules_to_reload = [
-        name for name in sys.modules
-        if name.startswith('pymultiwfn')
-    ]
+    modules_to_reload = [name for name in sys.modules if name.startswith("pymultiwfn")]
 
     # Force garbage collection before test
     gc.collect()
@@ -239,7 +230,7 @@ def isolated_environment():
             if module is not None:
                 # Clear module attributes to reset state
                 for attr in list(vars(module)):
-                    if not attr.startswith('__'):
+                    if not attr.startswith("__"):
                         try:
                             delattr(module, attr)
                         except (AttributeError, TypeError):
@@ -298,9 +289,12 @@ def assert_allclose_tolerance():
             # Use strict tolerance
             assert_allclose_tolerance(a, b, rtol=1e-10, atol=1e-12)
     """
+
     def _assert_allclose(actual, desired, rtol=1e-7, atol=1e-9, err_msg=""):
         """Wrapper around numpy.allclose with default tolerances."""
-        np.testing.assert_allclose(actual, desired, rtol=rtol, atol=atol, err_msg=err_msg)
+        np.testing.assert_allclose(
+            actual, desired, rtol=rtol, atol=atol, err_msg=err_msg
+        )
 
     return _assert_allclose
 

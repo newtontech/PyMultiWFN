@@ -6,13 +6,14 @@
 from pymultiwfn.io.parsers.wfn import WFNLoader
 import os
 
+
 def test_h2_ccsd():
     """测试 H2_CCSD.wfn 文件"""
     print("=" * 60)
     print("测试 H2_CCSD.wfn")
     print("=" * 60)
 
-    wfn_file = 'consistency_verifier/examples/H2_CCSD.wfn'
+    wfn_file = "consistency_verifier/examples/H2_CCSD.wfn"
 
     if not os.path.exists(wfn_file):
         print(f"错误: 文件 {wfn_file} 不存在")
@@ -34,8 +35,10 @@ def test_h2_ccsd():
     # 打印原子信息
     print(f"\n原子信息:")
     for i, atom in enumerate(wfn.atoms):
-        print(f"  原子 {i+1}: {atom.element} (核电荷={atom.charge:.1f}) "
-              f"坐标=({atom.x:.6f}, {atom.y:.6f}, {atom.z:.6f})")
+        print(
+            f"  原子 {i+1}: {atom.element} (核电荷={atom.charge:.1f}) "
+            f"坐标=({atom.x:.6f}, {atom.y:.6f}, {atom.z:.6f})"
+        )
 
     # 计算总核电荷
     total_nuclear_charge = sum(atom.charge for atom in wfn.atoms)
@@ -51,6 +54,7 @@ def test_h2_ccsd():
         print(f"\n❌ 电子数验证失败: {wfn.num_electrons} != {expected_electrons}")
         return False
 
+
 def test_other_wfn_files():
     """测试其他 WFN 文件"""
     print("\n" + "=" * 60)
@@ -58,9 +62,9 @@ def test_other_wfn_files():
     print("=" * 60)
 
     test_files = [
-        'consistency_verifier/examples/COBH3_CCSD.wfn',
-        'consistency_verifier/examples/ethane.wfn',
-        'consistency_verifier/examples/benzene.wfn',
+        "consistency_verifier/examples/COBH3_CCSD.wfn",
+        "consistency_verifier/examples/ethane.wfn",
+        "consistency_verifier/examples/benzene.wfn",
     ]
 
     for wfn_file in test_files:
@@ -85,7 +89,8 @@ def test_other_wfn_files():
         except Exception as e:
             print(f"\n{wfn_file}: ❌ 加载失败: {e}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     success = test_h2_ccsd()
     test_other_wfn_files()
 

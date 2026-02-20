@@ -32,7 +32,7 @@ def calc_density(
     coords: np.ndarray,
     use_cache: bool = True,
     parallel: bool = False,
-    chunk_size: int = 1000
+    chunk_size: int = 1000,
 ) -> np.ndarray:
     """
     Calculates the electron density at given coordinates.
@@ -60,9 +60,7 @@ def calc_density(
     # Alpha / Total Density
     if wfn.coefficients is not None and wfn.occupations is not None:
         P_alpha = _make_density_matrix(
-            wfn.coefficients,
-            wfn.occupations,
-            use_cache=use_cache
+            wfn.coefficients, wfn.occupations, use_cache=use_cache
         )
         rho += _contract_density(phi, P_alpha)
 
@@ -70,9 +68,7 @@ def calc_density(
     if wfn.is_unrestricted and wfn.coefficients_beta is not None:
         if wfn.occupations_beta is not None:
             P_beta = _make_density_matrix(
-                wfn.coefficients_beta,
-                wfn.occupations_beta,
-                use_cache=use_cache
+                wfn.coefficients_beta, wfn.occupations_beta, use_cache=use_cache
             )
             rho += _contract_density(phi, P_beta)
         else:
@@ -83,9 +79,7 @@ def calc_density(
 
 
 def _make_density_matrix(
-    coeffs: np.ndarray,
-    occs: np.ndarray,
-    use_cache: bool = True
+    coeffs: np.ndarray, occs: np.ndarray, use_cache: bool = True
 ) -> np.ndarray:
     """
     Constructs density matrix P from MO coefficients and occupations.
@@ -115,7 +109,7 @@ def _make_density_matrix(
 
     # Use einsum for better numerical stability
     # P_mu_nu = sum_i n_i C_i_mu C_i_nu
-    P = np.einsum('i,ij,ik->jk', n_occ, C_occ, C_occ, optimize=True)
+    P = np.einsum("i,ij,ik->jk", n_occ, C_occ, C_occ, optimize=True)
 
     # Cache the result
     if use_cache:
@@ -157,7 +151,7 @@ def clear_density_cache() -> None:
 def get_cache_stats() -> dict:
     """Get statistics about the density matrix cache."""
     return {
-        'cache_size': len(_density_matrix_cache),
-        'max_size': _cache_max_size,
-        'cache_keys': list(_density_matrix_cache.keys())
+        "cache_size": len(_density_matrix_cache),
+        "max_size": _cache_max_size,
+        "cache_keys": list(_density_matrix_cache.keys()),
     }

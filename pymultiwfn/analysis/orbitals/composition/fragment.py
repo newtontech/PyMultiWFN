@@ -41,14 +41,17 @@ class FragmentAnalyzer:
             if not (0 <= idx < len(self.wfn.atoms)):
                 raise IndexError(f"Atom index {idx} out of range")
 
-        self.fragments.append({
-            'name': name,
-            'atom_indices': atom_indices,
-            'basis_indices': self._get_fragment_basis_indices(atom_indices)
-        })
+        self.fragments.append(
+            {
+                "name": name,
+                "atom_indices": atom_indices,
+                "basis_indices": self._get_fragment_basis_indices(atom_indices),
+            }
+        )
 
-    def calculate_fragment_compositions(self, method: str = 'mulliken',
-                                      is_beta: bool = False) -> Dict[str, np.ndarray]:
+    def calculate_fragment_compositions(
+        self, method: str = "mulliken", is_beta: bool = False
+    ) -> Dict[str, np.ndarray]:
         """
         Calculate fragment compositions for all molecular orbitals.
 
@@ -77,21 +80,27 @@ class FragmentAnalyzer:
         fragment_contributions = np.zeros((n_mos, n_fragments))
 
         # Calculate contributions based on method
-        if method == 'mulliken':
-            fragment_contributions = self._calculate_mulliken_fragment_compositions(coefficients)
-        elif method == 'scpa':
-            fragment_contributions = self._calculate_scpa_fragment_compositions(coefficients)
+        if method == "mulliken":
+            fragment_contributions = self._calculate_mulliken_fragment_compositions(
+                coefficients
+            )
+        elif method == "scpa":
+            fragment_contributions = self._calculate_scpa_fragment_compositions(
+                coefficients
+            )
         else:
             raise ValueError(f"Unsupported method: {method}")
 
         # Create result dictionary
         results = {}
         for i, fragment in enumerate(self.fragments):
-            results[fragment['name']] = fragment_contributions[:, i]
+            results[fragment["name"]] = fragment_contributions[:, i]
 
         return results
 
-    def _calculate_mulliken_fragment_compositions(self, coefficients: np.ndarray) -> np.ndarray:
+    def _calculate_mulliken_fragment_compositions(
+        self, coefficients: np.ndarray
+    ) -> np.ndarray:
         """Calculate fragment compositions using Mulliken method."""
         if self.wfn.overlap_matrix is None:
             raise ValueError("Overlap matrix required for Mulliken analysis")
@@ -110,13 +119,15 @@ class FragmentAnalyzer:
             for frag_idx, fragment in enumerate(self.fragments):
                 # Sum contributions from basis functions in this fragment
                 frag_contribution = 0.0
-                for basis_idx in fragment['basis_indices']:
+                for basis_idx in fragment["basis_indices"]:
                     frag_contribution += basis_contributions[basis_idx]
                 fragment_contributions[i, frag_idx] = frag_contribution
 
         return fragment_contributions
 
-    def _calculate_scpa_fragment_compositions(self, coefficients: np.ndarray) -> np.ndarray:
+    def _calculate_scpa_fragment_compositions(
+        self, coefficients: np.ndarray
+    ) -> np.ndarray:
         """Calculate fragment compositions using SCPA method."""
         n_mos, n_basis = coefficients.shape
         n_fragments = len(self.fragments)
@@ -134,7 +145,7 @@ class FragmentAnalyzer:
                 for frag_idx, fragment in enumerate(self.fragments):
                     # Sum contributions from basis functions in this fragment
                     frag_contribution = 0.0
-                    for basis_idx in fragment['basis_indices']:
+                    for basis_idx in fragment["basis_indices"]:
                         frag_contribution += basis_contributions[basis_idx]
                     fragment_contributions[i, frag_idx] = frag_contribution
 
@@ -164,10 +175,10 @@ class FragmentAnalyzer:
         """Get information about defined fragments."""
         return [
             {
-                'name': frag['name'],
-                'atom_indices': frag['atom_indices'],
-                'n_atoms': len(frag['atom_indices']),
-                'n_basis_functions': len(frag['basis_indices'])
+                "name": frag["name"],
+                "atom_indices": frag["atom_indices"],
+                "n_atoms": len(frag["atom_indices"]),
+                "n_basis_functions": len(frag["basis_indices"]),
             }
             for frag in self.fragments
         ]

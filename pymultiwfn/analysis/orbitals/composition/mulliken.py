@@ -29,7 +29,9 @@ class MullikenAnalyzer:
         if self.wfn.coefficients is None:
             raise ValueError("MO coefficients are required for Mulliken analysis")
 
-    def calculate_orbital_composition(self, mo_idx: int, is_beta: bool = False) -> Dict[str, np.ndarray]:
+    def calculate_orbital_composition(
+        self, mo_idx: int, is_beta: bool = False
+    ) -> Dict[str, np.ndarray]:
         """
         Calculate Mulliken composition for a specific molecular orbital.
 
@@ -68,12 +70,14 @@ class MullikenAnalyzer:
         shell_contributions = self._sum_to_shells(basis_contributions)
 
         return {
-            'basis_contributions': basis_contributions,
-            'atom_contributions': atom_contributions,
-            'shell_contributions': shell_contributions
+            "basis_contributions": basis_contributions,
+            "atom_contributions": atom_contributions,
+            "shell_contributions": shell_contributions,
         }
 
-    def calculate_all_orbital_compositions(self, is_beta: bool = False) -> Dict[str, np.ndarray]:
+    def calculate_all_orbital_compositions(
+        self, is_beta: bool = False
+    ) -> Dict[str, np.ndarray]:
         """
         Calculate Mulliken compositions for all molecular orbitals.
 
@@ -116,9 +120,9 @@ class MullikenAnalyzer:
             shell_contributions[i, :] = self._sum_to_shells(basis_contributions[i, :])
 
         return {
-            'basis_contributions': basis_contributions,
-            'atom_contributions': atom_contributions,
-            'shell_contributions': shell_contributions
+            "basis_contributions": basis_contributions,
+            "atom_contributions": atom_contributions,
+            "shell_contributions": shell_contributions,
         }
 
     def _sum_to_atoms(self, basis_contributions: np.ndarray) -> np.ndarray:
@@ -131,7 +135,7 @@ class MullikenAnalyzer:
             for shell in atom.basis_functions:
                 n_functions = shell.get_n_functions()
                 atom_contributions[atom_idx] += np.sum(
-                    basis_contributions[basis_idx:basis_idx + n_functions]
+                    basis_contributions[basis_idx : basis_idx + n_functions]
                 )
                 basis_idx += n_functions
 
@@ -152,7 +156,7 @@ class MullikenAnalyzer:
                 n_functions = shell.get_n_functions()
                 shell_idx = shell_type_map[shell_type]
                 shell_contributions[shell_idx] += np.sum(
-                    basis_contributions[basis_idx:basis_idx + n_functions]
+                    basis_contributions[basis_idx : basis_idx + n_functions]
                 )
                 basis_idx += n_functions
 

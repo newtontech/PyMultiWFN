@@ -50,6 +50,13 @@ except ImportError:
     PQRLoader = None
 
 __all__ = [
-    "FchkLoader", "MoldenLoader", "WFNLoader", "WFXLoader",
-    "XYZLoader", "CubeLoader", "CP2KLoader", "PDBLoader", "PQRLoader"
+    "FchkLoader",
+    "MoldenLoader",
+    "WFNLoader",
+    "WFXLoader",
+    "XYZLoader",
+    "CubeLoader",
+    "CP2KLoader",
+    "PDBLoader",
+    "PQRLoader",
 ]

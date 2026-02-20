@@ -34,7 +34,9 @@ class FileManager:
         self.supported_formats = get_supported_formats()
         self.loaded_files: Dict[str, Wavefunction] = {}  # Cache for loaded files
 
-    def load_wavefunction(self, file_path: str, use_cache: bool = True, **kwargs) -> Wavefunction:
+    def load_wavefunction(
+        self, file_path: str, use_cache: bool = True, **kwargs
+    ) -> Wavefunction:
         """
         Load wavefunction data from a specified file path.
 
@@ -73,15 +75,23 @@ class FileManager:
                 self.loaded_files[file_path] = wavefunction
 
             if self.verbose:
-                print(f"Successfully loaded wavefunction: {wavefunction.num_atoms} atoms, "
-                      f"{wavefunction.num_basis} basis functions")
+                print(
+                    f"Successfully loaded wavefunction: {wavefunction.num_atoms} atoms, "
+                    f"{wavefunction.num_basis} basis functions"
+                )
 
             return wavefunction
 
         except Exception as e:
             raise ValueError(f"Failed to load wavefunction from {file_path}: {str(e)}")
 
-    def save_wavefunction(self, wavefunction: Wavefunction, file_path: str, format_hint: Optional[str] = None, **kwargs):
+    def save_wavefunction(
+        self,
+        wavefunction: Wavefunction,
+        file_path: str,
+        format_hint: Optional[str] = None,
+        **kwargs,
+    ):
         """
         Save wavefunction data to a specified file path.
 
@@ -111,14 +121,16 @@ class FileManager:
             raise ValueError(f"Cannot determine output format for {file_path}")
 
         # Dispatch to appropriate writer
-        if output_format in ['fchk', 'fch']:
+        if output_format in ["fchk", "fch"]:
             self._save_fchk(wavefunction, file_path, **kwargs)
-        elif output_format in ['molden', 'molf']:
+        elif output_format in ["molden", "molf"]:
             self._save_molden(wavefunction, file_path, **kwargs)
-        elif output_format in ['wfn', 'wfx']:
+        elif output_format in ["wfn", "wfx"]:
             self._save_wfn(wavefunction, file_path, **kwargs)
         else:
-            raise NotImplementedError(f"Output format '{output_format}' is not yet supported")
+            raise NotImplementedError(
+                f"Output format '{output_format}' is not yet supported"
+            )
 
         if self.verbose:
             print(f"Successfully saved wavefunction to {file_path}")
@@ -180,7 +192,7 @@ class FileManager:
             "exists": True,
             "readable": os.access(file_path, os.R_OK),
             "format": None,
-            "description": None
+            "description": None,
         }
 
         # Determine format
@@ -191,9 +203,10 @@ class FileManager:
             # Try to auto-detect
             try:
                 from pymultiwfn.io import _auto_detect_format
+
                 loader = _auto_detect_format(file_path)
                 if loader:
-                    info["format"] = type(loader).__name__.replace('Loader', '').lower()
+                    info["format"] = type(loader).__name__.replace("Loader", "").lower()
                     info["description"] = "Auto-detected format"
                 else:
                     info["format"] = "unknown"

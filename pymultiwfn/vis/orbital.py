@@ -35,7 +35,9 @@ class OrbitalVisualizer:
         """Set the wavefunction for orbital visualization"""
         self.wavefunction = wavefunction
 
-    def generate_grid(self, n_points: int = 50, padding: float = 3.0) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def generate_grid(
+        self, n_points: int = 50, padding: float = 3.0
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Generate a 3D grid for visualization
 
@@ -61,12 +63,14 @@ class OrbitalVisualizer:
         y = np.linspace(min_coords[1], max_coords[1], n_points)
         z = np.linspace(min_coords[2], max_coords[2], n_points)
 
-        X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
+        X, Y, Z = np.meshgrid(x, y, z, indexing="ij")
 
-        self.grid_data = {'X': X, 'Y': Y, 'Z': Z, 'coords': (x, y, z)}
+        self.grid_data = {"X": X, "Y": Y, "Z": Z, "coords": (x, y, z)}
         return X, Y, Z
 
-    def evaluate_orbital(self, orbital_index: int, grid_points: Optional[np.ndarray] = None) -> np.ndarray:
+    def evaluate_orbital(
+        self, orbital_index: int, grid_points: Optional[np.ndarray] = None
+    ) -> np.ndarray:
         """
         Evaluate orbital on a grid
 
@@ -86,9 +90,14 @@ class OrbitalVisualizer:
         if grid_points is None:
             if self.grid_data is None:
                 self.generate_grid()
-            grid_points = np.stack([self.grid_data['X'].flatten(),
-                                   self.grid_data['Y'].flatten(),
-                                   self.grid_data['Z'].flatten()], axis=1)
+            grid_points = np.stack(
+                [
+                    self.grid_data["X"].flatten(),
+                    self.grid_data["Y"].flatten(),
+                    self.grid_data["Z"].flatten(),
+                ],
+                axis=1,
+            )
 
         # Get orbital coefficients
         orbital_coeffs = self.wavefunction.mo_coeffs[:, orbital_index]
@@ -105,9 +114,11 @@ class OrbitalVisualizer:
                 basis_values = self._evaluate_basis_function(i, grid_points)
                 orbital_values += orbital_coeffs[i] * basis_values
 
-        return orbital_values.reshape(self.grid_data['X'].shape)
+        return orbital_values.reshape(self.grid_data["X"].shape)
 
-    def _evaluate_basis_function(self, basis_index: int, grid_points: np.ndarray) -> np.ndarray:
+    def _evaluate_basis_function(
+        self, basis_index: int, grid_points: np.ndarray
+    ) -> np.ndarray:
         """
         Evaluate a single basis function on grid points
 
@@ -135,7 +146,9 @@ class OrbitalVisualizer:
 
         return values
 
-    def create_isosurface_plotly(self, orbital_index: int, isovalue: Optional[float] = None) -> go.Figure:
+    def create_isosurface_plotly(
+        self, orbital_index: int, isovalue: Optional[float] = None
+    ) -> go.Figure:
         """
         Create a 3D isosurface plot using plotly
 
@@ -157,36 +170,39 @@ class OrbitalVisualizer:
         orbital_data = self.evaluate_orbital(orbital_index)
 
         # Create isosurface using plotly
-        fig = go.Figure(data=go.Isosurface(
-            x=self.grid_data['X'].flatten(),
-            y=self.grid_data['Y'].flatten(),
-            z=self.grid_data['Z'].flatten(),
-            value=orbital_data.flatten(),
-            isomin=-isovalue,
-            isomax=isovalue,
-            surface_count=2,
-            colorscale='RdBu',
-            cmin=-isovalue,
-            cmax=isovalue,
-            opacity=0.7,
-            colorbar=dict(title="Orbital Value")
-        ))
+        fig = go.Figure(
+            data=go.Isosurface(
+                x=self.grid_data["X"].flatten(),
+                y=self.grid_data["Y"].flatten(),
+                z=self.grid_data["Z"].flatten(),
+                value=orbital_data.flatten(),
+                isomin=-isovalue,
+                isomax=isovalue,
+                surface_count=2,
+                colorscale="RdBu",
+                cmin=-isovalue,
+                cmax=isovalue,
+                opacity=0.7,
+                colorbar=dict(title="Orbital Value"),
+            )
+        )
 
         fig.update_layout(
-            title=f'Molecular Orbital {orbital_index + 1} (Isovalue = ±{isovalue})',
+            title=f"Molecular Orbital {orbital_index + 1} (Isovalue = ±{isovalue})",
             scene=dict(
-                xaxis_title='X (Å)',
-                yaxis_title='Y (Å)',
-                zaxis_title='Z (Å)',
-                aspectmode='cube'
+                xaxis_title="X (Å)",
+                yaxis_title="Y (Å)",
+                zaxis_title="Z (Å)",
+                aspectmode="cube",
             ),
-            margin=dict(l=0, r=0, b=0, t=40)
+            margin=dict(l=0, r=0, b=0, t=40),
         )
 
         return fig
 
-    def create_contour_plot(self, orbital_index: int, plane: str = 'xy',
-                          z_value: Optional[float] = None) -> plt.Figure:
+    def create_contour_plot(
+        self, orbital_index: int, plane: str = "xy", z_value: Optional[float] = None
+    ) -> plt.Figure:
         """
         Create a 2D contour plot of an orbital
 
@@ -211,29 +227,31 @@ class OrbitalVisualizer:
 
         if z_value is None:
             # Use center of mass as default
-            z_value = coords[:, 2].mean() if plane == 'xy' else \
-                     coords[:, 1].mean() if plane == 'xz' else \
-                     coords[:, 0].mean()
+            z_value = (
+                coords[:, 2].mean()
+                if plane == "xy"
+                else coords[:, 1].mean() if plane == "xz" else coords[:, 0].mean()
+            )
 
         # Extract 2D slice
-        if plane == 'xy':
-            z_idx = np.argmin(np.abs(self.grid_data['coords'][2] - z_value))
+        if plane == "xy":
+            z_idx = np.argmin(np.abs(self.grid_data["coords"][2] - z_value))
             data_2d = orbital_data[:, :, z_idx]
-            x_vals = self.grid_data['coords'][0]
-            y_vals = self.grid_data['coords'][1]
-            xlabel, ylabel = 'X (Å)', 'Y (Å)'
-        elif plane == 'xz':
-            y_idx = np.argmin(np.abs(self.grid_data['coords'][1] - z_value))
+            x_vals = self.grid_data["coords"][0]
+            y_vals = self.grid_data["coords"][1]
+            xlabel, ylabel = "X (Å)", "Y (Å)"
+        elif plane == "xz":
+            y_idx = np.argmin(np.abs(self.grid_data["coords"][1] - z_value))
             data_2d = orbital_data[:, y_idx, :]
-            x_vals = self.grid_data['coords'][0]
-            y_vals = self.grid_data['coords'][2]
-            xlabel, ylabel = 'X (Å)', 'Z (Å)'
+            x_vals = self.grid_data["coords"][0]
+            y_vals = self.grid_data["coords"][2]
+            xlabel, ylabel = "X (Å)", "Z (Å)"
         else:  # yz
-            x_idx = np.argmin(np.abs(self.grid_data['coords'][0] - z_value))
+            x_idx = np.argmin(np.abs(self.grid_data["coords"][0] - z_value))
             data_2d = orbital_data[x_idx, :, :]
-            x_vals = self.grid_data['coords'][1]
-            y_vals = self.grid_data['coords'][2]
-            xlabel, ylabel = 'Y (Å)', 'Z (Å)'
+            x_vals = self.grid_data["coords"][1]
+            y_vals = self.grid_data["coords"][2]
+            xlabel, ylabel = "Y (Å)", "Z (Å)"
 
         # Create contour plot
         fig, ax = plt.subplots(figsize=(10, 8))
@@ -242,35 +260,51 @@ class OrbitalVisualizer:
         max_val = np.abs(data_2d).max()
         levels = np.linspace(-max_val, max_val, 20)
 
-        contour = ax.contourf(x_vals, y_vals, data_2d, levels=levels, cmap='RdBu_r')
-        ax.contour(x_vals, y_vals, data_2d, levels=levels, colors='black', linewidths=0.5, alpha=0.3)
+        contour = ax.contourf(x_vals, y_vals, data_2d, levels=levels, cmap="RdBu_r")
+        ax.contour(
+            x_vals,
+            y_vals,
+            data_2d,
+            levels=levels,
+            colors="black",
+            linewidths=0.5,
+            alpha=0.3,
+        )
 
         # Add colorbar
         cbar = plt.colorbar(contour, ax=ax)
-        cbar.set_label('Orbital Value')
+        cbar.set_label("Orbital Value")
 
         # Add atom positions if in plane
         tolerance = 0.5  # Angstroms
-        if plane == 'xy':
+        if plane == "xy":
             for atom in atoms:
                 if abs(atom.z - z_value) < tolerance:
-                    ax.plot(atom.x, atom.y, 'ko', markersize=8)
-                    ax.text(atom.x, atom.y + 0.3, atom.element, ha='center', fontsize=10)
-        elif plane == 'xz':
+                    ax.plot(atom.x, atom.y, "ko", markersize=8)
+                    ax.text(
+                        atom.x, atom.y + 0.3, atom.element, ha="center", fontsize=10
+                    )
+        elif plane == "xz":
             for atom in atoms:
                 if abs(atom.y - z_value) < tolerance:
-                    ax.plot(atom.x, atom.z, 'ko', markersize=8)
-                    ax.text(atom.x, atom.z + 0.3, atom.element, ha='center', fontsize=10)
+                    ax.plot(atom.x, atom.z, "ko", markersize=8)
+                    ax.text(
+                        atom.x, atom.z + 0.3, atom.element, ha="center", fontsize=10
+                    )
         else:  # yz
             for atom in atoms:
                 if abs(atom.x - z_value) < tolerance:
-                    ax.plot(atom.y, atom.z, 'ko', markersize=8)
-                    ax.text(atom.y, atom.z + 0.3, atom.element, ha='center', fontsize=10)
+                    ax.plot(atom.y, atom.z, "ko", markersize=8)
+                    ax.text(
+                        atom.y, atom.z + 0.3, atom.element, ha="center", fontsize=10
+                    )
 
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        ax.set_title(f'Molecular Orbital {orbital_index + 1} - {plane.upper()} Plane (z = {z_value:.2f} Å)')
-        ax.set_aspect('equal')
+        ax.set_title(
+            f"Molecular Orbital {orbital_index + 1} - {plane.upper()} Plane (z = {z_value:.2f} Å)"
+        )
+        ax.set_aspect("equal")
 
         return fig
 
@@ -288,7 +322,7 @@ class OrbitalVisualizer:
 
         # Get orbital energies and occupations
         energies = self.wavefunction.mo_energies
-        occupations = getattr(self.wavefunction, 'mo_occupations', None)
+        occupations = getattr(self.wavefunction, "mo_occupations", None)
 
         n_orbitals = len(energies)
         n_electrons = 0
@@ -307,13 +341,17 @@ class OrbitalVisualizer:
 
         # Plot orbital energies
         for i in range(n_orbitals):
-            occupation = occupations[i] if occupations is not None else (2 if i < n_electrons else 0)
+            occupation = (
+                occupations[i]
+                if occupations is not None
+                else (2 if i < n_electrons else 0)
+            )
 
             if occupation > 0:
-                color = 'blue'
+                color = "blue"
                 linewidth = 2
             else:
-                color = 'red'
+                color = "red"
                 linewidth = 1
 
             # Draw energy level
@@ -323,23 +361,25 @@ class OrbitalVisualizer:
             if occupation > 0:
                 n_electrons_orbital = int(occupation)
                 for j in range(n_electrons_orbital):
-                    x_offset = (j - n_electrons_orbital/2 + 0.25) * 0.15
-                    ax.plot(i + x_offset, energies[i], 'ko', markersize=4)
+                    x_offset = (j - n_electrons_orbital / 2 + 0.25) * 0.15
+                    ax.plot(i + x_offset, energies[i], "ko", markersize=4)
 
             # Highlight HOMO and LUMO
             if i == homo_idx:
-                ax.text(i + 0.5, energies[i], 'HOMO', fontsize=8, va='center')
+                ax.text(i + 0.5, energies[i], "HOMO", fontsize=8, va="center")
             elif i == lumo_idx:
-                ax.text(i + 0.5, energies[i], 'LUMO', fontsize=8, va='center')
+                ax.text(i + 0.5, energies[i], "LUMO", fontsize=8, va="center")
 
-        ax.set_xlabel('Orbital Index')
-        ax.set_ylabel('Energy (Hartree)')
-        ax.set_title('Molecular Orbital Energy Diagram')
+        ax.set_xlabel("Orbital Index")
+        ax.set_ylabel("Energy (Hartree)")
+        ax.set_title("Molecular Orbital Energy Diagram")
         ax.grid(True, alpha=0.3)
 
         # Set reasonable limits
         energy_range = energies.max() - energies.min()
-        ax.set_ylim(energies.min() - 0.1 * energy_range, energies.max() + 0.1 * energy_range)
+        ax.set_ylim(
+            energies.min() - 0.1 * energy_range, energies.max() + 0.1 * energy_range
+        )
 
         return fig
 
@@ -397,11 +437,13 @@ class OrbitalVisualizer:
             end_idx = min((i + 1) * basis_per_atom, n_basis)
             atom_coeffs = orbital_coeffs[start_idx:end_idx]
             contribution = np.sum(atom_coeffs**2)
-            contributions[atom.element] = contributions.get(atom.element, 0) + contribution
+            contributions[atom.element] = (
+                contributions.get(atom.element, 0) + contribution
+            )
 
         # Normalize
         total = sum(contributions.values())
         if total > 0:
-            contributions = {elem: val/total for elem, val in contributions.items()}
+            contributions = {elem: val / total for elem, val in contributions.items()}
 
         return contributions
