@@ -1023,10 +1023,15 @@ class TestChargeValidation:
         ])
         wf.energies = np.array([-0.5, 0.5])
 
-        # Adjust occupations
-        n_alpha = int(np.ceil(wf.num_electrons / 2))
-        n_beta = int(wf.num_electrons / 2)
-        wf.occupations = np.array([2.0] * n_alpha + [0.0] * (2 - n_alpha))
+        # Adjust occupations for restricted calculation
+        # Fill orbitals from lowest energy, each orbital can hold up to 2 electrons
+        remaining_electrons = wf.num_electrons
+        occupations = []
+        for i in range(2):
+            occ = min(2.0, remaining_electrons)
+            occupations.append(occ)
+            remaining_electrons -= occ
+        wf.occupations = np.array(occupations)
 
         wf.calculate_density_matrices()
         wf.calculate_overlap_matrix()

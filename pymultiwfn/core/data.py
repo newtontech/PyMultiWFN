@@ -130,8 +130,14 @@ class Wavefunction:
                 self.occupations[occupied_alpha_indices] = 1.0 # Occupation of 1 for alpha
             else: # Restricted
                 sorted_indices = np.argsort(self.energies)
-                occupied_alpha_indices = sorted_indices[:int(self.num_electrons / 2)] # For restricted, alpha and beta share MOs
-                self.occupations[occupied_alpha_indices] = 2.0 # Occupation of 2 for restricted
+                # Fill orbitals from lowest energy, each orbital can hold up to 2 electrons
+                remaining_electrons = self.num_electrons
+                for idx in sorted_indices:
+                    occ = min(2.0, remaining_electrons)
+                    self.occupations[idx] = occ
+                    remaining_electrons -= occ
+                    if remaining_electrons <= 0:
+                        break
 
         # For beta orbitals (only if unrestricted)
         if self.is_unrestricted and self.coefficients_beta is not None and self.energies_beta is not None:
