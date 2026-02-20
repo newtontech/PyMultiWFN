@@ -59,14 +59,14 @@ class ParserFactory:
         ".gms": GMSLoader,
         ".dat": GMSLoader,  # GAMESS files
         ".mop": MOPACLoader,
-        ".inp": ORCALoader,  # ORCA input
+        ".inp": ORCALoader,  # ORCA input (also CP2K, but ORCA is more common)
         ".out": ORCALoader,  # ORCA output
         # Grid data formats
         ".cube": CubeLoader,
         ".cub": CubeLoader,
         ".dx": DXLoader,
         # Program-specific formats
-        ".inp": CP2KLoader,
+        ".cp2k": CP2KLoader,  # Use .cp2k extension for CP2K input
         ".restart": CP2KLoader,
         ".coord": TurbomoleLoader,  # Turbomole coordinate files
         "poscar": VASPLoader,

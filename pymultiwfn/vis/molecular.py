@@ -222,13 +222,20 @@ class MolecularVisualizer:
                 r2 = np.array([atoms[j].x, atoms[j].y, atoms[j].z])
                 distance = np.linalg.norm(r1 - r2)
 
-                # Get covalent radii sum for bond criterion
-                elem1, elem2 = atoms[i].element, atoms[j].element
-                r_cov1 = self.vdw_radii.get(elem1, 1.5)
-                r_cov2 = self.vdw_radii.get(elem2, 1.5)
+        bonds = []  # Initialize bonds list
 
-                if distance < self.bond_threshold * (r_cov1 + r_cov2):
-                    bonds.append((i, j))
+        # Calculate distance
+        r1 = np.array([atoms[i].x, atoms[i].y, atoms[i].z])
+        r2 = np.array([atoms[j].x, atoms[j].y, atoms[j].z])
+        distance = np.linalg.norm(r1 - r2)
+
+        # Get covalent radii sum for bond criterion
+        elem1, elem2 = atoms[i].element, atoms[j].element
+        r_cov1 = self.vdw_radii.get(elem1, 1.5)
+        r_cov2 = self.vdw_radii.get(elem2, 1.5)
+
+        if distance < self.bond_threshold * (r_cov1 + r_cov2):
+            bonds.append((i, j))
 
         return bonds
 
