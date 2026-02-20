@@ -9,7 +9,6 @@ current_wfn = None
 
 
 def main():
-    global current_wfn
     parser = argparse.ArgumentParser(
         description="PyMultiWFN: A Python refactoring of Multiwfn"
     )
@@ -58,7 +57,6 @@ def process_file(filepath):
 
 
 def show_detailed_info():
-    global current_wfn
     if current_wfn is None:
         print("No wavefunction loaded.")
         return

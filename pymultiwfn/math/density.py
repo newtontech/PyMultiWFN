@@ -142,7 +142,6 @@ def _contract_density(phi: np.ndarray, P: np.ndarray) -> np.ndarray:
 
 def clear_density_cache() -> None:
     """Clear the density matrix cache."""
-    global _density_matrix_cache
     _density_matrix_cache.clear()
 
 
