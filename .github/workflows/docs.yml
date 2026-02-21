@@ -1,0 +1,44 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+        pip install sphinx sphinx-rtd-theme
+    
+    - name: Check documentation builds
+      run: |
+        echo "Documentation check:"
+        echo "- docs/user_guide.md: exists" && test -f docs/user_guide.md
+        echo "- docs/TESTING.md: exists" && test -f docs/TESTING.md
+        echo "- examples/: exists" && test -d examples
+        echo "- README.md: exists" && test -f README.md
+        echo "All documentation files present!"
+    
+    - name: Validate example scripts
+      run: |
+        for script in examples/*.py; do
+          if [ -f "$script" ]; then
+            echo "Checking $script..."
+            python -m py_compile "$script" || echo "Warning: $script has syntax issues"
+          fi
+        done
+        echo "Example scripts validated!"

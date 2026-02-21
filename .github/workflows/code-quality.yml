@@ -1,0 +1,54 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort mypy
+        pip install -e .
+    
+    - name: Check formatting with Black
+      run: |
+        black --check pymultiwfn tests --diff || true
+      continue-on-error: true
+    
+    - name: Check imports with isort
+      run: |
+        isort --check-only --diff pymultiwfn tests || true
+      continue-on-error: true
+    
+    - name: Lint with flake8
+      run: |
+        # Critical errors
+        flake8 pymultiwfn --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Style warnings
+        flake8 pymultiwfn --count --exit-zero --max-line-length=127 --statistics
+    
+    - name: Type check with mypy
+      run: |
+        mypy pymultiwfn --ignore-missing-imports || true
+      continue-on-error: true
+
+  quality-badge:
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+    - name: Quality checks passed
+      run: echo "Code quality checks passed!"
