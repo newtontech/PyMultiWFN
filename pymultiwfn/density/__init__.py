@@ -6,6 +6,7 @@ This module provides tools for electron density analysis including:
 - Laplacian analysis
 - ELF (Electron Localization Function)
 - LOL (Localized Orbital Locator)
+- RDG (Reduced Density Gradient)
 - Density topology
 
 Reference: PHASE2_TASKS.md - Module 2.2: Electron Density Analysis
@@ -15,5 +16,6 @@ from .topology import CriticalPointAnalyzer
 from .laplacian import LaplacianAnalyzer
 from .elf import ELFAnalyzer
 from .lol import LOLAnalyzer
+from .rdg import RDGAnalyzer
 
-__all__ = ['CriticalPointAnalyzer', 'LaplacianAnalyzer', 'ELFAnalyzer', 'LOLAnalyzer']
+__all__ = ['CriticalPointAnalyzer', 'LaplacianAnalyzer', 'ELFAnalyzer', 'LOLAnalyzer', 'RDGAnalyzer']
