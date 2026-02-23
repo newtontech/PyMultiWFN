@@ -405,6 +405,119 @@ class OrbitalsAnalyzer:
         # Placeholder - symmetry analysis requires molecular point group
         return None
     
+    def get_orbital_overlap(self, mo_i: int, mo_j: int) -> float:
+        """
+        Calculate overlap between two molecular orbitals.
+        
+        The orbital overlap is calculated as:
+        S_ij = C_i^T * S * C_j
+        where S is the AO overlap matrix and C are MO coefficients.
+        
+        For normalized orbitals, S_ii = 1.0 (self-overlap).
+        
+        Args:
+            mo_i: Zero-based index of first molecular orbital
+            mo_j: Zero-based index of second molecular orbital
+            
+        Returns:
+            Orbital overlap value (typically in range [-1, 1])
+            
+        Raises:
+            ValueError: If MO indices are negative
+            IndexError: If MO indices are out of range
+        """
+        # Validate input
+        if mo_i < 0 or mo_j < 0:
+            raise ValueError(f"MO indices must be non-negative, got ({mo_i}, {mo_j})")
+        
+        n_mo = len(self.alpha_energies)
+        if mo_i >= n_mo or mo_j >= n_mo:
+            raise IndexError(f"MO index out of range (0-{n_mo-1})")
+        
+        # Get MO coefficients
+        if self.wfn.coefficients is None:
+            raise ValueError("Wavefunction must have MO coefficients")
+        
+        # Get or calculate AO overlap matrix
+        if self.wfn.overlap_matrix is not None:
+            S_ao = self.wfn.overlap_matrix
+        else:
+            # Calculate overlap matrix
+            S_ao = self.wfn.calculate_overlap_matrix()
+        
+        C_i = self.wfn.coefficients[mo_i, :]
+        C_j = self.wfn.coefficients[mo_j, :]
+        
+        # Calculate MO overlap: S_ij = C_i^T * S_ao * C_j
+        overlap = float(C_i @ S_ao @ C_j)
+        
+        return overlap
+    
+    def get_overlap_matrix(self, mo_indices: list) -> np.ndarray:
+        """
+        Generate overlap matrix for a subset of molecular orbitals.
+        
+        Args:
+            mo_indices: List of MO indices to include in the matrix
+            
+        Returns:
+            Symmetric overlap matrix where S[i,j] = overlap(MO_i, MO_j)
+            Diagonal elements are 1.0 for normalized orbitals.
+            
+        Example:
+            >>> S = analyzer.get_overlap_matrix([0, 1, 2])
+            >>> print(S.shape)  # (3, 3)
+        """
+        n = len(mo_indices)
+        overlap_matrix = np.eye(n)  # Start with identity (self-overlap = 1)
+        
+        # Fill off-diagonal elements
+        for i, mo_i in enumerate(mo_indices):
+            for j, mo_j in enumerate(mo_indices):
+                if i != j:
+                    overlap_matrix[i, j] = self.get_orbital_overlap(mo_i, mo_j)
+        
+        return overlap_matrix
+    
+    def get_bonding_character(self, mo_i: int, mo_j: int) -> str:
+        """
+        Determine bonding character of interaction between two orbitals.
+        
+        Args:
+            mo_i: Zero-based index of first molecular orbital
+            mo_j: Zero-based index of second molecular orbital
+            
+        Returns:
+            One of: 'bonding', 'antibonding', 'non-bonding', or 'mixed'
+        """
+        overlap = self.get_orbital_overlap(mo_i, mo_j)
+        
+        if abs(overlap) < 0.1:
+            return 'non-bonding'
+        elif overlap > 0.3:
+            return 'bonding'
+        elif overlap < -0.3:
+            return 'antibonding'
+        else:
+            return 'mixed'
+    
+    def get_interaction_strength(self, mo_i: int, mo_j: int) -> float:
+        """
+        Calculate orbital interaction strength (absolute overlap).
+        
+        Interaction strength is defined as |S_ij|, representing the
+        magnitude of orbital coupling regardless of phase.
+        
+        Args:
+            mo_i: Zero-based index of first molecular orbital
+            mo_j: Zero-based index of second molecular orbital
+            
+        Returns:
+            Interaction strength in range [0, 1]
+        """
+        overlap = self.get_orbital_overlap(mo_i, mo_j)
+        return abs(overlap)
+    
     def __repr__(self) -> str:
         """String representation of the analyzer."""
         return (
