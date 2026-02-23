@@ -211,6 +211,200 @@ class OrbitalsAnalyzer:
             'fermi_level': self.fermi_level
         }
     
+    def get_composition(self, mo_index: int) -> Dict[str, Dict[str, float]]:
+        """
+        Calculate AO contribution to a molecular orbital.
+        
+        Uses squared MO coefficients as a measure of AO contribution
+        (Mulliken population approach).
+        
+        Args:
+            mo_index: Zero-based index of the molecular orbital
+            
+        Returns:
+            Dictionary mapping atom labels to their orbital contributions:
+            {'C1': {'2s': 0.35, '2p_z': 0.45}, 'H1': {'1s': 0.20}}
+            
+        Raises:
+            IndexError: If mo_index is out of range
+            ValueError: If negative mo_index is provided
+        """
+        # Validate input
+        if mo_index < 0:
+            raise ValueError(f"MO index must be non-negative, got {mo_index}")
+        
+        n_mo = len(self.alpha_energies)
+        if mo_index >= n_mo:
+            raise IndexError(f"MO index {mo_index} out of range (0-{n_mo-1})")
+        
+        # Get MO coefficients
+        if self.wfn.coefficients is None:
+            raise ValueError("Wavefunction must have MO coefficients")
+        
+        coeffs = self.wfn.coefficients[mo_index, :]  # MO coefficients for this orbital
+        
+        # Calculate contributions (squared coefficients)
+        contributions = coeffs ** 2
+        
+        # Normalize to sum to 1.0
+        total = np.sum(contributions)
+        if total > 1e-10:
+            contributions = contributions / total
+        
+        # Get atomic basis indices mapping
+        atomic_basis = self.wfn.get_atomic_basis_indices()
+        
+        # Build composition by atom
+        composition = {}
+        
+        for atom_idx, basis_indices in atomic_basis.items():
+            atom = self.wfn.atoms[atom_idx]
+            atom_label = f"{atom.element}{atom_idx + 1}"
+            
+            # Sum contributions for this atom
+            atom_contrib = sum(contributions[i] for i in basis_indices if i < len(contributions))
+            
+            if atom_contrib > 1e-6:  # Only include significant contributions
+                composition[atom_label] = {}
+                
+                # Assign orbital types based on shell types for this atom
+                atom_shells = [s for s in self.wfn.shells if s.center_idx == atom_idx]
+                
+                # Map shell types to orbital labels (simplified)
+                for shell in atom_shells:
+                    shell_type = shell.type
+                    if shell_type == 0:  # S shell
+                        orb_type = 's'
+                    elif shell_type == 1:  # P shell
+                        orb_type = 'p'
+                    elif shell_type == 2:  # D shell
+                        orb_type = 'd'
+                    elif shell_type == 3:  # F shell
+                        orb_type = 'f'
+                    else:
+                        orb_type = f'type{shell_type}'
+                    
+                    # Distribute atom contribution among orbital types
+                    if orb_type not in composition[atom_label]:
+                        composition[atom_label][orb_type] = 0.0
+                
+                # Proportionally distribute atom contribution
+                n_types = len(composition[atom_label])
+                if n_types > 0:
+                    per_type = atom_contrib / n_types
+                    for orb_type in composition[atom_label]:
+                        composition[atom_label][orb_type] = per_type
+        
+        return composition
+    
+    def get_dominant_orbital_type(self, mo_index: int) -> str:
+        """
+        Identify the dominant orbital type for a molecular orbital.
+        
+        Args:
+            mo_index: Zero-based index of the molecular orbital
+            
+        Returns:
+            One of: 's', 'p', 'd', 'f', or 'mixed'
+        """
+        composition = self.get_composition(mo_index)
+        
+        # Sum contributions by orbital type
+        type_sums = {'s': 0.0, 'p': 0.0, 'd': 0.0, 'f': 0.0}
+        
+        for atom_contrib in composition.values():
+            for orb_type, contrib in atom_contrib.items():
+                if orb_type.startswith('s'):
+                    type_sums['s'] += contrib
+                elif orb_type.startswith('p'):
+                    type_sums['p'] += contrib
+                elif orb_type.startswith('d'):
+                    type_sums['d'] += contrib
+                elif orb_type.startswith('f'):
+                    type_sums['f'] += contrib
+        
+        # Find dominant type
+        max_type = max(type_sums, key=type_sums.get)
+        max_value = type_sums[max_type]
+        
+        # If dominant type has > 50% contribution, return it
+        if max_value > 0.5:
+            return max_type
+        else:
+            return 'mixed'
+    
+    def get_orbital_localization(self, mo_index: int) -> Dict[str, float]:
+        """
+        Calculate orbital localization on each atom.
+        
+        Args:
+            mo_index: Zero-based index of the molecular orbital
+            
+        Returns:
+            Dictionary mapping atom labels to their total contribution:
+            {'C1': 0.65, 'H1': 0.20, 'H2': 0.15}
+        """
+        composition = self.get_composition(mo_index)
+        
+        # Sum contributions for each atom
+        localization = {}
+        for atom_label, orb_contrib in composition.items():
+            localization[atom_label] = sum(orb_contrib.values())
+        
+        return localization
+    
+    def generate_composition_report(self, mo_index: int) -> str:
+        """
+        Generate a human-readable composition report for a molecular orbital.
+        
+        Args:
+            mo_index: Zero-based index of the molecular orbital
+            
+        Returns:
+            Formatted string report of orbital composition
+        """
+        composition = self.get_composition(mo_index)
+        localization = self.get_orbital_localization(mo_index)
+        dominant_type = self.get_dominant_orbital_type(mo_index)
+        energy = self.alpha_energies[mo_index]
+        
+        lines = [
+            f"MO #{mo_index} Composition Report",
+            "=" * 40,
+            f"Energy: {energy:.6f} Ha ({energy * 27.2114:.3f} eV)",
+            f"Dominant Type: {dominant_type.upper()}",
+            "",
+            "Atomic Contributions:",
+        ]
+        
+        # Sort atoms by contribution (descending)
+        sorted_atoms = sorted(localization.items(), key=lambda x: -x[1])
+        
+        for atom_label, atom_total in sorted_atoms:
+            lines.append(f"  {atom_label}: {atom_total*100:.2f}%")
+            orb_contrib = composition[atom_label]
+            sorted_orbs = sorted(orb_contrib.items(), key=lambda x: -x[1])
+            for orb_type, contrib in sorted_orbs:
+                if contrib > 0.01:  # Only show > 1% contributions
+                    lines.append(f"    {orb_type}: {contrib*100:.2f}%")
+        
+        return "\n".join(lines)
+    
+    def get_orbital_symmetry(self, mo_index: int) -> Optional[str]:
+        """
+        Get orbital symmetry label (if available).
+        
+        Note: This is a placeholder for future symmetry analysis.
+        
+        Args:
+            mo_index: Zero-based index of the molecular orbital
+            
+        Returns:
+            Symmetry label or None if not available
+        """
+        # Placeholder - symmetry analysis requires molecular point group
+        return None
+    
     def __repr__(self) -> str:
         """String representation of the analyzer."""
         return (
