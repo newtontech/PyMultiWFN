@@ -6,11 +6,13 @@ This module provides tools for analyzing molecular orbital properties including:
 - Orbital compositions
 - Orbital overlap analysis
 - Natural Bond Orbital (NBO) analysis
+- Orbital localization (Boys, Pipek-Mezey)
 
 Reference: PHASE2_TASKS.md - Module 2.1: Orbital Analysis
 """
 
 from .energies import OrbitalsAnalyzer
 from .nbo import NBOAnalyzer
+from .localization import LocalizationAnalyzer
 
-__all__ = ['OrbitalsAnalyzer', 'NBOAnalyzer']
+__all__ = ['OrbitalsAnalyzer', 'NBOAnalyzer', 'LocalizationAnalyzer']
