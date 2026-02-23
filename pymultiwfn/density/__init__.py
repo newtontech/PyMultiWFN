@@ -10,5 +10,6 @@ Reference: PHASE2_TASKS.md - Module 2.2: Electron Density Analysis
 """
 
 from .topology import CriticalPointAnalyzer
+from .laplacian import LaplacianAnalyzer
 
-__all__ = ['CriticalPointAnalyzer']
+__all__ = ['CriticalPointAnalyzer', 'LaplacianAnalyzer']
