@@ -5,10 +5,12 @@ This module provides tools for analyzing molecular orbital properties including:
 - Orbital energies and HOMO-LUMO gaps
 - Orbital compositions
 - Orbital overlap analysis
+- Natural Bond Orbital (NBO) analysis
 
 Reference: PHASE2_TASKS.md - Module 2.1: Orbital Analysis
 """
 
 from .energies import OrbitalsAnalyzer
+from .nbo import NBOAnalyzer
 
-__all__ = ['OrbitalsAnalyzer']
+__all__ = ['OrbitalsAnalyzer', 'NBOAnalyzer']
