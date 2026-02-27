@@ -7,6 +7,13 @@
 
 ---
 
+## References
+
+**参考实现**: [szczypinski-group/pyMultiwfn](https://github.com/szczypinski-group/pyMultiwfn)  
+本项目在开发过程中参考了 szczypinski-group/pyMultiwfn 的实现方法和架构设计，特此致谢。
+
+---
+
 ## Overview
 
 Phase 3 focuses on **advanced bonding analysis** capabilities, building upon the electronic structure foundation from Phase 2. This phase will implement sophisticated bond analysis methods, aromaticity indices, and inter-molecular interaction analysis.

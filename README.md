@@ -139,7 +139,10 @@ If you use PyMultiWFN in your research, please cite:
 
 Based on the original [Multiwfn](http://sobereva.com/multiwfn/) program by Tian Lu.
 
+**Additional References:**
+- [szczypinski-group/pyMultiwfn](https://github.com/szczypinski-group/pyMultiwfn) - Reference implementation for wavefunction analysis algorithms
+
 ---
 
 **Maintained by**: PyMultiWFN Team  
-**Last Updated**: 2026-02-21
+**Last Updated**: 2026-02-27
