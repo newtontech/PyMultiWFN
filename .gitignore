@@ -98,3 +98,20 @@ consistency_verifier/examples/*.exe
 
 # Docs test files
 docs/test/
+
+# Development summaries (archived)
+docs/summaries/hourly/*
+!docs/summaries/hourly/.gitkeep
+docs/summaries/daily/*
+!docs/summaries/daily/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
