@@ -47,7 +47,7 @@ class Bonding:
             self.wfn = wfn
             
         self.atoms = self.wfn.atoms
-        self.natoms = self.wfn.natoms
+        self.natoms = len(self.atoms)
         self._fuzzy_atoms = None
         self._fuzzy_matrix = None
         
@@ -63,15 +63,14 @@ class Bonding:
         fuzzy_atoms = []
         for i, atom in enumerate(self.atoms):
             # Convert coordinates from Bohr to Angstrom if needed
-            coords = atom.coordinates
-            if hasattr(coords, 'units') and coords.units == 'bohr':
-                coords = coords * 0.529177  # Bohr to Angstrom
+            # Atom has x, y, z attributes
+            coords = np.array([atom.x, atom.y, atom.z], dtype=np.float64) * 0.529177  # Bohr to Angstrom
                 
             fa = FuzzyAtom(
                 atom_index=i,
-                element=atom.symbol,
+                element=atom.element,
                 coordinates=coords,
-                vdwa_radius=self._get_vdw_radius(atom.symbol),
+                vdwa_radius=self._get_vdw_radius(atom.element),
                 fuzzy_factor=0.5
             )
             fuzzy_atoms.append(fa)
@@ -93,24 +92,167 @@ class Bonding:
             Fuzzy bond order value
             
         Raises:
-            ValueError: If atom indices are invalid
+            ValueError: If atom indices are invalid or wavefunction data is missing
         """
         if not (0 <= atom_i < self.natoms and 0 <= atom_j < self.natoms):
             raise ValueError(f"Atom indices must be in range [0, {self.natoms})")
         if atom_i == atom_j:
             raise ValueError("Atom indices must be different")
             
-        return fuzzy_bond_order(self.fuzzy_atoms[atom_i], 
-                                self.fuzzy_atoms[atom_j])
+        # Get density and overlap matrices from wavefunction
+        if self.wfn.Ptot is None:
+            raise ValueError("Density matrix (Ptot) not available in wavefunction")
+        if self.wfn.overlap_matrix is None:
+            raise ValueError("Overlap matrix not available in wavefunction")
+        if self.wfn.shells is None or len(self.wfn.shells) == 0:
+            raise ValueError("Shell information not available in wavefunction")
+            
+        return fuzzy_bond_order(
+            density_matrix=self.wfn.Ptot,
+            overlap_matrix=self.wfn.overlap_matrix,
+            shells=self.wfn.shells,
+            atom_i=atom_i,
+            atom_j=atom_j,
+            fuzzy_factor=0.5
+        )
     
     def get_fuzzy_bond_order_matrix(self) -> np.ndarray:
         """Calculate fuzzy bond order matrix for all atom pairs.
         
         Returns:
             NxN matrix of fuzzy bond orders
+            
+        Raises:
+            ValueError: If wavefunction data is missing
         """
         if self._fuzzy_matrix is None:
+            # Get density and overlap matrices from wavefunction
+            if self.wfn.Ptot is None:
+                raise ValueError("Density matrix (Ptot) not available in wavefunction")
+            if self.wfn.overlap_matrix is None:
+                raise ValueError("Overlap matrix not available in wavefunction")
+            if self.wfn.shells is None or len(self.wfn.shells) == 0:
+                raise ValueError("Shell information not available in wavefunction")
+                
             self._fuzzy_matrix = calculate_fuzzy_bond_order_matrix(
-                self.fuzzy_atoms
+                density_matrix=self.wfn.Ptot,
+                overlap_matrix=self.wfn.overlap_matrix,
+                shells=self.wfn.shells,
+                fuzzy_factor=0.5
             )
         return self._fuzzy_matrix
+    
+    @property
+    def vdwa_radii(self) -> List[float]:
+        """Get van der Waals radii for all atoms."""
+        return [self._get_vdw_radius(atom.element) for atom in self.atoms]
+    
+    @property
+    def fuzzy_factor(self) -> float:
+        """Get fuzzy partition factor."""
+        return 0.5
+
+
+    def get_intrinsic_bond_order(self, atom_i: int, atom_j: int,
+                                  polarity_correction: bool = True) -> float:
+        """Calculate intrinsic bond order between two atoms.
+
+        The intrinsic bond order is based on the Wiberg bond order approach,
+        with optional polarity correction for polar bonds.
+
+        Args:
+            atom_i: Index of first atom (0-based)
+            atom_j: Index of second atom (0-based)
+            polarity_correction: Whether to apply polarity correction (default True)
+
+        Returns:
+            Intrinsic bond order value
+
+        Raises:
+            ValueError: If atom indices are invalid or wavefunction data is missing
+        """
+        if not (0 <= atom_i < self.natoms and 0 <= atom_j < self.natoms):
+            raise ValueError(f"Atom indices must be in range [0, {self.natoms})")
+        if atom_i == atom_j:
+            raise ValueError("Atom indices must be different")
+
+        # Get density and overlap matrices from wavefunction
+        if self.wfn.Ptot is None:
+            raise ValueError("Density matrix (Ptot) not available in wavefunction")
+        if self.wfn.overlap_matrix is None:
+            raise ValueError("Overlap matrix not available in wavefunction")
+        if self.wfn.shells is None or len(self.wfn.shells) == 0:
+            raise ValueError("Shell information not available in wavefunction")
+
+        from .intrinsic import intrinsic_bond_order
+        return intrinsic_bond_order(
+            density_matrix=self.wfn.Ptot,
+            overlap_matrix=self.wfn.overlap_matrix,
+            shells=self.wfn.shells,
+            atom_i=atom_i,
+            atom_j=atom_j,
+            polarity_correction=polarity_correction
+        )
+
+    def get_intrinsic_bond_order_matrix(self,
+                                         polarity_correction: bool = True) -> np.ndarray:
+        """Calculate intrinsic bond order matrix for all atom pairs.
+
+        Args:
+            polarity_correction: Whether to apply polarity correction (default True)
+
+        Returns:
+            NxN matrix of intrinsic bond orders
+
+        Raises:
+            ValueError: If wavefunction data is missing
+        """
+        if self.wfn.Ptot is None:
+            raise ValueError("Density matrix (Ptot) not available in wavefunction")
+        if self.wfn.overlap_matrix is None:
+            raise ValueError("Overlap matrix not available in wavefunction")
+        if self.wfn.shells is None or len(self.wfn.shells) == 0:
+            raise ValueError("Shell information not available in wavefunction")
+
+        from .intrinsic import calculate_intrinsic_bond_order_matrix
+        return calculate_intrinsic_bond_order_matrix(
+            density_matrix=self.wfn.Ptot,
+            overlap_matrix=self.wfn.overlap_matrix,
+            shells=self.wfn.shells,
+            polarity_correction=polarity_correction
+        )
+
+    def get_wiberg_bond_order(self, atom_i: int, atom_j: int) -> float:
+        """Calculate Wiberg bond order between two atoms.
+
+        Args:
+            atom_i: Index of first atom (0-based)
+            atom_j: Index of second atom (0-based)
+
+        Returns:
+            Wiberg bond order value
+
+        Raises:
+            ValueError: If atom indices are invalid or wavefunction data is missing
+        """
+        if not (0 <= atom_i < self.natoms and 0 <= atom_j < self.natoms):
+            raise ValueError(f"Atom indices must be in range [0, {self.natoms})")
+        if atom_i == atom_j:
+            raise ValueError("Atom indices must be different")
+
+        # Get density and overlap matrices from wavefunction
+        if self.wfn.Ptot is None:
+            raise ValueError("Density matrix (Ptot) not available in wavefunction")
+        if self.wfn.overlap_matrix is None:
+            raise ValueError("Overlap matrix not available in wavefunction")
+        if self.wfn.shells is None or len(self.wfn.shells) == 0:
+            raise ValueError("Shell information not available in wavefunction")
+
+        from .intrinsic import wiberg_bond_order
+        return wiberg_bond_order(
+            density_matrix=self.wfn.Ptot,
+            overlap_matrix=self.wfn.overlap_matrix,
+            shells=self.wfn.shells,
+            atom_i=atom_i,
+            atom_j=atom_j
+        )
