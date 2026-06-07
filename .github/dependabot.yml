@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    exclude-paths:
+      - "consistency_verifier/**"
+
+  - package-ecosystem: "pip"
+    directory: "/consistency_verifier"
+    schedule:
+      interval: "weekly"
