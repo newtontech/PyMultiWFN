@@ -1614,3 +1614,16 @@ TYPE_TO_IZ = np.array(
 ORB_TYPE_NAME = {0: "Alpha&Beta", 1: "Alpha", 2: "Beta"}
 
 ORB_TYPE_NAME_SHORT = {0: "A+B", 1: " A ", 2: " B "}
+
+ELEMENT_SYMBOL_TO_Z = {
+    symbol.strip().upper(): atomic_number
+    for atomic_number, symbol in enumerate(ELEMENT_NAMES)
+    if atomic_number > 0 and symbol.strip() and symbol.strip() != "??"
+}
+
+
+def get_atomic_number(symbol: str, default: int = 0) -> int:
+    """Return atomic number for an element symbol using one canonical table."""
+    if not symbol:
+        return default
+    return ELEMENT_SYMBOL_TO_Z.get(symbol.strip().upper(), default)

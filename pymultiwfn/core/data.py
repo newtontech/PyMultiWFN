@@ -3,9 +3,13 @@ Core data structures for PyMultiWFN.
 Defines Atom, BasisSet, and Wavefunction classes.
 """
 
+import logging
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
+
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -257,9 +261,11 @@ class Wavefunction:
             # Verify that total basis functions match
             total_bfs_assigned = sum(len(bfs) for bfs in atom_to_bfs.values())
             if total_bfs_assigned != self.num_basis:
-                print(
-                    f"Warning: Mismatch in total basis functions assigned ({total_bfs_assigned}) "
-                    f"vs expected ({self.num_basis}). This may indicate a parsing issue."
+                logger.warning(
+                    "Mismatch in total basis functions assigned (%s) vs expected (%s). "
+                    "This may indicate a parsing issue.",
+                    total_bfs_assigned,
+                    self.num_basis,
                 )
 
             return atom_to_bfs
@@ -293,10 +299,12 @@ class Wavefunction:
             if total_bfs_assigned != self.num_basis:
                 # This can happen if FCHK has basis functions not assigned to an atom, or issue in parsing.
                 # For now, just a warning.
-                print(
-                    f"Warning: Mismatch in total basis functions assigned ({total_bfs_assigned}) "
-                    f"vs expected ({self.num_basis}). This may indicate a parsing issue or "
-                    f"basis functions not associated with a specific atom (e.g., ghost atoms)."
+                logger.warning(
+                    "Mismatch in total basis functions assigned (%s) vs expected (%s). "
+                    "This may indicate a parsing issue or basis functions not associated "
+                    "with a specific atom (e.g., ghost atoms).",
+                    total_bfs_assigned,
+                    self.num_basis,
                 )
 
             return atom_to_bfs

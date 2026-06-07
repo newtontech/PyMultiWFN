@@ -6,11 +6,17 @@ This enhanced parser provides comprehensive error handling, validation,
 and supports various WFN format variants from different quantum chemistry programs.
 """
 
+import logging
 import re
-import numpy as np
 import warnings
-from typing import List, Dict, Any
-from pymultiwfn.core.data import Wavefunction, Shell
+from typing import Any, Dict, List
+
+import numpy as np
+
+from pymultiwfn.core.data import Shell, Wavefunction
+from pymultiwfn.core.definitions import get_atomic_number
+
+logger = logging.getLogger(__name__)
 
 
 class WFNLoader:
@@ -226,46 +232,7 @@ class WFNLoader:
 
     def _get_atomic_number(self, element_symbol: str) -> int:
         """Get atomic number from element symbol."""
-        symbol_to_number = {
-            "H": 1,
-            "He": 2,
-            "Li": 3,
-            "Be": 4,
-            "B": 5,
-            "C": 6,
-            "N": 7,
-            "O": 8,
-            "F": 9,
-            "Ne": 10,
-            "Na": 11,
-            "Mg": 12,
-            "Al": 13,
-            "Si": 14,
-            "P": 15,
-            "S": 16,
-            "Cl": 17,
-            "Ar": 18,
-            "K": 19,
-            "Ca": 20,
-            "Sc": 21,
-            "Ti": 22,
-            "V": 23,
-            "Cr": 24,
-            "Mn": 25,
-            "Fe": 26,
-            "Co": 27,
-            "Ni": 28,
-            "Cu": 29,
-            "Zn": 30,
-            "Ga": 31,
-            "Ge": 32,
-            "As": 33,
-            "Se": 34,
-            "Br": 35,
-            "Kr": 36,
-            # Add more as needed
-        }
-        return symbol_to_number.get(element_symbol.capitalize(), 0)
+        return get_atomic_number(element_symbol)
 
     def _parse_mo_coefficients_wfn(self):
         """
@@ -483,22 +450,21 @@ class WFNLoader:
             {}
         )  # Key: (atom_idx, shell_type), Value: list of (exponent, bf_idx)
 
-        # Debug: Print first 20 type_assignments and centre_assignments
-        print(f"[DEBUG] Basis function information (first 20 of {num_basis}):")
-        print(f"[DEBUG] Index | Centre | WFN Type | GTO Type | Exponent")
+        logger.debug("Basis function information (first 20 of %s):", num_basis)
+        logger.debug("Index | Centre | WFN Type | GTO Type | Exponent")
         for i in range(min(20, num_basis)):
             atom_idx = centre_assignments[i]
             shell_type = type_assignments[i]
             exp_val = exponents[i] if i < len(exponents) else "N/A"
-            print(
-                f"[DEBUG] {i:5d} | {atom_idx:6d} | {shell_type:8d} | {'?':7s} | {exp_val}"
+            logger.debug(
+                "%5d | %6d | %8d | %7s | %s", i, atom_idx, shell_type, "?", exp_val
             )
 
         # Count WFN types
         wfn_type_counts = {}
         for shell_type in type_assignments:
             wfn_type_counts[shell_type] = wfn_type_counts.get(shell_type, 0) + 1
-        print(f"[DEBUG] WFN type counts: {dict(sorted(wfn_type_counts.items()))}")
+        logger.debug("WFN type counts: %s", dict(sorted(wfn_type_counts.items())))
 
         for i in range(num_basis):
             atom_idx = centre_assignments[i]
@@ -574,8 +540,9 @@ class WFNLoader:
         if self.wfn.num_basis > 0:
             # Use identity matrix for WFN format (orthonormal basis)
             self.wfn.overlap_matrix = np.eye(self.wfn.num_basis)
-            print(
-                f"[DEBUG] Using identity overlap matrix for WFN format: shape={self.wfn.overlap_matrix.shape}"
+            logger.debug(
+                "Using identity overlap matrix for WFN format: shape=%s",
+                self.wfn.overlap_matrix.shape,
             )
 
             # Note: We're NOT normalizing the basis functions because the identity
@@ -753,7 +720,7 @@ class WFNLoader:
         if self.wfn.coefficients is None:
             return
 
-        print(f"[DEBUG] Normalizing {len(self.wfn.coefficients)} MO coefficients...")
+        logger.debug("Normalizing %s MO coefficients...", len(self.wfn.coefficients))
 
         # Normalize each MO coefficient vector
         for i in range(len(self.wfn.coefficients)):
@@ -770,7 +737,7 @@ class WFNLoader:
                     RuntimeWarning,
                 )
 
-        print(f"[DEBUG] MO coefficients normalized")
+        logger.debug("MO coefficients normalized")
 
     def _extract_wfn_basis_functions(self) -> List[dict]:
         """

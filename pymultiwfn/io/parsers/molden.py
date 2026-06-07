@@ -7,11 +7,13 @@ Molden format variants from different quantum chemistry programs.
 """
 
 import re
-import numpy as np
 import warnings
-from typing import List, Dict, Any
-from pymultiwfn.core.data import Wavefunction, Shell
-from pymultiwfn.core.definitions import ELEMENT_NAMES
+from typing import Any, Dict, List
+
+import numpy as np
+
+from pymultiwfn.core.data import Shell, Wavefunction
+from pymultiwfn.core.definitions import ELEMENT_NAMES, get_atomic_number
 
 
 class MoldenLoader:
@@ -178,46 +180,7 @@ class MoldenLoader:
 
     def _get_atomic_number(self, element_symbol: str) -> int:
         """Get atomic number from element symbol."""
-        symbol_to_number = {
-            "H": 1,
-            "HE": 2,
-            "LI": 3,
-            "BE": 4,
-            "B": 5,
-            "C": 6,
-            "N": 7,
-            "O": 8,
-            "F": 9,
-            "NE": 10,
-            "NA": 11,
-            "MG": 12,
-            "AL": 13,
-            "SI": 14,
-            "P": 15,
-            "S": 16,
-            "CL": 17,
-            "AR": 18,
-            "K": 19,
-            "CA": 20,
-            "SC": 21,
-            "TI": 22,
-            "V": 23,
-            "CR": 24,
-            "MN": 25,
-            "FE": 26,
-            "CO": 27,
-            "NI": 28,
-            "CU": 29,
-            "ZN": 30,
-            "GA": 31,
-            "GE": 32,
-            "AS": 33,
-            "SE": 34,
-            "BR": 35,
-            "KR": 36,
-            # Add more as needed
-        }
-        return symbol_to_number.get(element_symbol.upper(), 0)
+        return get_atomic_number(element_symbol)
 
     def _parse_basis(self):
         """Enhanced parsing of basis set information from [GTO] section."""

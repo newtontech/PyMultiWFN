@@ -12,12 +12,14 @@ This module implements fuzzy atomic space analysis methods including:
 Based on the original Multiwfn fuzzy.f90 Fortran implementation.
 """
 
-import numpy as np
-from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
 
-from pymultiwfn.core.data import Wavefunction
+import numpy as np
+
+from pymultiwfn.analysis.base import BaseWavefunctionAnalysis
 from pymultiwfn.core.constants import BOHR_TO_ANGSTROM
+from pymultiwfn.core.data import Wavefunction
 
 
 @dataclass
@@ -39,7 +41,7 @@ class FuzzyAnalysisConfig:
     )
 
 
-class FuzzyAtomsAnalyzer:
+class FuzzyAtomsAnalyzer(BaseWavefunctionAnalysis):
     """
     Main class for performing fuzzy atomic space analysis.
 
@@ -59,7 +61,7 @@ class FuzzyAtomsAnalyzer:
             wavefunction_data: Wavefunction data containing molecular information
             config: Configuration for the analysis
         """
-        self.wavefunction = wavefunction_data
+        super().__init__(wavefunction_data)
         self.config = config or FuzzyAnalysisConfig()
 
         # Initialize atomic radii for Becke partitioning
