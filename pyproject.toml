@@ -54,7 +54,7 @@ pymultiwfn = [
 [dependency-groups]
 dev = [
     "pytest>=9.0.3",
-    "pytest-cov>=5.0",
+    "pytest-cov>=7.1.0",
     "pytest-mock>=3.12",
     "pytest-xdist>=3.0",  # Parallel testing
     "pytest-timeout>=2.0",  # Test timeout
