@@ -22,12 +22,14 @@ A Python-first refactor of the Multiwfn wavefunction analysis program.
 
 ```bash
 # Clone the repository
-git clone https://github.com/pymultiwfn/pymultiwfn.git
-cd pymultiwfn
+git clone https://github.com/newtontech/PyMultiWFN.git
+cd PyMultiWFN
 
 # Install in development mode
 pip install -e .[dev]
 ```
+
+The current package is a Python-first refactor that keeps performance-sensitive numerical kernels explicit. When Fortran kernels are present under `pymultiwfn/math/fortran/`, treat them as implementation details behind Python APIs and keep equivalent Python tests for behavior.
 
 ## Quick Start
 
@@ -48,6 +50,24 @@ density = calc_density(wfn, coords)
 bond_orders = calculate_mayer_bond_order(wfn)
 print(bond_orders['total'])
 ```
+
+## Typical Workflows
+
+### 1. Inspect a wavefunction file
+
+```bash
+pymultiwfn --help
+```
+
+Use the CLI for smoke testing installation, then move to Python scripts for reproducible analysis.
+
+### 2. Density or orbital analysis
+
+Start from `examples/density_analysis.py`, replace the input wavefunction path, and save generated arrays or plots beside your experiment notes.
+
+### 3. Bond order comparison
+
+Use `examples/bond_analysis.py` to compare Mayer, Wiberg, or Mulliken-style outputs across molecules. Include the input file, method, and expected tolerance when adding tests.
 
 ## Documentation
 
@@ -128,6 +148,15 @@ If you use PyMultiWFN in your research, please cite:
 
 1. The original Multiwfn paper
 2. This repository
+
+```bibtex
+@software{pymultiwfn_newtontech,
+  title = {PyMultiWFN: Python-first wavefunction analysis tools},
+  author = {PyMultiWFN contributors},
+  year = {2026},
+  url = {https://github.com/newtontech/PyMultiWFN}
+}
+```
 
 ## Support
 
