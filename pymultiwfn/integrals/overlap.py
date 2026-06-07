@@ -21,13 +21,38 @@ Future enhancements:
 - Numba/Cython acceleration
 """
 
-import numpy as np
-from typing import Tuple, List, Dict
 from functools import lru_cache
+from typing import Dict, List, Tuple
+
+import numpy as np
+
 from ..core.data import Wavefunction
 
 # Cache for primitive overlap calculations
 _cache_max_size = 256
+
+GTO_TYPE_TO_LMN: Dict[int, Tuple[int, int, int]] = {
+    0: (0, 0, 0),  # S
+    1: (1, 0, 0),  # P_x
+    2: (0, 1, 0),  # P_y
+    3: (0, 0, 1),  # P_z
+    4: (2, 0, 0),  # D_xx
+    5: (0, 2, 0),  # D_yy
+    6: (0, 0, 2),  # D_zz
+    7: (1, 1, 0),  # D_xy
+    8: (1, 0, 1),  # D_xz
+    9: (0, 1, 1),  # D_yz
+    10: (3, 0, 0),  # F_xxx
+    11: (0, 3, 0),  # F_yyy
+    12: (0, 0, 3),  # F_zzz
+    13: (2, 1, 0),  # F_xxy
+    14: (2, 0, 1),  # F_xxz
+    15: (1, 2, 0),  # F_xyy
+    16: (0, 2, 1),  # F_yyz
+    17: (1, 0, 2),  # F_xzz
+    18: (0, 1, 2),  # F_yzz
+    19: (1, 1, 1),  # F_xyz
+}
 
 
 def calculate_overlap_matrix(
@@ -408,37 +433,10 @@ def _type_to_lmn(gto_type: int) -> Tuple[int, int, int]:
     Returns:
         Tuple (l, m, n) of angular momentum quantum numbers
     """
-    # S and P functions
-    if gto_type == 0:
-        return (0, 0, 0)
-    elif gto_type == 1:
-        return (1, 0, 0)
-    elif gto_type == 2:
-        return (0, 1, 0)
-    elif gto_type == 3:
-        return (0, 0, 1)
-
-    # D functions
-    elif gto_type == 4:
-        return (2, 0, 0)
-    elif gto_type == 5:
-        return (0, 2, 0)
-    elif gto_type == 6:
-        return (0, 0, 2)
-    elif gto_type == 7:
-        return (1, 1, 0)
-    elif gto_type == 8:
-        return (1, 0, 1)
-    elif gto_type == 9:
-        return (0, 1, 1)
-
-    # F functions (simplified for now)
-    elif 10 <= gto_type <= 19:
-        # This is a placeholder; implement properly if needed
-        return (0, 0, 0)
-
-    else:
-        raise NotImplementedError(f"GTO type {gto_type} not yet implemented")
+    try:
+        return GTO_TYPE_TO_LMN[gto_type]
+    except KeyError as exc:
+        raise NotImplementedError(f"GTO type {gto_type} not yet implemented") from exc
 
 
 def _obara_saika_S(

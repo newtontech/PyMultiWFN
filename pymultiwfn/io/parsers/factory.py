@@ -2,32 +2,37 @@
 Parser factory for automatically selecting the appropriate parser based on file extension.
 """
 
+import logging
 import os
-from typing import Optional, Dict, Type, List
+from typing import Dict, List, Optional, Type
+
 from pymultiwfn.core.data import Wavefunction
+
+from .cif import CIFLoader
+from .cp2k import CP2KLoader
+from .cube import CubeLoader
+from .dx import DXLoader
 
 # Import all parser classes
 from .fchk import FchkLoader
-from .molden import MoldenLoader
-from .wfn import WFNLoader
-from .wfx import WFXLoader
-from .mwfn import MWFNLoader
-from .xyz import XYZLoader
-from .pdb import PDBLoader
-from .cube import CubeLoader
 from .gjf import GJFLoader
-from .cp2k import CP2KLoader
+from .gms import GMSLoader
+from .gro import GROLoader
 from .mol import MOLLoader
 from .mol2 import MOL2Loader
-from .pqr import PQRLoader
-from .gro import GROLoader
-from .cif import CIFLoader
-from .gms import GMSLoader
+from .molden import MoldenLoader
 from .mopac import MOPACLoader
+from .mwfn import MWFNLoader
 from .orca import ORCALoader
+from .pdb import PDBLoader
+from .pqr import PQRLoader
 from .turbomole import TurbomoleLoader
 from .vasp import VASPLoader
-from .dx import DXLoader
+from .wfn import WFNLoader
+from .wfx import WFXLoader
+from .xyz import XYZLoader
+
+logger = logging.getLogger(__name__)
 
 
 class ParserFactory:
@@ -55,7 +60,6 @@ class ParserFactory:
         # Input file formats
         ".gjf": GJFLoader,
         ".com": GJFLoader,
-        ".gjf": GJFLoader,
         ".gms": GMSLoader,
         ".dat": GMSLoader,  # GAMESS files
         ".mop": MOPACLoader,
@@ -71,10 +75,6 @@ class ParserFactory:
         ".coord": TurbomoleLoader,  # Turbomole coordinate files
         "poscar": VASPLoader,
         "contcar": VASPLoader,
-        "chgc": VASPLoader,  # VASP charge density
-        "chg": VASPLoader,
-        "elfc": VASPLoader,  # VASP ELF
-        "locpot": VASPLoader,
     }
 
     @classmethod
@@ -179,8 +179,10 @@ class ParserFactory:
                     if second_line and len(second_line.split()) >= 4:
                         # Likely WFN format (NMO NPRIMITIVES NELECTRONS MULTIPLICITY)
                         return WFNLoader
-                except:
-                    pass
+                except (IndexError, ValueError) as exc:
+                    logger.debug(
+                        "WFN content detection failed for %s: %s", filename, exc
+                    )
 
             # Check for XYZ format
             if first_lines and first_lines[0].strip().isdigit():
@@ -201,8 +203,10 @@ class ParserFactory:
                     parts = first_lines[1].split()
                     if len(parts) >= 4:
                         return CubeLoader
-                except:
-                    pass
+                except (IndexError, ValueError) as exc:
+                    logger.debug(
+                        "Cube content detection failed for %s: %s", filename, exc
+                    )
 
             # Check for DX format
             if any(
@@ -237,8 +241,10 @@ class ParserFactory:
                         and counts_line[3:6].isdigit()
                     ):
                         return MOLLoader
-                except:
-                    pass
+                except (IndexError, ValueError) as exc:
+                    logger.debug(
+                        "MOL content detection failed for %s: %s", filename, exc
+                    )
 
             # Check for MOL2 format (@<TRIPOS>)
             if any("@<TRIPOS>" in line for line in first_lines):
@@ -258,12 +264,16 @@ class ParserFactory:
                     # Additional check for GRO format (residue format)
                     if len(first_lines) >= 3 and len(first_lines[2].split()) >= 5:
                         return GROLoader
-                except:
-                    pass
+                except (IndexError, ValueError) as exc:
+                    logger.debug(
+                        "GRO content detection failed for %s: %s", filename, exc
+                    )
 
-        except Exception:
+        except OSError:
             # If we can't read the file or parse content, return None
-            pass
+            logger.debug(
+                "Could not read parser content for %s", filename, exc_info=True
+            )
 
         return None
 

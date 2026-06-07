@@ -1,11 +1,12 @@
 """
 Parsers for VASP file formats.
-Includes POSCAR, CONTCAR, CHGCAR, CHG, ELFCAR, LOCPOT formats.
+Includes POSCAR and CONTCAR structure formats.
 """
 
-from pymultiwfn.core.data import Wavefunction
 import numpy as np
+
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
+from pymultiwfn.core.data import Wavefunction
 
 
 class VASPParser:
@@ -52,24 +53,6 @@ class POSCARLoader(VASPParser):
             # Full implementation would handle all POSCAR variants
 
         return self.wfn
-
-
-class CHGCARLoader(VASPParser):
-    """Parser for VASP CHGCAR files."""
-
-    def _parse(self) -> Wavefunction:
-        """Parse CHGCAR format."""
-        # TODO: Implement CHGCAR parsing for charge density
-        raise NotImplementedError("CHGCAR parser not yet implemented")
-
-
-class VASPGridLoader(VASPParser):
-    """Parser for VASP grid files (CHGCAR, CHG, ELFCAR, LOCPOT)."""
-
-    def _parse(self) -> Wavefunction:
-        """Parse VASP grid file format."""
-        # TODO: Implement VASP grid file parsing
-        raise NotImplementedError("VASP grid parser not yet implemented")
 
 
 # Convenience aliases

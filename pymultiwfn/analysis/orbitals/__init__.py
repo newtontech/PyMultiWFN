@@ -4,6 +4,7 @@ Module for analyzing molecular orbitals.
 
 import numpy as np
 
+from pymultiwfn.analysis.base import BaseWavefunctionAnalysis
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.math.basis import evaluate_basis
 
@@ -12,11 +13,14 @@ from pymultiwfn.math.basis import evaluate_basis
 # Import localization methods
 
 
-class OrbitalAnalyzer:
+class OrbitalAnalyzer(BaseWavefunctionAnalysis):
     def __init__(self, wavefunction: Wavefunction):
-        if wavefunction.coefficients is None:
+        super().__init__(wavefunction)
+
+    def validate_wavefunction(self) -> None:
+        super().validate_wavefunction()
+        if self.wfn.coefficients is None:
             raise ValueError("Wavefunction object must contain MO coefficients.")
-        self.wfn = wavefunction
 
     def get_orbital_properties(self, mo_idx: int, is_beta: bool = False) -> dict:
         """

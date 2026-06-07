@@ -8,9 +8,38 @@ This module implements various bond order analysis methods including:
 - Orbital occupancy-perturbed Mayer bond order
 """
 
+from typing import Dict, List, Optional, Tuple, Union
+
 import numpy as np
-from typing import Dict, List, Tuple, Optional, Union
+
 from ...core.data import Wavefunction
+
+
+def _iter_atom_basis_pairs(
+    atom_to_bfs: Dict[int, List[int]], n_atoms: int
+) -> List[Tuple[int, List[int], int, List[int]]]:
+    """Return atom basis-function pairs shared by bond-order algorithms."""
+    pairs = []
+    for i in range(n_atoms):
+        bfs_i = atom_to_bfs.get(i, [])
+        if not bfs_i:
+            continue
+
+        for j in range(i + 1, n_atoms):
+            bfs_j = atom_to_bfs.get(j, [])
+            if bfs_j:
+                pairs.append((i, bfs_i, j, bfs_j))
+    return pairs
+
+
+def _set_bond_order(matrix: np.ndarray, i: int, j: int, value: float) -> None:
+    matrix[i, j] = value
+    matrix[j, i] = value
+
+
+def _set_valence_diagonal(matrix: np.ndarray) -> None:
+    for i in range(matrix.shape[0]):
+        matrix[i, i] = np.sum(matrix[i, :])
 
 
 def calculate_mayer_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
@@ -41,6 +70,7 @@ def calculate_mayer_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
 
     n_atoms = wfn.num_atoms
     atom_to_bfs = wfn.get_atomic_basis_indices()
+    atom_pairs = _iter_atom_basis_pairs(atom_to_bfs, n_atoms)
 
     # Calculate P*S matrices
     PS_total = wfn.Ptot @ wfn.overlap_matrix
@@ -49,29 +79,17 @@ def calculate_mayer_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
     bnd_total = np.zeros((n_atoms, n_atoms))
 
     # Calculate total bond order using vectorized operations
-    for i in range(n_atoms):
-        bfs_i = atom_to_bfs.get(i, [])
-        if not bfs_i:
-            continue
+    for i, bfs_i, j, bfs_j in atom_pairs:
+        # Extract submatrices and compute bond order using vectorized operations
+        ps_ij = PS_total[np.ix_(bfs_i, bfs_j)]
+        ps_ji = PS_total[np.ix_(bfs_j, bfs_i)]
 
-        for j in range(i + 1, n_atoms):
-            bfs_j = atom_to_bfs.get(j, [])
-            if not bfs_j:
-                continue
-
-            # Extract submatrices and compute bond order using vectorized operations
-            ps_ij = PS_total[np.ix_(bfs_i, bfs_j)]
-            ps_ji = PS_total[np.ix_(bfs_j, bfs_i)]
-
-            # Mayer bond order formula: trace(ps_ij @ ps_ji)
-            # This is equivalent to sum_{a in A} sum_{b in B} (PS)_{ab} (PS)_{ba}
-            accum = np.trace(ps_ij @ ps_ji)
-            bnd_total[i, j] = accum
-            bnd_total[j, i] = accum  # Symmetric matrix
+        # Mayer bond order formula: trace(ps_ij @ ps_ji)
+        # This is equivalent to sum_{a in A} sum_{b in B} (PS)_{ab} (PS)_{ba}
+        _set_bond_order(bnd_total, i, j, np.trace(ps_ij @ ps_ji))
 
     # Set diagonal elements as sum of row elements (Mayer valence)
-    for i in range(n_atoms):
-        bnd_total[i, i] = np.sum(bnd_total[i, :])
+    _set_valence_diagonal(bnd_total)
 
     result = {"total": bnd_total}
 
@@ -88,38 +106,23 @@ def calculate_mayer_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
         bnd_alpha = np.zeros((n_atoms, n_atoms))
         bnd_beta = np.zeros((n_atoms, n_atoms))
 
-        for i in range(n_atoms):
-            bfs_i = atom_to_bfs.get(i, [])
-            if not bfs_i:
-                continue
+        for i, bfs_i, j, bfs_j in atom_pairs:
+            # Mayer bond order formula for alpha and beta
+            ps_alpha_ij = PS_alpha[np.ix_(bfs_i, bfs_j)]
+            ps_alpha_ji = PS_alpha[np.ix_(bfs_j, bfs_i)]
+            ps_beta_ij = PS_beta[np.ix_(bfs_i, bfs_j)]
+            ps_beta_ji = PS_beta[np.ix_(bfs_j, bfs_i)]
 
-            for j in range(i + 1, n_atoms):
-                bfs_j = atom_to_bfs.get(j, [])
-                if not bfs_j:
-                    continue
-
-                # Mayer bond order formula for alpha and beta
-                ps_alpha_ij = PS_alpha[np.ix_(bfs_i, bfs_j)]
-                ps_alpha_ji = PS_alpha[np.ix_(bfs_j, bfs_i)]
-                accum_alpha = np.trace(ps_alpha_ij @ ps_alpha_ji)
-
-                ps_beta_ij = PS_beta[np.ix_(bfs_i, bfs_j)]
-                ps_beta_ji = PS_beta[np.ix_(bfs_j, bfs_i)]
-                accum_beta = np.trace(ps_beta_ij @ ps_beta_ji)
-
-                bnd_alpha[i, j] = accum_alpha
-                bnd_alpha[j, i] = accum_alpha
-                bnd_beta[i, j] = accum_beta
-                bnd_beta[j, i] = accum_beta
+            _set_bond_order(bnd_alpha, i, j, np.trace(ps_alpha_ij @ ps_alpha_ji))
+            _set_bond_order(bnd_beta, i, j, np.trace(ps_beta_ij @ ps_beta_ji))
 
         # Scale by 2 for unrestricted (following Multiwfn convention)
         bnd_alpha = 2 * bnd_alpha
         bnd_beta = 2 * bnd_beta
 
         # Set diagonal elements
-        for i in range(n_atoms):
-            bnd_alpha[i, i] = np.sum(bnd_alpha[i, :])
-            bnd_beta[i, i] = np.sum(bnd_beta[i, :])
+        _set_valence_diagonal(bnd_alpha)
+        _set_valence_diagonal(bnd_beta)
 
         result["alpha"] = bnd_alpha
         result["beta"] = bnd_beta
@@ -152,6 +155,7 @@ def calculate_mulliken_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
 
     n_atoms = wfn.num_atoms
     atom_to_bfs = wfn.get_atomic_basis_indices()
+    atom_pairs = _iter_atom_basis_pairs(atom_to_bfs, n_atoms)
 
     # Initialize bond order matrices
     bnd_total = np.zeros((n_atoms, n_atoms))
@@ -169,26 +173,15 @@ def calculate_mulliken_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
             )
 
         # Calculate bond orders using vectorized operations
-        for i in range(n_atoms):
-            bfs_i = atom_to_bfs.get(i, [])
-            if not bfs_i:
-                continue
-
-            for j in range(i + 1, n_atoms):
-                bfs_j = atom_to_bfs.get(j, [])
-                if not bfs_j:
-                    continue
-
-                # Vectorized sum over basis function pairs
-                bnd_total[i, j] = np.sum(PS_total[np.ix_(bfs_i, bfs_j)])
-                bnd_total[j, i] = bnd_total[i, j]  # Symmetric matrix
+        for i, bfs_i, j, bfs_j in atom_pairs:
+            # Vectorized sum over basis function pairs
+            _set_bond_order(bnd_total, i, j, np.sum(PS_total[np.ix_(bfs_i, bfs_j)]))
 
         # Scale by 2 for closed-shell
         bnd_total = 2 * bnd_total
 
         # Set diagonal elements
-        for i in range(n_atoms):
-            bnd_total[i, i] = np.sum(bnd_total[i, :])
+        _set_valence_diagonal(bnd_total)
 
     else:
         # Unrestricted case
@@ -204,30 +197,18 @@ def calculate_mulliken_bond_order(wfn: Wavefunction) -> Dict[str, np.ndarray]:
         bnd_beta = np.zeros((n_atoms, n_atoms))
 
         # Calculate alpha and beta bond orders using vectorized operations
-        for i in range(n_atoms):
-            bfs_i = atom_to_bfs.get(i, [])
-            if not bfs_i:
-                continue
-
-            for j in range(i + 1, n_atoms):
-                bfs_j = atom_to_bfs.get(j, [])
-                if not bfs_j:
-                    continue
-
-                # Vectorized calculations for alpha and beta
-                bnd_alpha[i, j] = np.sum(PS_alpha[np.ix_(bfs_i, bfs_j)])
-                bnd_alpha[j, i] = bnd_alpha[i, j]
-                bnd_beta[i, j] = np.sum(PS_beta[np.ix_(bfs_i, bfs_j)])
-                bnd_beta[j, i] = bnd_beta[i, j]
+        for i, bfs_i, j, bfs_j in atom_pairs:
+            # Vectorized calculations for alpha and beta
+            _set_bond_order(bnd_alpha, i, j, np.sum(PS_alpha[np.ix_(bfs_i, bfs_j)]))
+            _set_bond_order(bnd_beta, i, j, np.sum(PS_beta[np.ix_(bfs_i, bfs_j)]))
 
         # Scale by 2 for unrestricted
         bnd_alpha = 2 * bnd_alpha
         bnd_beta = 2 * bnd_beta
 
         # Set diagonal elements
-        for i in range(n_atoms):
-            bnd_alpha[i, i] = np.sum(bnd_alpha[i, :])
-            bnd_beta[i, i] = np.sum(bnd_beta[i, :])
+        _set_valence_diagonal(bnd_alpha)
+        _set_valence_diagonal(bnd_beta)
 
         bnd_total = bnd_alpha + bnd_beta
 
