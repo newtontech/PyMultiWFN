@@ -70,52 +70,61 @@ class FuzzyAtom:
 def fuzzy_bond_order(
     density_matrix: np.ndarray,
     overlap_matrix: np.ndarray,
+    shells: list,
     atom_i: int,
     atom_j: int,
     fuzzy_factor: float = 0.5
 ) -> float:
     """Calculate fuzzy bond order between two atoms.
 
-    The fuzzy bond order is calculated using the formula:
-    FBO_ij = fuzzy_factor * (P * S)_{ij}
+    The fuzzy bond order is calculated by summing over all AOs on each atom:
+    FBO_ij = fuzzy_factor * sum_{mu in i, nu in j} 2 * P_{mu,nu} * S_{mu,nu}
 
-    where P is the density matrix and S is the overlap matrix.
+    where P is the density matrix, S is the overlap matrix, and the sum
+    is over all atomic orbitals (AOs) centered on atoms i and j.
 
     Args:
         density_matrix: Density matrix (AO basis)
         overlap_matrix: Overlap matrix (AO basis)
-        atom_i: Index of atom i (1-based)
-        atom_j: Index of atom j (1-based)
+        shells: List of Shell objects containing center_idx
+        atom_i: Index of atom i (0-based)
+        atom_j: Index of atom j (0-based)
         fuzzy_factor: Fuzzy partition factor (default 0.5)
 
     Returns:
         Fuzzy bond order value
 
     Raises:
-        IndexError: If atom indices are out of range
+        ValueError: If atom indices are invalid
     """
-    # Convert to 0-based indices
-    i_idx = atom_i - 1
-    j_idx = atom_j - 1
+    # Validate atom indices
+    if atom_i < 0 or atom_j < 0:
+        raise ValueError(f"Atom indices must be non-negative, got {atom_i}, {atom_j}")
+    if atom_i == atom_j:
+        raise ValueError("Atom indices must be different")
 
-    # Validate indices
-    n_basis = density_matrix.shape[0]
-    if i_idx < 0 or i_idx >= n_basis:
-        raise IndexError(f"Atom index {atom_i} out of range [1, {n_basis}]")
-    if j_idx < 0 or j_idx >= n_basis:
-        raise IndexError(f"Atom index {atom_j} out of range [1, {n_basis}]")
+    # Find AO indices for each atom
+    ao_indices_i = [idx for idx, shell in enumerate(shells) if shell.center_idx == atom_i]
+    ao_indices_j = [idx for idx, shell in enumerate(shells) if shell.center_idx == atom_j]
 
-    # Calculate bond order: FBO_ij = fuzzy_factor * (P * S)_{ij}
-    # Note: For multi-atom systems, we need to sum over AOs on each atom
-    # For simplicity, we use the diagonal approximation here
-    bond_order = fuzzy_factor * (density_matrix @ overlap_matrix)[i_idx, j_idx]
+    if not ao_indices_i:
+        raise ValueError(f"No AOs found for atom {atom_i}")
+    if not ao_indices_j:
+        raise ValueError(f"No AOs found for atom {atom_j}")
 
-    # Ensure bond order is positive and reasonable
+    # Calculate fuzzy bond order by summing over AO pairs
+    # Factor of 2 for electron pairs
+    bond_order = 0.0
+    for mu in ao_indices_i:
+        for nu in ao_indices_j:
+            # Sum 2 * P_{mu,nu} * S_{mu,nu} for all AO pairs
+            bond_order += 2.0 * density_matrix[mu, nu] * overlap_matrix[mu, nu]
+
+    # Apply fuzzy factor
+    bond_order *= fuzzy_factor
+
+    # Ensure bond order is positive
     bond_order = max(0.0, abs(bond_order))
-
-    # For multi-atom systems, bond order can be larger
-    # We normalize to typical bond order ranges (0.5-3.5)
-    bond_order = min(bond_order, 3.5)
 
     return float(bond_order)
 
@@ -123,6 +132,7 @@ def fuzzy_bond_order(
 def calculate_fuzzy_bond_order_matrix(
     density_matrix: np.ndarray,
     overlap_matrix: np.ndarray,
+    shells: list,
     fuzzy_factor: float = 0.5
 ) -> np.ndarray:
     """Calculate fuzzy bond order matrix.
@@ -130,20 +140,31 @@ def calculate_fuzzy_bond_order_matrix(
     Args:
         density_matrix: Density matrix (AO basis)
         overlap_matrix: Overlap matrix (AO basis)
+        shells: List of Shell objects containing center_idx
         fuzzy_factor: Fuzzy partition factor (default 0.5)
 
     Returns:
-        Symmetric bond order matrix
+        Symmetric bond order matrix (n_atoms x n_atoms)
     """
-    # Calculate bond order matrix: FBO = fuzzy_factor * P * S
-    bond_order_matrix = fuzzy_factor * (density_matrix @ overlap_matrix)
+    # Determine number of atoms from shells
+    atom_indices = sorted(set(shell.center_idx for shell in shells))
+    n_atoms = max(atom_indices) + 1
 
-    # Make symmetric and ensure positive values
-    bond_order_matrix = (bond_order_matrix + bond_order_matrix.T) / 2
-    bond_order_matrix = np.abs(bond_order_matrix)
+    # Initialize bond order matrix
+    bond_order_matrix = np.zeros((n_atoms, n_atoms))
 
-    # Zero out diagonal (no self-bonding)
-    np.fill_diagonal(bond_order_matrix, 0.0)
+    # Calculate bond order for each atom pair
+    for i in atom_indices:
+        for j in atom_indices:
+            if i < j:  # Only calculate upper triangle
+                try:
+                    bo = fuzzy_bond_order(density_matrix, overlap_matrix,
+                                         shells, i, j, fuzzy_factor)
+                    bond_order_matrix[i, j] = bo
+                    bond_order_matrix[j, i] = bo  # Symmetric
+                except ValueError:
+                    # Skip if no AOs for either atom
+                    pass
 
     return bond_order_matrix
 
