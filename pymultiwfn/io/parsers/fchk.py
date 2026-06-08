@@ -86,18 +86,34 @@ class FchkLoader:
         Handles both scalar and array data.
         """
         escaped_label = re.escape(label)
-        # Pattern to capture scalar value on the same line OR N=count on the same line
+        # Pattern to capture either:
+        # 1. Label I N=count (explicit N= format)
+        # 2. Label I value (implicit value at end of line)
         pattern_scalar_or_n = (
-            rf"{escaped_label}\s+[IR]\s+(?:N=\s*(\d+)\s*)?(.+)?(?=\n|$)"
+            rf"{escaped_label}\s+[IR]\s+(?:N=\s*(\d+)\s*|(\S+)\s*)?$"
         )
 
-        match = re.search(pattern_scalar_or_n, self.content)
+        match = re.search(pattern_scalar_or_n, self.content, re.MULTILINE)
 
         if not match:
             return np.array([])
 
-        count_str = match.group(1)
-        scalar_val_str = match.group(2)
+        count_str = match.group(1)  # For N=count format
+        implicit_val_str = match.group(2)  # For implicit value format
+
+        if count_str:
+            # Explicit N=count format
+            count = int(count_str)
+        elif implicit_val_str:
+            # Implicit value format (e.g., "Label I 25")
+            try:
+                count = int(implicit_val_str) if dtype == int else float(implicit_val_str)
+                # For scalar values, return single value array
+                return np.array([count])
+            except ValueError:
+                return np.array([])
+        else:
+            return np.array([])
 
         if count_str:  # It's an array with N=count
             count = int(count_str)
@@ -106,7 +122,8 @@ class FchkLoader:
             data_str = self.content[start_idx:]
 
             # Find the start of the next label to delimit the current data block
-            next_label_match = re.search(r"\n[A-Z][a-zA-Z\s]+\s+[IR]", data_str)
+            # Need to ensure we match the full label pattern
+            next_label_match = re.search(r"\n[A-Z][a-zA-Z\s]+\s+[IR]\s+", data_str)
             if next_label_match:
                 data_chunk = data_str[: next_label_match.start()]
             else:
@@ -131,13 +148,20 @@ class FchkLoader:
                     break
             arr = np.array(values, dtype=dtype)
             return arr
-        elif scalar_val_str:  # It's a scalar value on the same line
-            try:
-                # Need to find the actual scalar value at the end of the matched line
-                # Example: "Number of electrons I 76" -> scalar_val_str will be "76"
-                return np.array([dtype(scalar_val_str.strip())])
-            except ValueError:
-                return np.array([])
+        else:
+            # No N=count found, treat as scalar value
+            # Extract the last value from the matched line
+            line = match.group().strip()
+            parts = line.split()
+            # The last part should be the scalar value
+            if len(parts) >= 2:
+                try:
+                    scalar_val = parts[-1]
+                    return np.array([dtype(scalar_val)])
+                except (ValueError, IndexError):
+                    return np.array([])
+            return np.array([])
+
         return np.array([])
 
     def _parse_overlap_matrix(self):

@@ -283,7 +283,7 @@ class ElectrostaticAnalyzer:
         
         try:
             charges = self.calculate_mulliken_charges()
-        except:
+        except Exception:
             charges = {}
         
         lines = [

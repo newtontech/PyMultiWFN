@@ -27,11 +27,37 @@ classifiers = [
 dependencies = [
     "numpy>=1.21",
     "scipy>=1.7",
-    "matplotlib>=3.10.9",
-    "numba>=0.65.1",
+    "numba>=0.55",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.0",
+    "build>=1.0",
+    "flake8>=7.0",
+    "isort>=5.13",
+    "mypy>=1.8",
+    "pre-commit>=3.6",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-mock>=3.12",
+    "pytest-xdist>=3.0",
+    "pytest-timeout>=2.0",
+    "pytest-rerunfailures>=13.0",
+]
+visualization = [
+    "matplotlib>=3.5",
+    "plotly>=5.0",
+    "pyvista>=0.35",
+]
+gui = [
     "PyQt5>=5.15",
-    "plotly>=6.8.0",
-    "pyvista>=0.48.4"
+]
+all = [
+    "matplotlib>=3.5",
+    "plotly>=5.0",
+    "pyvista>=0.35",
+    "PyQt5>=5.15",
 ]
 
 [project.urls]
@@ -53,8 +79,14 @@ pymultiwfn = [
 
 [dependency-groups]
 dev = [
-    "pytest>=9.0.3",
-    "pytest-cov>=7.1.0",
+    "black>=24.0",
+    "build>=1.0",
+    "flake8>=7.0",
+    "isort>=5.13",
+    "mypy>=1.8",
+    "pre-commit>=3.6",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
     "pytest-mock>=3.12",
     "pytest-xdist>=3.0",  # Parallel testing
     "pytest-timeout>=2.0",  # Test timeout
@@ -101,6 +133,8 @@ markers = [
     "integration: Integration tests requiring external resources",
     "slow: Slow-running tests",
     "requires_data: Tests requiring test data files",
+    "reference: Tests comparing against bundled Multiwfn reference data",
+    "visualization: Tests requiring optional visualization dependencies",
     "benchmark: Performance benchmarking tests",
     "expensive: Tests that require significant computational resources",
 ]

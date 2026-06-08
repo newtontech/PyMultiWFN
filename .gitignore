@@ -9,6 +9,7 @@ __pycache__/
 
 # Distribution / packaging
 build/
+dist/
 Dist/
 *.egg-info/
 *.egg
@@ -19,6 +20,7 @@ pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
+.ruff_cache/
 .tox/
 .nox/
 .coverage
@@ -99,11 +101,8 @@ consistency_verifier/examples/*.exe
 # Docs test files
 docs/test/
 
-# Development summaries (archived)
-docs/summaries/hourly/*
-!docs/summaries/hourly/.gitkeep
-docs/summaries/daily/*
-!docs/summaries/daily/.gitkeep
+# Development summaries stay tracked when they are moved under docs/summaries/.
+# Local generated reports should use ignored cache/build/output patterns above.
 
 # IDE
 .vscode/

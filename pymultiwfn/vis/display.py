@@ -71,7 +71,7 @@ class Plotter:
         # Set plot style
         try:
             plt.style.use(self.settings.style.value)
-        except:
+        except Exception:
             plt.style.use("default")
 
         # Color maps for different types of data
@@ -517,7 +517,7 @@ class Plotter:
                     for child in ax.get_children():
                         try:
                             axes[i].add_child(child)
-                        except:
+                        except Exception:
                             pass
                 axes[i].set_title(title, fontsize=self.settings.font_size + 1)
 

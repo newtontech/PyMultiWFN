@@ -1,5 +1,8 @@
 # PyMultiWFN 测试框架使用指南
 
+> 本文是中文扩展指南，保留更详细的本地开发命令和历史性能说明。
+> 标准测试入口和分类规则以 [`TESTING.md`](TESTING.md) 为准。
+
 ## 📋 概述
 
 PyMultiWFN 使用 pytest 作为测试框架，配置了以下高级功能：
@@ -370,7 +373,7 @@ rm -rf .coverage htmlcov
 - [pytest 官方文档](https://docs.pytest.org/)
 - [pytest-xdist 文档](https://pytest-xdist.readthedocs.io/)
 - [pytest-cov 文档](https://pytest-cov.readthedocs.io/)
-- [PyMultiWFN 架构文档](../docs/architecture_plan.md)
+- [PyMultiWFN 架构文档](../architecture_plan.md)
 
 ---
 

@@ -1,0 +1,41 @@
+default_install_hook_types:
+  - pre-commit
+  - pre-push
+
+repos:
+  - repo: local
+    hooks:
+      - id: python-compile
+        name: Python syntax compile check
+        entry: bash -c 'PYTHON=.venv/bin/python; [ -x "$PYTHON" ] || PYTHON=python; "$PYTHON" -m compileall -q pymultiwfn tests'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: flake8-critical
+        name: Flake8 critical errors
+        entry: bash -c 'PYTHON=.venv/bin/python; [ -x "$PYTHON" ] || PYTHON=python; "$PYTHON" -m flake8 pymultiwfn tests --count --select=E9,F63,F7,F82 --show-source --statistics'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: focused-bonding-tests
+        name: Focused bonding tests
+        entry: bash -c 'PYTHON=.venv/bin/python; [ -x "$PYTHON" ] || PYTHON=python; "$PYTHON" -m pytest tests/bonding/test_fuzzy_bond_order.py'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: full-test-suite
+        name: Full pytest suite
+        entry: bash -c 'PYTHON=.venv/bin/python; [ -x "$PYTHON" ] || PYTHON=python; "$PYTHON" -m pytest'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+      - id: package-build
+        name: Package build
+        entry: bash -c 'PYTHON=.venv/bin/python; [ -x "$PYTHON" ] || PYTHON=python; "$PYTHON" -m build'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

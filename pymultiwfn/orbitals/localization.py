@@ -112,7 +112,7 @@ class LocalizationAnalyzer:
             # QR decomposition for orthonormalization
             Q, R = np.linalg.qr(localized)
             localized = Q
-        except:
+        except Exception:
             pass  # Keep as-is if orthonormalization fails
         
         self._boys_coeffs = localized
@@ -172,7 +172,7 @@ class LocalizationAnalyzer:
         try:
             Q, R = np.linalg.qr(localized)
             localized = Q
-        except:
+        except Exception:
             pass
         
         self._pm_coeffs = localized

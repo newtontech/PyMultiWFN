@@ -6,7 +6,8 @@ file formats including Gaussian FCHK, WFN, Molden, and others.
 """
 
 import os
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Dict, Any, Optional, Union
 
 from .parsers.fchk import FchkLoader
 from .parsers.wfn import WFNLoader
@@ -35,7 +36,7 @@ if CP2KLoader:
     FILE_FORMATS[".cp2k"] = CP2KLoader
 
 
-def load(filename: str, **kwargs) -> Any:
+def load(filename: Union[str, Path], **kwargs) -> Any:
     """
     Generic loader that detects file type and returns a Wavefunction object.
 
@@ -50,29 +51,32 @@ def load(filename: str, **kwargs) -> Any:
         ValueError: If file format is not supported
         FileNotFoundError: If file does not exist
     """
-    if not os.path.exists(filename):
-        raise FileNotFoundError(f"File not found: {filename}")
+    # Convert Path to string if needed
+    filename_str = str(filename)
+
+    if not os.path.exists(filename_str):
+        raise FileNotFoundError(f"File not found: {filename_str}")
 
     # Check file extension
-    _, ext = os.path.splitext(filename.lower())
+    _, ext = os.path.splitext(filename_str.lower())
 
     # Handle special cases
-    if "molden" in filename.lower() and ext not in FILE_FORMATS:
-        loader = MoldenLoader(filename)
+    if "molden" in filename_str.lower() and ext not in FILE_FORMATS:
+        loader = MoldenLoader(filename_str)
         return loader.load()
 
     if ext in FILE_FORMATS:
         loader_class = FILE_FORMATS[ext]
-        loader = loader_class(filename, **kwargs)
+        loader = loader_class(filename_str, **kwargs)
         return loader.load()
     else:
         # Try to auto-detect format
-        loader = _auto_detect_format(filename)
+        loader = _auto_detect_format(filename_str)
         if loader:
             return loader.load()
         else:
             raise NotImplementedError(
-                f"File type '{ext}' for {filename} not yet supported. "
+                f"File type '{ext}' for {filename_str} not yet supported. "
                 f"Supported formats: {', '.join(FILE_FORMATS.keys())}"
             )
 

@@ -283,6 +283,8 @@ class Wavefunction:
                 num_bfs_in_shell = 0
                 if l_value == -1:  # SP shell
                     num_bfs_in_shell = 4  # 1 s-type + 3 p-type
+                elif l_value == -2:  # Special combined shell (e.g., 5D or other)
+                    num_bfs_in_shell = 5  # Based on N2.fch analysis
                 elif l_value >= 0:  # S, P, D, F, ...
                     num_bfs_in_shell = 2 * l_value + 1
                 else:
