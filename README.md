@@ -71,9 +71,11 @@ Use `examples/bond_analysis.py` to compare Mayer, Wiberg, or Mulliken-style outp
 
 ## Documentation
 
+- **[Documentation Index](docs/README.md)**: User docs, GitHub Pages assets, testing guides, and archived development records
 - **[User Guide](docs/user_guide.md)**: Complete guide to using PyMultiWFN
-- **[Testing Guide](docs/TESTING.md)**: How to run and write tests
+- **[Testing Guide](docs/TESTING.md)**: Canonical test commands and test organization
 - **[Examples](examples/)**: Example scripts for common tasks
+- **[Architecture Plan](architecture_plan.md)**: Architecture, repository boundaries, and progress tracking
 
 ## Examples
 
@@ -86,6 +88,9 @@ See the `examples/` directory for complete examples:
 ## Testing
 
 ```bash
+# Install development tooling
+pip install -e ".[dev]"
+
 # Run all tests
 pytest
 
@@ -94,6 +99,9 @@ pytest -n auto
 
 # Run with coverage
 pytest --cov=pymultiwfn --cov-report=html
+
+# Install local git quality gates
+pre-commit install --install-hooks
 ```
 
 See [Testing Guide](docs/TESTING.md) for more details.
@@ -109,8 +117,15 @@ Performance benchmarks (tested on typical laptop):
 
 Run benchmarks:
 ```bash
-python benchmark_performance.py
+python scripts/dev/benchmark_performance.py
 ```
+
+## Repository Boundaries
+
+- `pymultiwfn/` is the installable Python package. Package discovery in `pyproject.toml` is limited to `pymultiwfn*`.
+- `Multiwfn_3.8_dev_src_Linux_2025-Nov-23/` is upstream reference source used for migration, parity review, and consistency analysis. It is not part of the Python package installation.
+- `Multiwfn_3.8_bin_Linux_noGUI/` and `Multiwfn_3.8_bin_Linux_noGUI.zip` are retained reference assets for local comparison and consistency verification.
+- Historical reports, prompts, and development records are archived under `docs/summaries/` and `docs/tasks/`.
 
 ## Project Status
 

@@ -218,7 +218,7 @@ class CriticalPointAnalyzer:
                                 'laplacian': self.get_laplacian_at_point(position)
                             }
                             critical_points.append(cp)
-                except:
+                except Exception:
                     pass  # Skip if optimization fails
         
         self._critical_points = critical_points

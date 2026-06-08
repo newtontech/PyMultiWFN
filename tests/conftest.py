@@ -23,6 +23,97 @@ def test_data_dir():
     return Path(__file__).parent / "test_data"
 
 
+@pytest.fixture(scope="session")
+def repo_root():
+    """Return repository root for locating bundled reference data."""
+    return Path(__file__).resolve().parents[1]
+
+
+@pytest.fixture(scope="session")
+def multiwfn_examples_dir(repo_root):
+    """Return bundled Multiwfn examples directory, or skip if unavailable."""
+    examples_dir = repo_root / "Multiwfn_3.8_bin_Linux_noGUI" / "examples"
+    if not examples_dir.exists():
+        pytest.skip(f"Multiwfn examples directory not found at {examples_dir}")
+    return examples_dir
+
+
+def _first_existing_path(candidates, label):
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    formatted = "\n".join(str(candidate) for candidate in candidates)
+    pytest.skip(f"{label} reference file not found. Checked:\n{formatted}")
+
+
+@pytest.fixture(scope="session")
+def h2_wavefunction_file(repo_root):
+    """Return a bundled H2 wavefunction/reference file."""
+    examples_dir = repo_root / "Multiwfn_3.8_bin_Linux_noGUI" / "examples"
+    return _first_existing_path(
+        [
+            repo_root / "tests" / "test_data" / "H2_CCSD.wfn",
+            examples_dir / "H2.fch",
+            examples_dir / "H2_CCSD.wfn",
+        ],
+        "H2",
+    )
+
+
+@pytest.fixture(scope="session")
+def water_wavefunction_file(multiwfn_examples_dir):
+    """Return a bundled water FCHK/reference file."""
+    return _first_existing_path(
+        [
+            multiwfn_examples_dir / "H2O.fch",
+            multiwfn_examples_dir / "H2O_m3ub3lyp.wfn",
+        ],
+        "H2O",
+    )
+
+
+@pytest.fixture(scope="session")
+def n2_wavefunction_file(multiwfn_examples_dir):
+    """Return a bundled N2 FCHK/reference file."""
+    return _first_existing_path([multiwfn_examples_dir / "N2.fch"], "N2")
+
+
+@pytest.fixture(scope="session")
+def benzene_wavefunction_file(multiwfn_examples_dir):
+    """Return a bundled benzene FCHK/reference file."""
+    return _first_existing_path(
+        [
+            multiwfn_examples_dir / "benzene.fch",
+            multiwfn_examples_dir / "benzene.wfn",
+        ],
+        "benzene",
+    )
+
+
+@pytest.fixture(scope="session")
+def c2h4_wavefunction_file(repo_root):
+    """Return a bundled C2H4 wavefunction/reference file."""
+    examples_dir = repo_root / "Multiwfn_3.8_bin_Linux_noGUI" / "examples"
+    return _first_existing_path(
+        [
+            repo_root / "tests" / "test_data" / "C2H4_HF.wfn",
+            examples_dir / "C2H4_HF.wfn",
+            examples_dir / "ethene.wfn",
+        ],
+        "C2H4",
+    )
+
+
+@pytest.fixture(scope="session")
+def c2h2_wavefunction_file(repo_root):
+    """Return a bundled C2H2 wavefunction/reference file."""
+    return _first_existing_path(
+        [repo_root / "tests" / "test_data" / "C2H2.wfn"],
+        "C2H2",
+    )
+
+
+
 @pytest.fixture
 def sample_atom():
     """

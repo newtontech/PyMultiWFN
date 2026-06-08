@@ -7,6 +7,9 @@ Comprehensive guide to testing PyMultiWFN.
 ## Quick Start
 
 ```bash
+# Install development tooling
+pip install -e ".[dev]"
+
 # Run all tests
 pytest
 
@@ -19,6 +22,31 @@ pytest -m "not slow"
 # Run with coverage
 pytest --cov=pymultiwfn --cov-report=html
 ```
+
+---
+
+## Git Quality Gates
+
+PyMultiWFN keeps local git hooks and GitHub CI aligned through
+`.pre-commit-config.yaml`.
+
+```bash
+# Install both pre-commit and pre-push hooks
+pre-commit install --install-hooks
+
+# Run the fast commit gate manually
+pre-commit run --all-files --hook-stage pre-commit
+
+# Run the full push gate manually
+pre-commit run --all-files --hook-stage pre-push
+```
+
+The pre-commit gate runs Python syntax checks, critical flake8 errors, and the
+focused fuzzy bond-order tests. The pre-push gate runs the full pytest suite and
+builds the package.
+
+GitHub Actions runs the same two hook stages in `Git Hooks` CI, then verifies
+that retained Multiwfn reference assets are not included in the built wheel.
 
 ---
 

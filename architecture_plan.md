@@ -1,5 +1,37 @@
 # PyMultiWFN 架构重构计划
 
+## 0. Repository Organization and Documentation Standards
+
+This repository is maintained as an installable Python package plus a tracked reference corpus for Multiwfn parity work.
+
+### 0.1 Package Boundary
+
+- `pymultiwfn/` is the installable Python package.
+- `pyproject.toml` limits package discovery to `pymultiwfn*`, so reference sources, binaries, documentation, scripts, and verification fixtures are not installed as Python packages.
+- `Multiwfn_3.8_dev_src_Linux_2025-Nov-23/` is upstream reference source. It is used for migration, algorithm review, and consistency analysis only.
+- `Multiwfn_3.8_bin_Linux_noGUI/` and `Multiwfn_3.8_bin_Linux_noGUI.zip` are retained reference assets for local comparison and consistency verification. They should not be deleted or moved during repository cleanup.
+
+### 0.2 Documentation Layout
+
+- `README.md` is the public project entry point: install, quick start, documentation links, testing entry, status summary, and repository boundaries.
+- `docs/` contains user documentation, GitHub Pages assets, testing guides, and public project notes.
+- `docs/summaries/development/` stores development work summaries and historical process notes.
+- `docs/summaries/status/` stores session and status snapshots.
+- `docs/summaries/reports/` stores phase reports, roadmap notes, issue lists, and framework reports.
+- `docs/summaries/verification/` stores test output manifests and verification reports.
+- `docs/tasks/` stores historical task prompts and coder/verifier instructions.
+- `nightly-development/` remains a dedicated development-log archive.
+- `scripts/dev/` contains one-off or reusable diagnostic scripts.
+- `scripts/automation/` contains local development loop and automation shell scripts.
+
+### 0.3 Cleanup Rules
+
+- Do not change Python behavior while reorganizing documentation or scripts.
+- Do not rename exported Python symbols as part of repository cleanup.
+- Keep status numbers, coverage claims, and performance figures either freshly verified or clearly treated as historical records.
+- Remove generated caches and build artifacts from the working tree before commits.
+- Keep `architecture_plan.md` updated when repository boundaries, module responsibilities, or progress status changes.
+
 ## 1. 现有项目结构分析 (Reconnaissance)
 
 ### 1.1 文件类型与分布
