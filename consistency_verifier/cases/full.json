@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "description": "Nightly/full-suite seed cases for larger retained reference assets.",
+  "cases": [
+    {
+      "id": "full_phenanthrene_metadata",
+      "suite": "full",
+      "input": "Multiwfn_3.8_bin_Linux_noGUI/examples/phenanthrene.wfn",
+      "multiwfn": {
+        "commands": ["18", "1", "q"],
+        "timeout_seconds": 90
+      },
+      "pymultiwfn": {
+        "density_points": [[0.0, 0.0, 0.0]]
+      },
+      "comparisons": [
+        {"field": "num_atoms", "kind": "int"},
+        {"field": "num_electrons", "kind": "float", "tolerance": 1e-8},
+        {"field": "charge", "kind": "float", "tolerance": 1e-8},
+        {"field": "num_orbitals", "kind": "int", "required": false}
+      ]
+    }
+  ]
+}

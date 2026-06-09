@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "description": "Fast oracle checks for basic Multiwfn/PyMultiWFN metadata parity.",
+  "cases": [
+    {
+      "id": "smoke_h2_metadata",
+      "suite": "smoke",
+      "input": "Multiwfn_3.8_bin_Linux_noGUI/examples/H2_CCSD.wfn",
+      "multiwfn": {
+        "commands": ["18", "1", "q"],
+        "timeout_seconds": 30
+      },
+      "comparisons": [
+        {"field": "num_atoms", "kind": "int"},
+        {"field": "num_electrons", "kind": "float", "tolerance": 1e-8},
+        {"field": "charge", "kind": "float", "tolerance": 1e-8},
+        {"field": "num_orbitals", "kind": "int", "required": false}
+      ]
+    },
+    {
+      "id": "smoke_water_metadata",
+      "suite": "smoke",
+      "input": "Multiwfn_3.8_bin_Linux_noGUI/examples/H2O.fch",
+      "multiwfn": {
+        "commands": ["18", "1", "q"],
+        "timeout_seconds": 30
+      },
+      "comparisons": [
+        {"field": "num_atoms", "kind": "int"},
+        {"field": "num_electrons", "kind": "float", "tolerance": 1e-8},
+        {"field": "charge", "kind": "float", "tolerance": 1e-8},
+        {"field": "num_basis", "kind": "int", "required": false}
+      ]
+    },
+    {
+      "id": "smoke_benzene_metadata",
+      "suite": "smoke",
+      "input": "Multiwfn_3.8_bin_Linux_noGUI/examples/benzene.fch",
+      "multiwfn": {
+        "commands": ["18", "1", "q"],
+        "timeout_seconds": 30
+      },
+      "comparisons": [
+        {"field": "num_atoms", "kind": "int"},
+        {"field": "num_electrons", "kind": "float", "tolerance": 1e-8},
+        {"field": "charge", "kind": "float", "tolerance": 1e-8},
+        {"field": "num_basis", "kind": "int", "required": false}
+      ]
+    }
+  ]
+}

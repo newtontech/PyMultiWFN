@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "description": "Representative PR-layer observations for numerical parity triage.",
+  "cases": [
+    {
+      "id": "pr_h2_density_gradient_orbitals",
+      "suite": "pr",
+      "input": "Multiwfn_3.8_bin_Linux_noGUI/examples/H2_CCSD.wfn",
+      "multiwfn": {
+        "commands": ["18", "1", "q"],
+        "timeout_seconds": 45
+      },
+      "pymultiwfn": {
+        "density_points": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.0]],
+        "gradient_points": [[0.0, 0.0, 0.0]]
+      },
+      "comparisons": [
+        {"field": "num_atoms", "kind": "int"},
+        {"field": "num_electrons", "kind": "float", "tolerance": 1e-8},
+        {"field": "charge", "kind": "float", "tolerance": 1e-8},
+        {"field": "num_orbitals", "kind": "int", "required": false}
+      ]
+    },
+    {
+      "id": "pr_c2h2_bond_orders",
+      "suite": "pr",
+      "input": "Multiwfn_3.8_bin_Linux_noGUI/examples/C2H2.wfn",
+      "multiwfn": {
+        "commands": ["18", "1", "q"],
+        "timeout_seconds": 45
+      },
+      "pymultiwfn": {
+        "bond_pairs": [[1, 2]],
+        "density_points": [[0.0, 0.0, 0.0]]
+      },
+      "comparisons": [
+        {"field": "num_atoms", "kind": "int"},
+        {"field": "num_electrons", "kind": "float", "tolerance": 1e-8},
+        {"field": "charge", "kind": "float", "tolerance": 1e-8}
+      ]
+    },
+    {
+      "id": "pr_benzene_orbital_metadata",
+      "suite": "pr",
+      "input": "Multiwfn_3.8_bin_Linux_noGUI/examples/benzene.fch",
+      "multiwfn": {
+        "commands": ["18", "1", "q"],
+        "timeout_seconds": 45
+      },
+      "pymultiwfn": {
+        "density_points": [[0.0, 0.0, 0.0]]
+      },
+      "comparisons": [
+        {"field": "num_atoms", "kind": "int"},
+        {"field": "num_electrons", "kind": "float", "tolerance": 1e-8},
+        {"field": "charge", "kind": "float", "tolerance": 1e-8},
+        {"field": "num_basis", "kind": "int", "required": false}
+      ]
+    }
+  ]
+}

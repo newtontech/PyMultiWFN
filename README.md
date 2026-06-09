@@ -100,6 +100,9 @@ pytest -n auto
 # Run with coverage
 pytest --cov=pymultiwfn --cov-report=html
 
+# Run Multiwfn oracle consistency smoke checks on Linux
+python -m consistency_verifier run --suite smoke
+
 # Install local git quality gates
 pre-commit install --install-hooks
 ```

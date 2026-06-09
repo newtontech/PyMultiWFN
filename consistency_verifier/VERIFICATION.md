@@ -1,31 +1,33 @@
 # Consistency Verification
 
-This project includes a tool to verify the consistency between `PyMultiWFN` and the original `Multiwfn`.
+Run parity checks from the repository root:
 
-## Prerequisites
+```bash
+python -m consistency_verifier run --suite smoke
+python -m consistency_verifier run --suite pr
+python -m consistency_verifier run --suite full
+```
 
-1.  **Multiwfn Executable**: You need a working `Multiwfn` executable.
-    *   If you are on Windows, ensure `Multiwfn.exe` is accessible.
-    *   If you are on Linux/WSL, ensure the `Multiwfn` binary is compiled and accessible.
-2.  **PyMultiWFN**: Installed via pip (e.g., `pip install -e .`).
+The default oracle is:
 
-## Usage
+```text
+Multiwfn_3.8_bin_Linux_noGUI/Multiwfn
+```
 
-1.  Set the `MULTIWFN_BIN` environment variable to the path of your Multiwfn executable.
-    *   Windows (PowerShell): `$env:MULTIWFN_BIN = "C:\path\to\Multiwfn.exe"`
-    *   Linux/Bash: `export MULTIWFN_BIN=/path/to/Multiwfn`
-    
-    Alternatively, you can edit `run_verification.py` directly.
+Override it with `MULTIWFN_BIN` or `--multiwfn-bin` when needed.
 
-2.  Run the verification script:
-    ```bash
-    python run_verification.py
-    ```
+```bash
+MULTIWFN_BIN=/path/to/Multiwfn python -m consistency_verifier run --suite smoke
+python -m consistency_verifier run --suite smoke --multiwfn-bin /path/to/Multiwfn
+```
 
-## How it works
+The retained oracle binary is a Linux x86-64 executable. On non-Linux developer
+machines, use the unit tests for the harness and run live oracle parity in a
+Linux environment.
 
-The `ConsistencyVerifier` class (in `consistency_verifier/verifier.py`) runs both programs with the same input file and keystrokes. It captures the standard output and compares them line by line.
+Reports are written under `consistency_verifier/results/<run-id>/` and include:
 
-## Adding Test Cases
-
-To add more test cases, modify `run_verification.py` to include different input files and command sequences.
+- `report.json`
+- raw Multiwfn stdout/stderr transcripts
+- structured PyMultiWFN values
+- per-case comparison results

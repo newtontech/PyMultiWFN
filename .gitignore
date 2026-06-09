@@ -61,6 +61,7 @@ output_*.txt
 *_pymultiwfn.txt
 *_diff.txt
 test_reports/
+consistency_verifier/results/
 *.cube
 *.grid
 *.dens
