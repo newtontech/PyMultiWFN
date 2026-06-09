@@ -32,6 +32,14 @@ This repository is maintained as an installable Python package plus a tracked re
 - Remove generated caches and build artifacts from the working tree before commits.
 - Keep `architecture_plan.md` updated when repository boundaries, module responsibilities, or progress status changes.
 
+### 0.4 Multiwfn Oracle Consistency Workflow
+
+- `consistency_verifier/` is the internal parity harness for comparing PyMultiWFN with the retained Multiwfn 3.8 noGUI binary.
+- `python -m consistency_verifier run --suite smoke|pr|full` is the canonical entry point for local, CI, and nightly verification.
+- Case manifests live in `consistency_verifier/cases/*.json`; generated transcripts and JSON reports live under ignored `consistency_verifier/results/`.
+- `smoke` covers fast metadata parity, `pr` adds representative density/gradient/bond/orbital observations, and `full` is the nightly expansion layer for larger retained examples.
+- The retained Linux binary is the behavior oracle. The upstream source directory remains a reference for explaining and migrating algorithms, not for package installation or test execution.
+
 ## 1. 现有项目结构分析 (Reconnaissance)
 
 ### 1.1 文件类型与分布

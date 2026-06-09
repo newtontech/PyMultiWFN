@@ -1,0 +1,41 @@
+name: Multiwfn Oracle Consistency
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run the oracle smoke suite daily at 03:00 UTC.
+    - cron: "0 3 * * *"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Verify retained oracle binary
+        run: |
+          test -x Multiwfn_3.8_bin_Linux_noGUI/Multiwfn
+          file Multiwfn_3.8_bin_Linux_noGUI/Multiwfn
+
+      - name: Run smoke oracle parity
+        run: python -m consistency_verifier run --suite smoke
+
+      - name: Upload verifier reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: consistency-verifier-smoke
+          path: consistency_verifier/results/
+          if-no-files-found: ignore
+          retention-days: 14

@@ -50,6 +50,30 @@ that retained Multiwfn reference assets are not included in the built wheel.
 
 ---
 
+## Multiwfn Oracle Consistency
+
+The retained Linux noGUI binary is the behavior oracle for parity work. Run the
+manifest-driven verifier from the repository root:
+
+```bash
+python -m consistency_verifier run --suite smoke
+python -m consistency_verifier run --suite pr
+python -m consistency_verifier run --suite full
+```
+
+`smoke` is intended for fast metadata parity, `pr` adds representative numerical
+observations, and `full` is the nightly expansion layer. Reports are generated
+under `consistency_verifier/results/`.
+
+GitHub Actions also runs the smoke oracle suite on Linux in the
+`Multiwfn Oracle Consistency` workflow and uploads generated reports.
+
+On non-Linux machines, the retained binary cannot be executed directly; run the
+harness unit tests locally and run live oracle parity in Linux CI or a Linux
+development environment.
+
+---
+
 ## Test Organization
 
 ### Test Categories
