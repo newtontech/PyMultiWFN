@@ -1,6 +1,7 @@
-import numpy as np
-from typing import List, Dict, Any
 from itertools import combinations
+from typing import Any, Dict, List
+
+import numpy as np
 
 
 def search_adndp_candidates(

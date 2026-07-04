@@ -6,6 +6,7 @@ for testing purposes when the full implementation is not available.
 """
 
 import numpy as np
+
 from ..core.data import Wavefunction
 
 

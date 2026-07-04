@@ -19,6 +19,20 @@ repos:
         pass_filenames: false
         stages: [pre-commit]
 
+      - id: black-check
+        name: Black formatting check
+        entry: bash -c 'PYTHON=.venv/bin/python; [ -x "$PYTHON" ] || PYTHON=python; "$PYTHON" -m black --check pymultiwfn tests --diff'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: isort-check
+        name: Import sorting check
+        entry: bash -c 'PYTHON=.venv/bin/python; [ -x "$PYTHON" ] || PYTHON=python; "$PYTHON" -m isort --check-only --diff pymultiwfn tests'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
       - id: focused-bonding-tests
         name: Focused bonding tests
         entry: bash -c 'PYTHON=.venv/bin/python; [ -x "$PYTHON" ] || PYTHON=python; "$PYTHON" -m pytest tests/bonding/test_fuzzy_bond_order.py'

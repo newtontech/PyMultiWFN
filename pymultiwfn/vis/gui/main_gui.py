@@ -5,42 +5,43 @@ This module provides the main graphical user interface for PyMultiWFN,
 replicating the functionality of the original GUI.f90 from Multiwfn.
 """
 
-import sys
 import os
+import sys
+
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QWidget,
-    QVBoxLayout,
-    QHBoxLayout,
-    QSplitter,
     QAction,
-    QToolBar,
+    QApplication,
+    QFileDialog,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+    QSplitter,
     QStatusBar,
     QTabWidget,
-    QGroupBox,
-    QPushButton,
-    QLabel,
-    QMessageBox,
-    QFileDialog,
+    QToolBar,
+    QVBoxLayout,
+    QWidget,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QThread
+
+# Core imports
+from ...io.loader import load_wavefunction
 
 # PyMultiWFN imports
 from ..molecular import MolecularVisualizer
 from ..orbital import OrbitalVisualizer
 from ..weak_interaction import WeakInteractionAnalyzer
 from .widgets import (
-    OrbitalSelector,
-    ViewControls,
+    FileSelector,
     IsosurfaceControls,
     MoleculeControls,
+    OrbitalSelector,
     ProgressBar,
-    FileSelector,
+    ViewControls,
 )
-
-# Core imports
-from ...io.loader import load_wavefunction
 
 
 class VisualizationThread(QThread):

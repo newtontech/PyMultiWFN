@@ -6,14 +6,14 @@ and other spectral analysis tools.
 """
 
 from .excitations import (
-    ExcitedState,
-    MOTransition,
     ExcitationAnalysis,
-    ExcitationLoader,
     ExcitationAnalyzer,
     ExcitationFileType,
-    load_excitation_data,
+    ExcitationLoader,
+    ExcitedState,
+    MOTransition,
     analyze_excitation,
+    load_excitation_data,
 )
 
 __all__ = [

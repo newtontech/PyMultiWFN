@@ -4,8 +4,10 @@ Unit tests for pymultiwfn.io.loader module.
 Tests the file loading functionality.
 """
 
-import pytest
 from pathlib import Path
+
+import pytest
+
 from pymultiwfn.io.loader import load_wavefunction
 
 
@@ -36,8 +38,7 @@ class TestLoaderIntegration:
     @pytest.mark.requires_data
     def test_load_real_wfn_file(self, test_data_dir):
         """Test loading a real WFN file from test data."""
-        # This test will only work when actual test data is added
-        wfn_file = test_data_dir / "wfn" / "water_sto3g.wfn"
+        wfn_file = test_data_dir / "H2_CCSD.wfn"
 
         if not wfn_file.exists():
             pytest.skip("Test data file not available")

@@ -12,4 +12,4 @@ Reference: PHASE2_TASKS.md - Module 2.3: Electrostatic Analysis
 
 from .potential import ElectrostaticAnalyzer
 
-__all__ = ['ElectrostaticAnalyzer']
+__all__ = ["ElectrostaticAnalyzer"]

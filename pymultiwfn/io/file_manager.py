@@ -6,10 +6,10 @@ including loading, saving, and format conversion for various quantum chemistry f
 """
 
 import os
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 from pymultiwfn.core.data import Wavefunction
-from pymultiwfn.io import load, get_supported_formats, validate_file
+from pymultiwfn.io import get_supported_formats, load, validate_file
 
 
 class FileManager:

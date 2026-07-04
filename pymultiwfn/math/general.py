@@ -7,10 +7,11 @@ This module provides pure Python implementations using NumPy and SciPy to replac
 the original Fortran mathematical routines from Multiwfn.
 """
 
+from typing import Callable, Tuple, Union
+
 import numpy as np
 import scipy.special
 from scipy import interpolate
-from typing import Tuple, Union, Callable
 
 # Physical constants and conversion factors
 PI = np.pi

@@ -54,6 +54,7 @@ Thumbs.db
 *.log
 *.tmp
 *.out
+.worktrees/
 
 # Verification script generated outputs
 output_*.txt

@@ -7,11 +7,11 @@ file formats including Gaussian FCHK, WFN, Molden, and others.
 
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from .parsers.fchk import FchkLoader
-from .parsers.wfn import WFNLoader
 from .parsers.molden import MoldenLoader
+from .parsers.wfn import WFNLoader
 
 try:
     from .parsers.cp2k import CP2KLoader

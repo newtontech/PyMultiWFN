@@ -7,9 +7,9 @@ Based on the visualization functionality from Multiwfn.
 """
 
 from .display import Plotter
-from .weak_interaction import WeakInteractionAnalyzer
-from .orbital import OrbitalVisualizer
 from .molecular import MolecularVisualizer
+from .orbital import OrbitalVisualizer
+from .weak_interaction import WeakInteractionAnalyzer
 
 # GUI components are optional (require PyQt5)
 try:

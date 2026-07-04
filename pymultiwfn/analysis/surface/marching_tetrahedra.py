@@ -8,9 +8,10 @@ Tian Lu, Feiwu Chen, "Quantitative analysis of molecular surface based on
 improved Marching Tetrahedra algorithm", J. Mol. Graph. Model., 38, 314-323 (2012).
 """
 
-import numpy as np
-from typing import Tuple, Optional
 from dataclasses import dataclass
+from typing import Optional, Tuple
+
+import numpy as np
 
 # Tetrahedron vertex configurations for cubic cell decomposition
 TETRAHEDRON_PATTERNS = [

@@ -18,16 +18,17 @@ Test Strategy:
 
 import numpy as np
 import pytest
-from pymultiwfn.core.data import Wavefunction, Atom, Shell
+
+from pymultiwfn.core.data import Atom, Shell, Wavefunction
+from pymultiwfn.math.density import calc_density
 from pymultiwfn.math.gradient import (
-    calc_density_gradient,
-    calc_density_laplacian,
+    _contract_gradient,
     _eval_contraction_gradient,
     _eval_contraction_laplacian,
-    _contract_gradient,
     _make_density_matrix,
+    calc_density_gradient,
+    calc_density_laplacian,
 )
-from pymultiwfn.math.density import calc_density
 
 # ============================================================================
 # Fixtures

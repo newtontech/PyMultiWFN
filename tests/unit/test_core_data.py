@@ -4,8 +4,9 @@ Unit tests for pymultiwfn.core.data module.
 Tests the Atom, Shell, and Wavefunction data structures.
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from pymultiwfn.core.data import Atom, Shell, Wavefunction
 
 

@@ -9,24 +9,24 @@ including:
 - Fragment-based surface analysis
 """
 
-from .surface_analysis import (
-    SurfaceAnalyzer,
-    SurfaceType,
-    MappedFunction,
-    SurfaceData,
-)
 from .marching_tetrahedra import (
     MarchingTetrahedra,
     MarchingTetrahedraConfig,
     extract_isosurface,
 )
+from .surface_analysis import (
+    MappedFunction,
+    SurfaceAnalyzer,
+    SurfaceData,
+    SurfaceType,
+)
 from .utils import (
     calculate_surface_curvature,
     calculate_surface_descriptors,
-    smooth_surface,
-    resample_surface,
-    interpolate_to_grid,
     export_surface_to_obj,
+    interpolate_to_grid,
+    resample_surface,
+    smooth_surface,
 )
 
 __all__ = [

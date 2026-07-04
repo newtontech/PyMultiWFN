@@ -5,8 +5,9 @@ This module tests calculations on more complex molecular systems
 beyond simple atoms and diatomics.
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from pymultiwfn.core.data import Atom, Shell, Wavefunction
 from pymultiwfn.math.density import calc_density
 
@@ -29,8 +30,12 @@ class TestWaterMolecule:
 
         # Reference: H2O has 3 atoms
         assert len(atoms) == 3, "H2O should have 3 atoms"
-        assert sum(1 for a in atoms if a.element == "O") == 1, "H2O should have 1 O atom"
-        assert sum(1 for a in atoms if a.element == "H") == 2, "H2O should have 2 H atoms"
+        assert (
+            sum(1 for a in atoms if a.element == "O") == 1
+        ), "H2O should have 1 O atom"
+        assert (
+            sum(1 for a in atoms if a.element == "H") == 2
+        ), "H2O should have 2 H atoms"
 
     def test_water_electron_count(self):
         """Verify H2O has 10 electrons.
@@ -59,7 +64,9 @@ class TestWaterMolecule:
         )
 
         # Reference: H2O has 10 electrons
-        assert wfn.num_electrons == 10.0, f"H2O should have 10 electrons, got {wfn.num_electrons}"
+        assert (
+            wfn.num_electrons == 10.0
+        ), f"H2O should have 10 electrons, got {wfn.num_electrons}"
 
     def test_water_symmetry(self):
         """Verify H2O C2v symmetry.
@@ -74,8 +81,8 @@ class TestWaterMolecule:
         ]
 
         # Reference: Two H atoms should be equidistant from O
-        h1_dist = np.sqrt(atoms[1].x**2 + atoms[1].y**2 + atoms[1].z**2)
-        h2_dist = np.sqrt(atoms[2].x**2 + atoms[2].y**2 + atoms[2].z**2)
+        h1_dist = np.sqrt(atoms[1].x ** 2 + atoms[1].y ** 2 + atoms[1].z ** 2)
+        h2_dist = np.sqrt(atoms[2].x ** 2 + atoms[2].y ** 2 + atoms[2].z ** 2)
 
         assert (
             abs(h1_dist - h2_dist) < 1e-10
@@ -114,8 +121,12 @@ class TestMethaneMolecule:
 
         # Reference: CH4 has 5 atoms
         assert len(atoms) == 5, "CH4 should have 5 atoms"
-        assert sum(1 for a in atoms if a.element == "C") == 1, "CH4 should have 1 C atom"
-        assert sum(1 for a in atoms if a.element == "H") == 4, "CH4 should have 4 H atoms"
+        assert (
+            sum(1 for a in atoms if a.element == "C") == 1
+        ), "CH4 should have 1 C atom"
+        assert (
+            sum(1 for a in atoms if a.element == "H") == 4
+        ), "CH4 should have 4 H atoms"
 
     def test_methane_electron_count(self):
         """Verify CH4 has 10 electrons.
@@ -145,7 +156,9 @@ class TestMethaneMolecule:
         )
 
         # Reference: CH4 has 10 electrons
-        assert wfn.num_electrons == 10.0, f"CH4 should have 10 electrons, got {wfn.num_electrons}"
+        assert (
+            wfn.num_electrons == 10.0
+        ), f"CH4 should have 10 electrons, got {wfn.num_electrons}"
 
     def test_methane_tetrahedral_symmetry(self):
         """Verify CH4 has tetrahedral symmetry.
@@ -163,7 +176,7 @@ class TestMethaneMolecule:
         # Reference: All H-C distances should be equal
         distances = []
         for i in range(1, 5):  # H atoms are indices 1-4
-            dist = np.sqrt(atoms[i].x**2 + atoms[i].y**2 + atoms[i].z**2)
+            dist = np.sqrt(atoms[i].x ** 2 + atoms[i].y ** 2 + atoms[i].z ** 2)
             distances.append(dist)
 
         # All distances should be equal (within tolerance)
@@ -185,8 +198,8 @@ class TestDiatomicMolecules:
         # N2 molecule (N≡N triple bond)
         bond_length = 2.0  # Bohr (approximate)
         atoms = [
-            Atom(element="N", index=7, x=0.0, y=0.0, z=-bond_length/2, charge=7.0),
-            Atom(element="N", index=7, x=0.0, y=0.0, z=bond_length/2, charge=7.0),
+            Atom(element="N", index=7, x=0.0, y=0.0, z=-bond_length / 2, charge=7.0),
+            Atom(element="N", index=7, x=0.0, y=0.0, z=bond_length / 2, charge=7.0),
         ]
 
         # Reference: N2 has 2 atoms
@@ -218,7 +231,9 @@ class TestDiatomicMolecules:
         )
 
         # Reference: N2 has 14 electrons
-        assert wfn.num_electrons == 14.0, f"N2 should have 14 electrons, got {wfn.num_electrons}"
+        assert (
+            wfn.num_electrons == 14.0
+        ), f"N2 should have 14 electrons, got {wfn.num_electrons}"
 
     def test_o2_electron_count(self):
         """Verify O2 has 16 electrons.
@@ -246,7 +261,9 @@ class TestDiatomicMolecules:
         )
 
         # Reference: O2 has 16 electrons
-        assert wfn.num_electrons == 16.0, f"O2 should have 16 electrons, got {wfn.num_electrons}"
+        assert (
+            wfn.num_electrons == 16.0
+        ), f"O2 should have 16 electrons, got {wfn.num_electrons}"
 
 
 class TestMolecularProperties:
@@ -309,4 +326,6 @@ class TestMolecularProperties:
 
         # Reference: Cation has +1 charge
         assert wfn.charge == +1, f"H2O+ should have +1 charge, got {wfn.charge}"
-        assert wfn.num_electrons == 9, f"H2O+ should have 9 electrons, got {wfn.num_electrons}"
+        assert (
+            wfn.num_electrons == 9
+        ), f"H2O+ should have 9 electrons, got {wfn.num_electrons}"

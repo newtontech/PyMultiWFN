@@ -12,18 +12,30 @@ This test suite follows TDD principles and covers:
 - Validation: charges should be reasonable for typical organic molecules
 """
 
-import pytest
 import numpy as np
-from pymultiwfn.core.data import Wavefunction, Atom, Shell
+import pytest
+
+from pymultiwfn.analysis.population.fuzzy_atoms import (
+    FuzzyAnalysisConfig,
+    FuzzyAtomsAnalyzer,
+    perform_fuzzy_analysis,
+)
 from pymultiwfn.analysis.population.mulliken import (
     calculate_mulliken_population_and_charges,
 )
-from pymultiwfn.analysis.population.fuzzy_atoms import (
-    FuzzyAtomsAnalyzer,
-    FuzzyAnalysisConfig,
-    perform_fuzzy_analysis,
-)
 from pymultiwfn.analysis.population.population import perform_population_analysis
+from pymultiwfn.core.data import Atom, Shell, Wavefunction
+
+
+def set_synthetic_identity_overlap(wavefunction: Wavefunction) -> None:
+    """Use an explicit orthonormal-basis overlap for synthetic algebra fixtures."""
+    if wavefunction.num_basis == 0:
+        wavefunction.calculate_overlap_matrix()
+        return
+
+    with pytest.warns(RuntimeWarning, match="identity overlap matrix fallback"):
+        wavefunction.calculate_overlap_matrix(allow_identity_fallback=True)
+
 
 # ============================================================================
 # Pytest Fixtures
@@ -82,7 +94,7 @@ def hydrogen_molecule():
 
     # Calculate density matrices
     wf.calculate_density_matrices()
-    wf.calculate_overlap_matrix()
+    set_synthetic_identity_overlap(wf)
 
     return wf
 
@@ -162,7 +174,7 @@ def water_molecule():
             wf.coefficients[i, :] /= coeff_norm
 
     wf.calculate_density_matrices()
-    wf.calculate_overlap_matrix()
+    set_synthetic_identity_overlap(wf)
 
     return wf
 
@@ -249,7 +261,7 @@ def methyl_radical():
             wf.coefficients_beta[i, :] /= coeff_norm_beta
 
     wf.calculate_density_matrices()
-    wf.calculate_overlap_matrix()
+    set_synthetic_identity_overlap(wf)
 
     return wf
 
@@ -285,7 +297,7 @@ def single_atom():
     wf.occupations = np.array([1.0])
 
     wf.calculate_density_matrices()
-    wf.calculate_overlap_matrix()
+    set_synthetic_identity_overlap(wf)
 
     return wf
 
@@ -367,7 +379,7 @@ def charged_molecule():
             wf.coefficients[i, :] /= coeff_norm
 
     wf.calculate_density_matrices()
-    wf.calculate_overlap_matrix()
+    set_synthetic_identity_overlap(wf)
 
     return wf
 
@@ -628,7 +640,7 @@ class TestMullikenPopulation:
                 wf.occupations = np.array([2.0, 0.0])  # Default
 
         wf.calculate_density_matrices()
-        wf.calculate_overlap_matrix()
+        set_synthetic_identity_overlap(wf)
 
         total_pop, total_charges, _, _, _ = calculate_mulliken_population_and_charges(
             wf, wf.overlap_matrix
@@ -985,7 +997,7 @@ class TestPopulationEdgeCases:
         wf.is_unrestricted = False
 
         wf.calculate_density_matrices()
-        wf.calculate_overlap_matrix()
+        set_synthetic_identity_overlap(wf)
 
         # This should handle empty case without crashing
         # Note: Behavior depends on implementation
@@ -1044,7 +1056,7 @@ class TestPopulationEdgeCases:
                 wf.coefficients[i, :] /= coeff_norm
 
         wf.calculate_density_matrices()
-        wf.calculate_overlap_matrix()
+        set_synthetic_identity_overlap(wf)
 
         total_pop, total_charges, _, _, _ = calculate_mulliken_population_and_charges(
             wf, wf.overlap_matrix
@@ -1200,7 +1212,7 @@ class TestChargeValidation:
         wf.occupations = np.array(occupations)
 
         wf.calculate_density_matrices()
-        wf.calculate_overlap_matrix()
+        set_synthetic_identity_overlap(wf)
 
         total_pop, total_charges, _, _, _ = calculate_mulliken_population_and_charges(
             wf, wf.overlap_matrix

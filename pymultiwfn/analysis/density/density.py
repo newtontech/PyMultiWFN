@@ -1,4 +1,5 @@
 import numpy as np
+
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.math.density import calc_density
 

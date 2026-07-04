@@ -4,6 +4,7 @@ Defines Atom, BasisSet, and Wavefunction classes.
 """
 
 import logging
+import warnings
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
@@ -219,19 +220,51 @@ class Wavefunction:
 
         self.Ptot = self.Palpha + self.Pbeta
 
-    def calculate_overlap_matrix(self):
+    def calculate_overlap_matrix(
+        self, *, allow_identity_fallback: bool = False
+    ) -> np.ndarray:
         """
         Calculate the overlap matrix S_uv.
 
-        Returns identity matrix as placeholder for testing.
-        For production use, full GTO overlap integrals should be implemented.
+        Uses the Gaussian integral implementation when shell/basis data is
+        available. Identity overlap is available only as an explicit fallback
+        for legacy tests or incomplete synthetic wavefunctions.
         """
         if self.num_basis == 0:
             self.overlap_matrix = np.array([])
-        else:
-            # Placeholder: return identity matrix
-            # TODO: Implement full GTO overlap integrals
+            return self.overlap_matrix
+
+        if allow_identity_fallback:
+            warnings.warn(
+                "Using explicit identity overlap matrix fallback for a synthetic "
+                "orthonormal basis.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
             self.overlap_matrix = np.eye(self.num_basis)
+            return self.overlap_matrix
+
+        if not self.shells:
+            raise ValueError(
+                "Cannot calculate overlap matrix without basis shell "
+                "information. Pass allow_identity_fallback=True only for "
+                "synthetic orthonormal-basis tests."
+            )
+
+        from pymultiwfn.integrals.overlap import (
+            calculate_overlap_matrix as _calculate_overlap_matrix,
+        )
+
+        overlap_matrix = _calculate_overlap_matrix(self, verbose=False)
+        expected_shape = (self.num_basis, self.num_basis)
+        if overlap_matrix.shape != expected_shape:
+            raise ValueError(
+                "Calculated overlap matrix shape "
+                f"{overlap_matrix.shape} does not match num_basis {expected_shape}."
+            )
+
+        self.overlap_matrix = overlap_matrix
+        return self.overlap_matrix
 
     def get_atomic_basis_indices(self) -> Dict[int, List[int]]:
         """

@@ -6,17 +6,18 @@ This script loads a WFN file, calculates the overlap matrix,
 and verifies its properties: symmetry, positivity, integration, and range.
 """
 
-import numpy as np
 import sys
 from pathlib import Path
+
+import numpy as np
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 try:
-    from pymultiwfn.io.parsers.wfn import WFNLoader
     from pymultiwfn.integrals import calculate_overlap_matrix
+    from pymultiwfn.io.parsers.wfn import WFNLoader
 except ImportError as e:
     print(f"❌ Import error: {e}")
     print("Make sure you're in the project root and dependencies are installed.")

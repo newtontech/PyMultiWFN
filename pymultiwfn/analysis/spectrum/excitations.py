@@ -6,11 +6,12 @@ including TD-DFT excitation analysis, transition density matrices, NTOs,
 and charge transfer analysis.
 """
 
-import numpy as np
-from typing import List, Optional, Dict, Tuple
+import re
 from dataclasses import dataclass, field
 from enum import Enum
-import re
+from typing import Dict, List, Optional, Tuple
+
+import numpy as np
 
 from ...core.data import Wavefunction
 

@@ -12,10 +12,16 @@ This module provides tools for electron density analysis including:
 Reference: PHASE2_TASKS.md - Module 2.2: Electron Density Analysis
 """
 
-from .topology import CriticalPointAnalyzer
-from .laplacian import LaplacianAnalyzer
 from .elf import ELFAnalyzer
+from .laplacian import LaplacianAnalyzer
 from .lol import LOLAnalyzer
 from .rdg import RDGAnalyzer
+from .topology import CriticalPointAnalyzer
 
-__all__ = ['CriticalPointAnalyzer', 'LaplacianAnalyzer', 'ELFAnalyzer', 'LOLAnalyzer', 'RDGAnalyzer']
+__all__ = [
+    "CriticalPointAnalyzer",
+    "LaplacianAnalyzer",
+    "ELFAnalyzer",
+    "LOLAnalyzer",
+    "RDGAnalyzer",
+]

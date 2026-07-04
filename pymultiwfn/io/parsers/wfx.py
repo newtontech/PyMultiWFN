@@ -4,8 +4,10 @@ WFX format is an extended version of WFN with more complete wavefunction informa
 """
 
 import re
+
 import numpy as np
-from pymultiwfn.core.data import Wavefunction, Shell
+
+from pymultiwfn.core.data import Shell, Wavefunction
 from pymultiwfn.core.definitions import ELEMENT_NAMES
 
 

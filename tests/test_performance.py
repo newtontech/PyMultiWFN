@@ -5,16 +5,18 @@ This module tests performance-critical functions and validates
 that optimizations don't break correctness.
 """
 
-import pytest
-import numpy as np
 import time
+
+import numpy as np
+import pytest
+
+from pymultiwfn.analysis.bonding.bondorder import calculate_mayer_bond_order
 from pymultiwfn.core.data import Atom, Shell, Wavefunction
 from pymultiwfn.math.density import (
     calc_density,
     clear_density_cache,
     get_cache_stats,
 )
-from pymultiwfn.analysis.bonding.bondorder import calculate_mayer_bond_order
 
 
 class TestDensityPerformance:
@@ -57,7 +59,10 @@ class TestDensityPerformance:
         for i in range(12):
             shells.append(
                 Shell(
-                    type=0, center_idx=i, exponents=np.array([3.0]), coefficients=np.array([1.0])
+                    type=0,
+                    center_idx=i,
+                    exponents=np.array([3.0]),
+                    coefficients=np.array([1.0]),
                 )
             )
 
@@ -154,7 +159,9 @@ class TestDensityPerformance:
         # Performance benchmark (should be < 5 seconds for 10k points)
         assert elapsed < 5.0, f"Processing took {elapsed:.2f}s (> 5s threshold)"
 
-        print(f"\nBatch processing: {n_points} points in {elapsed:.3f}s ({n_points/elapsed:.0f} points/s)")
+        print(
+            f"\nBatch processing: {n_points} points in {elapsed:.3f}s ({n_points/elapsed:.0f} points/s)"
+        )
 
     def test_cache_memory_management(self):
         """Test that cache doesn't grow unboundedly."""
@@ -165,7 +172,12 @@ class TestDensityPerformance:
         for i in range(150):  # More than cache max size
             atoms = [Atom(element="H", index=1, x=0.0, y=0.0, z=i * 0.1, charge=1.0)]
             shells = [
-                Shell(type=0, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([1.0]))
+                Shell(
+                    type=0,
+                    center_idx=0,
+                    exponents=np.array([1.0]),
+                    coefficients=np.array([1.0]),
+                )
             ]
 
             wfn = Wavefunction(
@@ -187,8 +199,9 @@ class TestDensityPerformance:
 
         # Cache should not exceed max size
         stats = get_cache_stats()
-        assert stats["cache_size"] <= stats["max_size"], \
-            f"Cache size {stats['cache_size']} exceeds max {stats['max_size']}"
+        assert (
+            stats["cache_size"] <= stats["max_size"]
+        ), f"Cache size {stats['cache_size']} exceeds max {stats['max_size']}"
 
 
 class TestBondOrderPerformance:
@@ -214,7 +227,12 @@ class TestBondOrderPerformance:
         shells = []
         for i in range(20):
             shells.append(
-                Shell(type=0, center_idx=i, exponents=np.array([2.0]), coefficients=np.array([1.0]))
+                Shell(
+                    type=0,
+                    center_idx=i,
+                    exponents=np.array([2.0]),
+                    coefficients=np.array([1.0]),
+                )
             )
 
         # Create wavefunction
@@ -262,7 +280,9 @@ class TestBondOrderPerformance:
         assert bond_order.shape == (20, 20)
 
         # Should complete in reasonable time (< 2s)
-        assert elapsed < 2.0, f"Bond order calculation took {elapsed:.2f}s (> 2s threshold)"
+        assert (
+            elapsed < 2.0
+        ), f"Bond order calculation took {elapsed:.2f}s (> 2s threshold)"
 
         print(f"\nBond order (20 atoms): {elapsed:.3f}s")
 
@@ -277,7 +297,12 @@ class TestMemoryEfficiency:
 
         atoms = [Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)]
         shells = [
-            Shell(type=0, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([1.0]))
+            Shell(
+                type=0,
+                center_idx=0,
+                exponents=np.array([1.0]),
+                coefficients=np.array([1.0]),
+            )
         ]
 
         # Random coefficients
@@ -310,7 +335,12 @@ class TestMemoryEfficiency:
         # Small molecule
         atoms = [Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)]
         shells = [
-            Shell(type=0, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([1.0]))
+            Shell(
+                type=0,
+                center_idx=0,
+                exponents=np.array([1.0]),
+                coefficients=np.array([1.0]),
+            )
         ]
 
         wfn = Wavefunction(
@@ -345,7 +375,12 @@ class TestNumericalStability:
         """Test density calculation with very large coordinates."""
         atoms = [Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)]
         shells = [
-            Shell(type=0, center_idx=0, exponents=np.array([1.0]), coefficients=np.array([1.0]))
+            Shell(
+                type=0,
+                center_idx=0,
+                exponents=np.array([1.0]),
+                coefficients=np.array([1.0]),
+            )
         ]
 
         wfn = Wavefunction(
@@ -374,7 +409,12 @@ class TestNumericalStability:
         """Test density calculation very close to nucleus."""
         atoms = [Atom(element="H", index=1, x=0.0, y=0.0, z=0.0, charge=1.0)]
         shells = [
-            Shell(type=0, center_idx=0, exponents=np.array([100.0]), coefficients=np.array([1.0]))
+            Shell(
+                type=0,
+                center_idx=0,
+                exponents=np.array([100.0]),
+                coefficients=np.array([1.0]),
+            )
         ]
 
         wfn = Wavefunction(

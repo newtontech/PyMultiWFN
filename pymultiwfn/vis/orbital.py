@@ -5,10 +5,11 @@ This module provides functionality for visualizing molecular orbitals,
 including isosurfaces, orbital plots, and related properties.
 """
 
-import numpy as np
+from typing import Dict, Optional, Tuple
+
 import matplotlib.pyplot as plt
+import numpy as np
 import plotly.graph_objects as go
-from typing import Dict, Tuple, Optional
 
 from ..core.data import Wavefunction
 

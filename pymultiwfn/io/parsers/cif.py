@@ -4,9 +4,11 @@ CIF format is used for crystallographic data storage and exchange.
 """
 
 import re
+
 import numpy as np
-from pymultiwfn.core.data import Wavefunction
+
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
+from pymultiwfn.core.data import Wavefunction
 
 
 class CIFLoader:

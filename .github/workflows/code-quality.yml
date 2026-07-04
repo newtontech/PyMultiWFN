@@ -26,13 +26,11 @@ jobs:
     
     - name: Check formatting with Black
       run: |
-        black --check pymultiwfn tests --diff || true
-      continue-on-error: true
+        black --check pymultiwfn tests --diff
     
     - name: Check imports with isort
       run: |
-        isort --check-only --diff pymultiwfn tests || true
-      continue-on-error: true
+        isort --check-only --diff pymultiwfn tests
     
     - name: Lint with flake8
       run: |
@@ -41,7 +39,7 @@ jobs:
         # Style warnings
         flake8 pymultiwfn --count --exit-zero --max-line-length=127 --statistics
     
-    - name: Type check with mypy
+    - name: Type check with mypy (advisory)
       run: |
         mypy pymultiwfn --ignore-missing-imports || true
       continue-on-error: true

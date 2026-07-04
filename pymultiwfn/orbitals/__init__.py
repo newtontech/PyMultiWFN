@@ -12,7 +12,7 @@ Reference: PHASE2_TASKS.md - Module 2.1: Orbital Analysis
 """
 
 from .energies import OrbitalsAnalyzer
-from .nbo import NBOAnalyzer
 from .localization import LocalizationAnalyzer
+from .nbo import NBOAnalyzer
 
-__all__ = ['OrbitalsAnalyzer', 'NBOAnalyzer', 'LocalizationAnalyzer']
+__all__ = ["OrbitalsAnalyzer", "NBOAnalyzer", "LocalizationAnalyzer"]

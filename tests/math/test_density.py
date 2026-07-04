@@ -18,11 +18,12 @@ Test Strategy:
 
 import numpy as np
 import pytest
-from pymultiwfn.core.data import Wavefunction, Atom, Shell
+
+from pymultiwfn.core.data import Atom, Shell, Wavefunction
 from pymultiwfn.math.density import (
-    calc_density,
-    _make_density_matrix,
     _contract_density,
+    _make_density_matrix,
+    calc_density,
 )
 
 # ============================================================================

@@ -4,10 +4,12 @@ Enhanced version with comprehensive error handling and additional data parsing.
 """
 
 import re
-import numpy as np
 import warnings
-from typing import Dict, Any
-from pymultiwfn.core.data import Wavefunction, Shell
+from typing import Any, Dict
+
+import numpy as np
+
+from pymultiwfn.core.data import Shell, Wavefunction
 from pymultiwfn.core.definitions import ELEMENT_NAMES
 
 
@@ -89,9 +91,7 @@ class FchkLoader:
         # Pattern to capture either:
         # 1. Label I N=count (explicit N= format)
         # 2. Label I value (implicit value at end of line)
-        pattern_scalar_or_n = (
-            rf"{escaped_label}\s+[IR]\s+(?:N=\s*(\d+)\s*|(\S+)\s*)?$"
-        )
+        pattern_scalar_or_n = rf"{escaped_label}\s+[IR]\s+(?:N=\s*(\d+)\s*|(\S+)\s*)?$"
 
         match = re.search(pattern_scalar_or_n, self.content, re.MULTILINE)
 
@@ -107,7 +107,9 @@ class FchkLoader:
         elif implicit_val_str:
             # Implicit value format (e.g., "Label I 25")
             try:
-                count = int(implicit_val_str) if dtype == int else float(implicit_val_str)
+                count = (
+                    int(implicit_val_str) if dtype == int else float(implicit_val_str)
+                )
                 # For scalar values, return single value array
                 return np.array([count])
             except ValueError:

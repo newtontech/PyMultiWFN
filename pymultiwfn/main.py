@@ -1,6 +1,8 @@
-import os
 import argparse
+import os
+
 import numpy as np
+
 from pymultiwfn.io.loader import load_wavefunction
 from pymultiwfn.math.density import calc_density
 

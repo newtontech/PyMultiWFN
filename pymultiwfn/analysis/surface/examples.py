@@ -6,15 +6,16 @@ functionality for different types of molecular surface analysis.
 """
 
 import numpy as np
-from pymultiwfn.core.data import Wavefunction, Atom
+
 from pymultiwfn.analysis.surface import (
+    MappedFunction,
     SurfaceAnalyzer,
     SurfaceType,
-    MappedFunction,
-    extract_isosurface,
     calculate_surface_descriptors,
     export_surface_to_obj,
+    extract_isosurface,
 )
+from pymultiwfn.core.data import Atom, Wavefunction
 
 
 def example_water_molecule():

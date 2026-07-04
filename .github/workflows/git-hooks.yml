@@ -46,6 +46,9 @@ jobs:
       - name: Run pre-push hooks
         run: pre-commit run --all-files --hook-stage pre-push
 
+      - name: Build package for wheel inspection
+        run: python -m build
+
       - name: Verify reference assets stay out of wheel
         run: |
           python - <<'PY'

@@ -8,9 +8,10 @@ This module implements various (hyper)polarizability analyses including:
 - Visualization via unit sphere and vector representations
 """
 
-import numpy as np
-from typing import List, Dict, Optional, Union
 import re
+from typing import Dict, List, Optional, Union
+
+import numpy as np
 
 from ...core.data import Wavefunction
 

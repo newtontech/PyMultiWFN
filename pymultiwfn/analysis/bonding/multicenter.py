@@ -1,7 +1,8 @@
-import numpy as np
-from typing import List, Tuple, Optional
-from itertools import permutations
 import math
+from itertools import permutations
+from typing import List, Optional, Tuple
+
+import numpy as np
 
 from pymultiwfn.core.data import Wavefunction
 

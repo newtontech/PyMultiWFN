@@ -10,12 +10,13 @@ This module tests critical point analysis functionality including:
 Reference: PHASE2_TASKS.md - Module 2.2: Electron Density Analysis
 """
 
-import pytest
-import numpy as np
 from pathlib import Path
 
-from pymultiwfn.io import load
+import numpy as np
+import pytest
+
 from pymultiwfn.density.topology import CriticalPointAnalyzer
+from pymultiwfn.io import load
 
 
 class TestCriticalPointAnalysis:
@@ -45,7 +46,9 @@ class TestCriticalPointAnalysis:
     def test_find_critical_points_method(self, h2_wfn):
         """Test that find_critical_points method exists."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
-        assert hasattr(analyzer, 'find_critical_points'), "Should have find_critical_points method"
+        assert hasattr(
+            analyzer, "find_critical_points"
+        ), "Should have find_critical_points method"
 
     def test_find_critical_points_returns_list(self, h2_wfn):
         """Test that find_critical_points returns list."""
@@ -57,16 +60,18 @@ class TestCriticalPointAnalysis:
         """Test critical point data structure."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
         points = analyzer.find_critical_points()
-        
+
         if len(points) > 0:
             cp = points[0]
-            assert 'position' in cp or 'type' in cp, "Critical point should have position or type"
+            assert (
+                "position" in cp or "type" in cp
+            ), "Critical point should have position or type"
 
     def test_gradient_calculation(self, h2_wfn):
         """Test gradient calculation on grid."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
-        
-        if hasattr(analyzer, 'calculate_gradient'):
+
+        if hasattr(analyzer, "calculate_gradient"):
             point = np.array([0.0, 0.0, 0.0])
             gradient = analyzer.calculate_gradient(point)
             assert isinstance(gradient, np.ndarray), "Gradient should be numpy array"
@@ -75,8 +80,8 @@ class TestCriticalPointAnalysis:
     def test_hessian_calculation(self, h2_wfn):
         """Test Hessian calculation on grid."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
-        
-        if hasattr(analyzer, 'calculate_hessian'):
+
+        if hasattr(analyzer, "calculate_hessian"):
             point = np.array([0.0, 0.0, 0.0])
             hessian = analyzer.calculate_hessian(point)
             assert isinstance(hessian, np.ndarray), "Hessian should be numpy array"
@@ -85,41 +90,43 @@ class TestCriticalPointAnalysis:
     def test_hessian_symmetric(self, h2_wfn):
         """Test that Hessian is symmetric."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
-        
-        if hasattr(analyzer, 'calculate_hessian'):
+
+        if hasattr(analyzer, "calculate_hessian"):
             point = np.array([0.0, 0.0, 0.0])
             hessian = analyzer.calculate_hessian(point)
-            assert np.allclose(hessian, hessian.T, atol=1e-6), "Hessian should be symmetric"
+            assert np.allclose(
+                hessian, hessian.T, atol=1e-6
+            ), "Hessian should be symmetric"
 
     def test_bond_critical_points(self, c2h4_wfn):
         """Test bond critical point (BCP) detection."""
         analyzer = CriticalPointAnalyzer(c2h4_wfn)
-        
-        if hasattr(analyzer, 'get_bond_critical_points'):
+
+        if hasattr(analyzer, "get_bond_critical_points"):
             bcps = analyzer.get_bond_critical_points()
             assert isinstance(bcps, list), "BCPs should be a list"
 
     def test_ring_critical_points(self, c2h4_wfn):
         """Test ring critical point (RCP) detection."""
         analyzer = CriticalPointAnalyzer(c2h4_wfn)
-        
-        if hasattr(analyzer, 'get_ring_critical_points'):
+
+        if hasattr(analyzer, "get_ring_critical_points"):
             rcps = analyzer.get_ring_critical_points()
             assert isinstance(rcps, list), "RCPs should be a list"
 
     def test_cage_critical_points(self, h2_wfn):
         """Test cage critical point (CCP) detection."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
-        
-        if hasattr(analyzer, 'get_cage_critical_points'):
+
+        if hasattr(analyzer, "get_cage_critical_points"):
             ccps = analyzer.get_cage_critical_points()
             assert isinstance(ccps, list), "CCPs should be a list"
 
     def test_critical_point_rank(self, h2_wfn):
         """Test critical point rank determination."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
-        
-        if hasattr(analyzer, 'get_critical_point_rank'):
+
+        if hasattr(analyzer, "get_critical_point_rank"):
             points = analyzer.find_critical_points()
             if len(points) > 0:
                 rank = analyzer.get_critical_point_rank(points[0])
@@ -129,8 +136,8 @@ class TestCriticalPointAnalysis:
     def test_critical_point_signature(self, h2_wfn):
         """Test critical point signature (rank, signature)."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
-        
-        if hasattr(analyzer, 'get_critical_point_signature'):
+
+        if hasattr(analyzer, "get_critical_point_signature"):
             points = analyzer.find_critical_points()
             if len(points) > 0:
                 sig = analyzer.get_critical_point_signature(points[0])
@@ -139,8 +146,8 @@ class TestCriticalPointAnalysis:
     def test_density_at_critical_point(self, h2_wfn):
         """Test density value at critical points."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
-        
-        if hasattr(analyzer, 'get_density_at_point'):
+
+        if hasattr(analyzer, "get_density_at_point"):
             point = np.array([0.0, 0.0, 0.0])
             density = analyzer.get_density_at_point(point)
             assert isinstance(density, (int, float)), "Density should be numeric"
@@ -149,8 +156,8 @@ class TestCriticalPointAnalysis:
     def test_laplacian_at_critical_point(self, h2_wfn):
         """Test Laplacian value at critical points."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
-        
-        if hasattr(analyzer, 'get_laplacian_at_point'):
+
+        if hasattr(analyzer, "get_laplacian_at_point"):
             point = np.array([0.0, 0.0, 0.0])
             laplacian = analyzer.get_laplacian_at_point(point)
             assert isinstance(laplacian, (int, float)), "Laplacian should be numeric"
@@ -158,19 +165,21 @@ class TestCriticalPointAnalysis:
     def test_ellipticity_calculation(self, h2_wfn):
         """Test ellipticity calculation at BCPs."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
-        
-        if hasattr(analyzer, 'calculate_ellipticity'):
+
+        if hasattr(analyzer, "calculate_ellipticity"):
             points = analyzer.find_critical_points()
             if len(points) > 0:
                 ellipticity = analyzer.calculate_ellipticity(points[0])
-                assert isinstance(ellipticity, (int, float)), "Ellipticity should be numeric"
+                assert isinstance(
+                    ellipticity, (int, float)
+                ), "Ellipticity should be numeric"
                 assert ellipticity >= 0, "Ellipticity should be non-negative"
 
     def test_critical_point_report(self, h2_wfn):
         """Test critical point report generation."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
-        
-        if hasattr(analyzer, 'generate_report'):
+
+        if hasattr(analyzer, "generate_report"):
             report = analyzer.generate_report()
             assert isinstance(report, str), "Report should be a string"
 
@@ -178,14 +187,16 @@ class TestCriticalPointAnalysis:
         """Test that gradient norm is near zero at critical points."""
         analyzer = CriticalPointAnalyzer(h2_wfn)
         points = analyzer.find_critical_points()
-        
-        if hasattr(analyzer, 'calculate_gradient') and len(points) > 0:
+
+        if hasattr(analyzer, "calculate_gradient") and len(points) > 0:
             for cp in points[:3]:
-                if 'position' in cp:
-                    gradient = analyzer.calculate_gradient(cp['position'])
+                if "position" in cp:
+                    gradient = analyzer.calculate_gradient(cp["position"])
                     norm = np.linalg.norm(gradient)
                     # Allow larger tolerance due to simplified density model
-                    assert norm < 0.5, f"Gradient norm at CP should be small, got {norm}"
+                    assert (
+                        norm < 0.5
+                    ), f"Gradient norm at CP should be small, got {norm}"
 
 
 class TestCriticalPointAdvanced:
@@ -202,8 +213,8 @@ class TestCriticalPointAdvanced:
     def test_morse_relationship(self, c2h4_wfn):
         """Test Morse relationship at critical points."""
         analyzer = CriticalPointAnalyzer(c2h4_wfn)
-        
-        if hasattr(analyzer, 'verify_morse_relationship'):
+
+        if hasattr(analyzer, "verify_morse_relationship"):
             points = analyzer.find_critical_points()
             if len(points) > 0:
                 result = analyzer.verify_morse_relationship(points[0])

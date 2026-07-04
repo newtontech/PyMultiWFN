@@ -3,8 +3,8 @@ Parser for Protein Data Bank files (.pdb, .PDB).
 PDB format is widely used for protein and molecular structures.
 """
 
-from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
+from pymultiwfn.core.data import Wavefunction
 
 
 class PDBLoader:

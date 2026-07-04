@@ -1,7 +1,8 @@
-import pytest
-import subprocess
 import os
+import subprocess
 from pathlib import Path
+
+import pytest
 
 
 # 测试简化版本的一致性

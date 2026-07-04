@@ -1,6 +1,8 @@
-import numpy as np
-from pymultiwfn.core.data import Wavefunction
 from typing import Dict
+
+import numpy as np
+
+from pymultiwfn.core.data import Wavefunction
 
 
 def calculate_mulliken_bond_order(wavefunction: Wavefunction) -> Dict[str, np.ndarray]:

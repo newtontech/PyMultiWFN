@@ -14,12 +14,23 @@ from typing import Dict, List, Optional
 
 import numpy as np
 
-
 # van der Waals radii (in Angstroms)
 VDW_RADII = {
-    'H': 1.20,  'C': 1.70,  'N': 1.55,  'O': 1.52,  'F': 1.47,
-    'P': 1.80,  'S': 1.80,  'Cl': 1.75, 'Br': 1.85, 'I': 1.98,
-    'B': 1.92,  'Si': 2.10, 'Ge': 2.11, 'As': 1.85, 'Se': 1.90,
+    "H": 1.20,
+    "C": 1.70,
+    "N": 1.55,
+    "O": 1.52,
+    "F": 1.47,
+    "P": 1.80,
+    "S": 1.80,
+    "Cl": 1.75,
+    "Br": 1.85,
+    "I": 1.98,
+    "B": 1.92,
+    "Si": 2.10,
+    "Ge": 2.11,
+    "As": 1.85,
+    "Se": 1.90,
 }
 
 
@@ -34,6 +45,7 @@ class FuzzyAtom:
         vdwa_radius: van der Waals radius in Angstroms
         fuzzy_factor: Fuzzy partition factor (0.0-1.0, default 0.5)
     """
+
     atom_index: int
     element: str
     coordinates: np.ndarray
@@ -56,7 +68,7 @@ class FuzzyAtom:
         """Get atomic symbol."""
         return self.element
 
-    def fuzzy_overlap_radius(self, other: 'FuzzyAtom') -> float:
+    def fuzzy_overlap_radius(self, other: "FuzzyAtom") -> float:
         """Calculate fuzzy overlap radius with another atom.
 
         Args:

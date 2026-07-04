@@ -5,9 +5,11 @@ This module provides common fixtures used across multiple test modules,
 particularly for quantum chemistry data structures and test data files.
 """
 
-import pytest
-import numpy as np
 from pathlib import Path
+
+import numpy as np
+import pytest
+
 from pymultiwfn.core.data import Atom, Shell, Wavefunction
 
 
@@ -111,7 +113,6 @@ def c2h2_wavefunction_file(repo_root):
         [repo_root / "tests" / "test_data" / "C2H2.wfn"],
         "C2H2",
     )
-
 
 
 @pytest.fixture
@@ -252,8 +253,8 @@ def parallel_safe():
             # Get unique random seed
             seed = parallel_safe['seed']
     """
-    import tempfile
     import os
+    import tempfile
 
     # Try to get pytest-xdist worker ID
     worker_id = os.getenv("PYTEST_XDIST_WORKER", "master")
@@ -299,9 +300,9 @@ def isolated_environment():
             from pymultiwfn import something
             ...
     """
+    import gc
     import importlib
     import sys
-    import gc
 
     # Get all modules to reload (before test)
     modules_to_reload = [name for name in sys.modules if name.startswith("pymultiwfn")]

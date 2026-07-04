@@ -5,9 +5,11 @@ This module tests PyMultiWFN calculations against known reference values
 to ensure correctness and numerical stability.
 """
 
-import pytest
-import numpy as np
 from pathlib import Path
+
+import numpy as np
+import pytest
+
 from pymultiwfn.io.loader import load_wavefunction
 
 

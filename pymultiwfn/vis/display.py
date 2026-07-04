@@ -6,12 +6,13 @@ including 2D plots, contour plots, scatter plots, and specialized visualizations
 Based on the plotting functionality from Multiwfn's dislin_d module.
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-from typing import List, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
+from typing import List, Optional, Tuple
+
+import matplotlib.pyplot as plt
+import numpy as np
+import plotly.graph_objects as go
 
 from ..config import Config
 

@@ -5,8 +5,9 @@ This module provides atomic radial density data and fitting parameters for eleme
 The data is used for promolecular density calculations and atomic density fitting.
 """
 
-import numpy as np
 from typing import Tuple
+
+import numpy as np
 
 
 def genatmraddens(element_index: int) -> Tuple[np.ndarray, int]:

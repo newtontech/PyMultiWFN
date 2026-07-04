@@ -5,8 +5,9 @@ This module tests the implementation of Cartesian F basis functions
 in the basis set evaluation module.
 """
 
-import pytest
 import numpy as np
+import pytest
+
 from pymultiwfn.core.data import Atom, Shell, Wavefunction
 
 

@@ -1,7 +1,7 @@
 # pymultiwfn/io/loader.py
 
-from pymultiwfn.io.file_manager import FileManager
 from pymultiwfn.core.data import Wavefunction
+from pymultiwfn.io.file_manager import FileManager
 
 # Instantiate FileManager once to handle all loading requests
 _file_manager = FileManager()

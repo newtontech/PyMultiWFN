@@ -1,5 +1,6 @@
-import numpy as np
 from typing import Dict
+
+import numpy as np
 
 from pymultiwfn.core.data import Wavefunction
 

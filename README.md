@@ -16,7 +16,7 @@ A Python-first refactor of the Multiwfn wavefunction analysis program.
 - **Population Analysis**: Mulliken, Hirshfeld, Becke populations
 - **Orbital Analysis**: MO visualization and analysis
 - **High Performance**: Optimized with NumPy, caching, and parallel processing
-- **Well Tested**: 290+ tests with comprehensive coverage
+- **Well Tested**: 500+ local tests with focused scientific regression coverage
 
 ## Installation
 
@@ -135,16 +135,20 @@ python scripts/dev/benchmark_performance.py
 **Version**: 0.1.2 (Alpha)
 
 **Test Status**:
-- Tests: 291 passing, 10 skipped
-- Coverage: Comprehensive
-- Quality: 0 violations
+- Last local verification: 2026-07-04 on macOS with `.venv` Python 3.13.13.
+- Default pytest: 509 passed, 28 skipped, 3 warnings.
+- Opt-in file-loading integration: 5 passed with `--runintegration`.
+- Quality gates: Black and isort pass for `pymultiwfn/` and `tests/`; critical flake8 passes.
+- Advisory debt: broader flake8 reports 122 style/complexity findings.
+- Build: `python -m build` produced sdist and wheel successfully; wheel inspection found 0 retained Multiwfn assets.
+- Consistency: smoke verifier skipped 3 Linux-oracle cases locally because the retained Multiwfn binary is Linux-only.
 
 **Development Progress**:
-- ✅ Code Quality: 100% complete
-- ✅ Test Framework: 70% complete
-- 🔄 Performance: 40% complete
-- 🔄 Documentation: 60% complete
-- 🔄 Consistency: 50% complete
+- Code Quality: blocking format/import/critical-syntax gates are in place; advisory style debt remains.
+- Test Framework: default and opt-in file-loading suites are green; some skips still reflect missing or unsupported fixtures.
+- Performance: partially benchmarked.
+- Documentation: improving, with status now tied to command output.
+- Consistency: partial until Linux oracle smoke and parity suites pass in CI.
 
 ## Contributing
 
@@ -192,4 +196,4 @@ Based on the original [Multiwfn](http://sobereva.com/multiwfn/) program by Tian 
 ---
 
 **Maintained by**: PyMultiWFN Team  
-**Last Updated**: 2026-02-27
+**Last Updated**: 2026-07-04

@@ -9,27 +9,27 @@ This module tests:
 - Validation against known chemical systems
 """
 
-import pytest
-import numpy as np
 from pathlib import Path
 
-from pymultiwfn.io.loader import load_wavefunction
+import numpy as np
+import pytest
 
 # Import directly from modules to avoid LSB import issues
 from pymultiwfn.analysis.bonding.mayer import calculate_mayer_bond_order
 from pymultiwfn.analysis.bonding.mulliken import calculate_mulliken_bond_order
 from pymultiwfn.analysis.bonding.multicenter import calculate_multicenter_bond_order
 from pymultiwfn.core.data import Wavefunction
+from pymultiwfn.io.loader import load_wavefunction
 
 # Import utility functions from bondorder module directly
 # Note: We're using a try/except in case the module has issues
 try:
     from pymultiwfn.analysis.bonding.bondorder import (
-        calculate_wiberg_bond_order,
-        get_bond_orders_above_threshold,
         calculate_fragment_bond_order,
-        get_bond_order_statistics,
+        calculate_wiberg_bond_order,
         compare_bond_orders,
+        get_bond_order_statistics,
+        get_bond_orders_above_threshold,
     )
 
     BONDORDER_UTILS_AVAILABLE = True
@@ -45,7 +45,7 @@ except ImportError:
 @pytest.fixture
 def test_data_dir():
     """Return path to test data directory."""
-    return Path("/home/yhm/software/PyMultiWFN/consistency_verifier/examples")
+    return Path(__file__).resolve().parents[1] / "test_data"
 
 
 @pytest.fixture

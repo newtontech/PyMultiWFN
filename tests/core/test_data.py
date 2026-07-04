@@ -7,9 +7,10 @@ Tests cover:
 - Wavefunction class: initialization, methods, edge cases
 """
 
-import pytest
+from typing import Dict, List
+
 import numpy as np
-from typing import List, Dict
+import pytest
 
 from pymultiwfn.core.data import Atom, Shell, Wavefunction
 
@@ -513,8 +514,10 @@ class TestWavefunctionOverlapMatrix:
 
         assert sample_wavefunction.overlap_matrix is not None
         assert sample_wavefunction.overlap_matrix.shape == (2, 2)
-        # Should be identity for placeholder
-        np.testing.assert_array_equal(sample_wavefunction.overlap_matrix, np.eye(2))
+        assert np.allclose(
+            sample_wavefunction.overlap_matrix, sample_wavefunction.overlap_matrix.T
+        )
+        assert sample_wavefunction.overlap_matrix[0, 1] > 0.0
 
     def test_calculate_overlap_matrix_zero_basis(self):
         """Test overlap matrix with zero basis functions."""
@@ -525,14 +528,22 @@ class TestWavefunctionOverlapMatrix:
         assert wf.overlap_matrix is not None
         np.testing.assert_array_equal(wf.overlap_matrix, np.array([]))
 
-    def test_calculate_overlap_matrix_identity(self):
-        """Test that placeholder overlap matrix is identity."""
+    def test_calculate_overlap_matrix_requires_shells_without_fallback(self):
+        """Test that missing shell data does not silently produce identity."""
         wf = Wavefunction()
         wf.num_basis = 5
-        wf.calculate_overlap_matrix()
 
-        expected = np.eye(5)
-        np.testing.assert_array_equal(wf.overlap_matrix, expected)
+        with pytest.raises(ValueError, match="without basis shell information"):
+            wf.calculate_overlap_matrix()
+
+    def test_calculate_overlap_matrix_identity_fallback_is_explicit(self):
+        """Test explicit identity fallback for synthetic orthonormal basis tests."""
+        wf = Wavefunction()
+        wf.num_basis = 5
+        with pytest.warns(RuntimeWarning, match="identity overlap matrix fallback"):
+            overlap = wf.calculate_overlap_matrix(allow_identity_fallback=True)
+
+        np.testing.assert_array_equal(overlap, np.eye(5))
 
 
 # =============================================================================
@@ -759,8 +770,10 @@ class TestIntegration:
         assert wf.Palpha is not None
         assert wf.Ptot is not None
 
-        # Calculate overlap matrix
-        wf.calculate_overlap_matrix()
+        # Synthetic fixture has coefficients but no shell basis data, so it
+        # must opt into the orthonormal-basis fallback explicitly.
+        with pytest.warns(RuntimeWarning, match="identity overlap matrix fallback"):
+            wf.calculate_overlap_matrix(allow_identity_fallback=True)
         assert wf.overlap_matrix is not None
 
     def test_hydrogen_atom_unrestricted(self):

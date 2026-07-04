@@ -519,6 +519,30 @@ python -m pip install -U --extra-index-url https://test.pypi.org/simple pymultiw
 - Added overflow protection in basis function evaluation
 - Removed test files as specified in project requirements
 
+## 6. Repository Improvement Audit (2026-07-04)
+
+The current checkout needs a truthfulness and scientific-parity pass before broad
+new feature work. A detailed plan is maintained in
+`docs/quality/REPO_IMPROVEMENT_PLAN_2026-07-04.md`.
+
+Current verified signals:
+
+- Full local pytest on the existing macOS `.venv` with Python 3.13.13: 509 passed, 28 skipped, 3 warnings.
+- Opt-in file-loading integration with `--runintegration`: 5 passed.
+- Black and isort checks pass for `pymultiwfn/` and `tests/`.
+- Critical flake8 gate has 0 syntax/undefined-name failures.
+- Broader flake8 style/complexity scan remains advisory with 122 findings.
+- `python -m build` produces both sdist and wheel; wheel inspection found 0 retained Multiwfn assets.
+- Consistency verifier smoke on macOS with `--skip-oracle-if-unavailable`: 3 skipped because the retained oracle is Linux-only.
+
+Highest priority work:
+
+1. Run Linux oracle parity for overlap/bond-order and metadata smoke cases.
+2. Add pure spherical D/F overlap support or keep those fixtures explicitly skipped.
+3. Replace remaining zero-output placeholder analyzers on advertised public APIs.
+4. Reduce the 122 advisory flake8 findings in small, behavior-neutral batches.
+5. Keep README and status docs tied to fresh command output.
+
 ### Current Project Reality (Based on AGENTS.md):
 
 **MVP Finalization Status (2025-Nov-24):**

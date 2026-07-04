@@ -1,7 +1,9 @@
+from typing import Any, Dict, List
+
 import numpy as np
-from typing import List, Dict, Any
 
 from pymultiwfn.core.data import Wavefunction
+
 from .mayer import calculate_mayer_bond_order  # To reuse Mayer BO calculation
 
 
@@ -153,7 +155,6 @@ def calculate_orbital_perturbed_mayer_bond_order(
         )
 
     wavefunction.calculate_density_matrices()  # Ensure density matrices and occupations are inferred
-
 
     # Calculate the unperturbed Mayer bond order (total, alpha, beta)
     (

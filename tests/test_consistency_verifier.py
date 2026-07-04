@@ -108,7 +108,10 @@ def test_collect_pymultiwfn_values_from_retained_h2(repo_root):
     case = CaseSpec(
         case_id="h2_probe",
         suite="smoke",
-        input_path=repo_root / "Multiwfn_3.8_bin_Linux_noGUI" / "examples" / "H2_CCSD.wfn",
+        input_path=repo_root
+        / "Multiwfn_3.8_bin_Linux_noGUI"
+        / "examples"
+        / "H2_CCSD.wfn",
         commands=[],
         comparisons=[],
         pymultiwfn={"density_points": [[0.0, 0.0, 0.0]]},

@@ -1,5 +1,7 @@
+from typing import Any, Dict, List, Tuple
+
 import numpy as np
-from typing import List, Dict, Any, Tuple
+
 from pymultiwfn.core.data import Wavefunction
 
 

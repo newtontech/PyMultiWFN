@@ -4,10 +4,11 @@ Fix for overlap matrix calculation - use WFN original basis function ordering
 """
 
 import numpy as np
-from pymultiwfn.io.parsers.wfn import WFNLoader
+
 from pymultiwfn.integrals.overlap import (
     _calculate_primitive_overlap,
 )
+from pymultiwfn.io.parsers.wfn import WFNLoader
 
 
 def calculate_overlap_matrix_wfn_order(wfn):

@@ -5,11 +5,13 @@ This module adds reference value tests to ensure numerical accuracy
 against known literature values and standard quantum chemistry calculations.
 """
 
-import pytest
 import numpy as np
+import pytest
+
+from pymultiwfn.analysis.bonding.bondorder import calculate_mayer_bond_order
 from pymultiwfn.core.data import Atom, Shell, Wavefunction
 from pymultiwfn.math.density import calc_density
-from pymultiwfn.analysis.bonding.bondorder import calculate_mayer_bond_order
+
 # Note: mulliken_population_analysis not yet implemented
 # from pymultiwfn.analysis.population.mulliken import mulliken_population_analysis
 
@@ -61,7 +63,9 @@ class TestReferenceValues:
         )
 
         # Reference: num_electrons should be 2.0
-        assert wfn.num_electrons == 2.0, f"Electron count should be 2.0, got {wfn.num_electrons}"
+        assert (
+            wfn.num_electrons == 2.0
+        ), f"Electron count should be 2.0, got {wfn.num_electrons}"
 
     def test_h2_bond_order_unity(self):
         """Verify H2 bond order is approximately 1.0 (single bond).

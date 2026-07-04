@@ -12,14 +12,15 @@ References:
   Angew. Chem. Int. Ed., 137, e202504895 (2025)
 """
 
-import numpy as np
-from typing import List, Tuple, Optional, Dict
 from dataclasses import dataclass
 from enum import Enum
+from typing import Dict, List, Optional, Tuple
 
+import numpy as np
+
+from ..config import Config
 from ..core.data import Wavefunction
 from ..math.density import calc_density
-from ..config import Config
 
 
 class AnalysisType(Enum):

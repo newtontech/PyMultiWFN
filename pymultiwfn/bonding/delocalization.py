@@ -11,10 +11,11 @@ References:
 - Matito, E. et al. (2005). J. Phys. Chem. A 109, 5600-5609.
 """
 
-import numpy as np
-from typing import Union, Tuple, List, Optional, Dict
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
+
+import numpy as np
 
 
 @dataclass
@@ -27,6 +28,7 @@ class DelocalizationResult:
         di_value: Delocalization index value in electrons
         bond_type: Classification of bond type (single, double, aromatic, etc.)
     """
+
     atom_i: int
     atom_j: int
     di_value: float
@@ -396,7 +398,7 @@ class DelocalizationIndex:
             return self.wfn.Ptot
 
         # Calculate if not present
-        if hasattr(self.wfn, 'calculate_density_matrices'):
+        if hasattr(self.wfn, "calculate_density_matrices"):
             self.wfn.calculate_density_matrices()
             if self.wfn.Ptot is not None:
                 return self.wfn.Ptot
@@ -406,7 +408,7 @@ class DelocalizationIndex:
             # P = C * occ * C^T (for MOs as rows)
             C = self.wfn.coefficients
             occ = self.wfn.occupations
-            P = np.einsum('oi,oj->ij', C * occ[:, np.newaxis], C)
+            P = np.einsum("oi,oj->ij", C * occ[:, np.newaxis], C)
             return P
 
         raise ValueError("Cannot construct density matrix from wavefunction")
@@ -417,7 +419,7 @@ class DelocalizationIndex:
             return self.wfn.overlap_matrix
 
         # Calculate if method exists
-        if hasattr(self.wfn, 'calculate_overlap_matrix'):
+        if hasattr(self.wfn, "calculate_overlap_matrix"):
             self.wfn.calculate_overlap_matrix()
             if self.wfn.overlap_matrix is not None:
                 return self.wfn.overlap_matrix
@@ -428,7 +430,7 @@ class DelocalizationIndex:
 
     def _get_atom_basis_indices(self) -> Dict[int, List[int]]:
         """Get mapping from atom index to basis function indices."""
-        if hasattr(self.wfn, 'get_atomic_basis_indices'):
+        if hasattr(self.wfn, "get_atomic_basis_indices"):
             return self.wfn.get_atomic_basis_indices()
 
         # Fallback: assign basis functions equally (approximation)
@@ -480,9 +482,7 @@ class DelocalizationIndex:
             self.density_matrix, self.overlap_matrix, indices_i, indices_j
         )
 
-    def get_three_center_di(
-        self, atom_a: int, atom_b: int, atom_c: int
-    ) -> float:
+    def get_three_center_di(self, atom_a: int, atom_b: int, atom_c: int) -> float:
         """Calculate 3-center delocalization index.
 
         Args:
@@ -501,9 +501,7 @@ class DelocalizationIndex:
 
         for atom in [atom_a, atom_b, atom_c]:
             if not (0 <= atom < self.natoms):
-                raise ValueError(
-                    f"Atom index {atom} out of range [0, {self.natoms})"
-                )
+                raise ValueError(f"Atom index {atom} out of range [0, {self.natoms})")
 
         indices_a = self.atom_basis_indices.get(atom_a, [])
         indices_b = self.atom_basis_indices.get(atom_b, [])
@@ -597,7 +595,9 @@ class DelocalizationIndex:
         ai = self.get_aromaticity_index(ring_atoms)
         return ai >= threshold
 
-    def get_all_dihedral_dis(self, ring_atoms: List[int]) -> Dict[Tuple[int, int], float]:
+    def get_all_dihedral_dis(
+        self, ring_atoms: List[int]
+    ) -> Dict[Tuple[int, int], float]:
         """Get all delocalization indices for atom pairs in a ring.
 
         Args:

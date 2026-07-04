@@ -3,8 +3,8 @@ Parsers for ORCA input and output files.
 ORCA is a quantum chemistry program for electronic structure calculation.
 """
 
-from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.core.constants import ANGSTROM_TO_BOHR
+from pymultiwfn.core.data import Wavefunction
 
 
 class ORCALoader:

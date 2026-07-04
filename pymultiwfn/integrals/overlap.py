@@ -22,6 +22,7 @@ Future enhancements:
 """
 
 from functools import lru_cache
+from math import comb, prod
 from typing import Dict, List, Tuple
 
 import numpy as np
@@ -82,9 +83,6 @@ def calculate_overlap_matrix(
     nbasis = len(basis_functions)
     overlap_matrix = np.zeros((nbasis, nbasis))
 
-    # Get all basis function parameters
-    basis_functions = _extract_basis_functions(wfn)
-
     if verbose:
         print(
             f"Calculating overlap matrix for {len(basis_functions)} basis functions..."
@@ -111,9 +109,8 @@ def calculate_overlap_matrix(
 
     if verbose:
         print(f"Overlap matrix calculated. Trace: {np.trace(overlap_matrix):.6f}")
-        print(
-            f"Max absolute off-diagonal: {np.max(np.abs(overlap_matrix - np.diag(np.diag(overlap_matrix)))):.6f}"
-        )
+        off_diagonal = overlap_matrix - np.diag(np.diag(overlap_matrix))
+        print(f"Max absolute off-diagonal: {np.max(np.abs(off_diagonal)):.6f}")
 
     return overlap_matrix
 
@@ -354,9 +351,9 @@ def _calculate_primitive_overlap(
     """
     Calculate overlap integral between two primitive GTOs.
 
-    Uses the Obara-Saika recurrence relations for efficient calculation.
+    Uses a direct Cartesian Gaussian moment formula for efficient calculation.
 
-    Optimizations:
+    Notes:
     - LRU caching for repeated calculations
     - Efficient use of numpy operations
 
@@ -404,8 +401,9 @@ def _calculate_primitive_overlap(
     l1, m1, n1 = _type_to_lmn(type1)
     l2, m2, n2 = _type_to_lmn(type2)
 
-    # Use Obara-Saika recurrence relations
-    S = _obara_saika_S(l1, m1, n1, l2, m2, n2, PA, PB, p, S0)
+    # Use the direct Cartesian product formula. The old recursive path could
+    # bounce angular momentum between centers without reducing total order.
+    S = _cartesian_overlap(l1, m1, n1, l2, m2, n2, PA, PB, p, S0)
 
     return S
 
@@ -439,7 +437,7 @@ def _type_to_lmn(gto_type: int) -> Tuple[int, int, int]:
         raise NotImplementedError(f"GTO type {gto_type} not yet implemented") from exc
 
 
-def _obara_saika_S(
+def _cartesian_overlap(
     l1: int,
     m1: int,
     n1: int,
@@ -452,74 +450,24 @@ def _obara_saika_S(
     S0: float,
 ) -> float:
     """
-    Obara-Saika recurrence relation for overlap integrals.
+    Direct Cartesian Gaussian overlap integral.
 
-    This function uses recursive formula to calculate overlaps
-    between arbitrary Cartesian Gaussians.
+    This factors the 3D integral into exact 1D Gaussian moments normalized by
+    the S-S primitive overlap. It supports every Cartesian angular momentum in
+    ``GTO_TYPE_TO_LMN`` without recursive reduction.
 
     Args:
         l1, m1, n1: Angular momentum of first GTO
         l2, m2, n2: Angular momentum of second GTO
-        PA: Vector from P to A (Gaussian product to center 1)
-        PB: Vector from P to B (Gaussian product to center 2)
+        PA: Vector from center 1 to Gaussian product center P
+        PB: Vector from center 2 to Gaussian product center P
         p: Sum of exponents (alpha + beta)
         S0: 0D overlap integral (SS type)
 
     Returns:
         Overlap integral value
     """
-    # Base case: SS overlap
-    if l1 == 0 and m1 == 0 and n1 == 0 and l2 == 0 and m2 == 0 and n2 == 0:
-        return S0
-
-    # Use explicit formulas for low angular momentum
-    if l1 <= 1 and l2 <= 1 and m1 <= 1 and m2 <= 1 and n1 <= 1 and n2 <= 1:
-        return _explicit_overlap_SPD(l1, m1, n1, l2, m2, n2, PA, PB, p, S0)
-
-    # Recursively reduce angular momentum
-    S = 0.0
-
-    # Recursion for l1 (reduce l1 by 1, increase l2 by 1)
-    if l1 > 0:
-        term1 = _obara_saika_S(l1 - 1, m1, n1, l2 + 1, m2, n2, PA, PB, p, S0)
-        term1 *= l1 / (2 * p)
-        S += term1
-
-        term2 = _obara_saika_S(l1 - 1, m1, n1, l2, m2, n2, PA, PB, p, S0)
-        term2 += PA[0] * term1  # This is simplified; full formula is more complex
-        S += term2
-
-    # Recursion for m1 (reduce m1 by 1, increase m2 by 1)
-    if m1 > 0:
-        term1 = _obara_saika_S(l1, m1 - 1, n1, l2, m2 + 1, n2, PA, PB, p, S0)
-        term1 *= m1 / (2 * p)
-        S += term1
-
-    # Recursion for n1 (reduce n1 by 1, increase n2 by 1)
-    if n1 > 0:
-        term1 = _obara_saika_S(l1, m1, n1 - 1, l2, m2 + 1, n2, PA, PB, p, S0)
-        term1 *= n1 / (2 * p)
-        S += term1
-
-    # Recursion for l2 (reduce l2 by 1, increase l1 by 1)
-    if l2 > 0:
-        term1 = _obara_saika_S(l1 + 1, m1, n1, l2 - 1, m2, n2, PA, PB, p, S0)
-        term1 *= l2 / (2 * p)
-        S += term1
-
-    # Recursion for m2 (reduce m2 by 1, increase m1 by 1)
-    if m2 > 0:
-        term1 = _obara_saika_S(l1, m1 + 1, n1, l2, m2 - 1, n2, PA, PB, p, S0)
-        term1 *= m2 / (2 * p)
-        S += term1
-
-    # Recursion for n2 (reduce n2 by 1, increase n1 by 1)
-    if n2 > 0:
-        term1 = _obara_saika_S(l1, m1, n1 + 1, l2, m2, n2 - 1, PA, PB, p, S0)
-        term1 *= n2 / (2 * p)
-        S += term1
-
-    return S
+    return _explicit_overlap_SPD(l1, m1, n1, l2, m2, n2, PA, PB, p, S0)
 
 
 def _explicit_overlap_SPD(
@@ -535,10 +483,10 @@ def _explicit_overlap_SPD(
     S0: float,
 ) -> float:
     """
-    Explicit overlap formulas for S, P, and D functions.
+    Explicit Cartesian overlap formula.
 
-    This implements Obara-Saika recurrence relations in a more
-    direct form for low angular momentum functions.
+    This computes exact 1D Gaussian moments along each Cartesian dimension
+    and multiplies them by the S-S primitive overlap.
 
     Args:
         l1, m1, n1: Angular momentum of first GTO
@@ -568,10 +516,8 @@ def _overlap_1d(i: int, j: int, PA: float, PB: float, p: float) -> float:
     """
     1D overlap integral for Cartesian Gaussians.
 
-    Uses recurrence relation:
-    S(i, j) = (2*pi/p)^(1/2) * [exp(-mu*PA^2) * sum terms]
-
-    For now, implement explicit formulas for i, j <= 2.
+    The returned value is normalized by the zero-order 1D integral; the caller
+    multiplies the x/y/z factors by the full S-S primitive overlap.
 
     Args:
         i: Angular momentum in this dimension (first GTO)
@@ -583,19 +529,29 @@ def _overlap_1d(i: int, j: int, PA: float, PB: float, p: float) -> float:
     Returns:
         1D overlap integral
     """
-    # Base case: SS overlap (i=0, j=0)
-    if i == 0 and j == 0:
+    value = 0.0
+    for a in range(i + 1):
+        for b in range(j + 1):
+            moment_order = a + b
+            if moment_order % 2:
+                continue
+
+            coefficient = comb(i, a) * comb(j, b) * (PA ** (i - a)) * (PB ** (j - b))
+            value += coefficient * _gaussian_moment_ratio(moment_order, p)
+
+    return value
+
+
+def _gaussian_moment_ratio(order: int, p: float) -> float:
+    """Return int x^order exp(-p x^2) dx divided by the zero-order integral."""
+    if order == 0:
         return 1.0
+    if order % 2:
+        return 0.0
 
-    # S-P overlap
-    if i == 0 and j == 1:
-        return PB
-    elif i == 1 and j == 0:
-        return PA
-
-    # For higher angular momentum, this would need full implementation
-    # For now, return 0 as placeholder
-    return 0.0
+    k = order // 2
+    odd_product = prod(range(1, 2 * k, 2))
+    return odd_product / ((2 * p) ** k)
 
 
 def clear_overlap_cache() -> None:

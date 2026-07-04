@@ -5,9 +5,10 @@ This module implements information-theoretic analysis of electron density
 using real-space functions and fuzzy atomic partitioning methods.
 """
 
-import numpy as np
-from typing import Tuple, List
 from dataclasses import dataclass
+from typing import List, Tuple
+
+import numpy as np
 
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.math.density import calc_density as calculate_electron_density

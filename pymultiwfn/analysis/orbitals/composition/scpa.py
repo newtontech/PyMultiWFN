@@ -2,8 +2,10 @@
 SCPA (Square of Coefficients Partition Analysis) for orbital composition.
 """
 
-import numpy as np
 from typing import Dict, List
+
+import numpy as np
+
 from pymultiwfn.core.data import Wavefunction
 
 

@@ -1,7 +1,7 @@
 # pymultiwfn/io/parsers/fortran_parser.py
 
 import re
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class FortranParser:

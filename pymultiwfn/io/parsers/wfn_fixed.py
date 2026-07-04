@@ -2,8 +2,8 @@
 Fixed WFN parser that correctly stores centre_assignments for basis function indexing.
 """
 
-from pymultiwfn.io.parsers.wfn import WFNLoader
 from pymultiwfn.core.data import Wavefunction
+from pymultiwfn.io.parsers.wfn import WFNLoader
 
 
 class WFNLoaderFixed(WFNLoader):

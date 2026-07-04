@@ -8,10 +8,11 @@ Tian Lu, Feiwu Chen, "Quantitative analysis of molecular surface based on
 improved Marching Tetrahedra algorithm", J. Mol. Graph. Model., 38, 314-323 (2012).
 """
 
-import numpy as np
-from typing import List, Tuple, Optional, Dict, Any
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
 
 from pymultiwfn.core.data import Wavefunction
 from pymultiwfn.math.density import calc_density

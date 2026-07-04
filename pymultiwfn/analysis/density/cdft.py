@@ -11,11 +11,13 @@ This module implements various CDFT analysis methods including:
 - Nucleophilic and electrophilic superdelocalizabilities
 """
 
-import numpy as np
 from typing import Dict, List, Optional
+
+import numpy as np
+
 from ...core.data import Wavefunction
-from ...math.density import calc_density
 from ...math.basis import eval_basis_functions
+from ...math.density import calc_density
 
 
 def calculate_fukui_functions(
@@ -167,7 +169,6 @@ def calculate_condensed_fukui_functions(
     q_N = calculate_hirshfeld_charges(wfn_N)
     q_Np = calculate_hirshfeld_charges(wfn_Np)
     q_Nm = calculate_hirshfeld_charges(wfn_Nm)
-
 
     # Calculate condensed Fukui functions
     f_minus = (q_Nm - q_N) / degeneracy_m

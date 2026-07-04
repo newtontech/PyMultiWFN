@@ -6,15 +6,16 @@ including bonds, atoms, and molecular properties. Based on the molecular visuali
 features from Multiwfn's GUI and display modules.
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
+from typing import Dict, List, Optional, Tuple
 
-from ..core.data import Wavefunction
+import matplotlib.pyplot as plt
+import numpy as np
+import plotly.graph_objects as go
+
 from ..config import Config
+from ..core.data import Wavefunction
 
 
 class VisualizationStyle(Enum):

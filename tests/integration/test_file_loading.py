@@ -4,8 +4,9 @@ Integration tests for PyMultiWFN file loading.
 These tests test the full workflow of loading various file formats.
 """
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 @pytest.mark.integration
@@ -20,12 +21,11 @@ class TestFileLoading:
         assert (test_data_dir / "fchk").exists()
         assert (test_data_dir / "molden").exists()
 
-    @pytest.mark.skip(reason="No test data files available yet")
     def test_load_wfn_file(self, test_data_dir):
         """Test loading a WFN file end-to-end."""
         from pymultiwfn.io.loader import load_wavefunction
 
-        wfn_file = test_data_dir / "wfn" / "example.wfn"
+        wfn_file = test_data_dir / "H2_CCSD.wfn"
         if not wfn_file.exists():
             pytest.skip("Example WFN file not found")
 

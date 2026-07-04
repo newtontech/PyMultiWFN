@@ -12,13 +12,14 @@ The implementation follows the approach used in Multiwfn, supporting different
 broadening functions (Gaussian, Lorentzian, Pseudo-Voigt) and fragment definitions.
 """
 
-import numpy as np
-from typing import List, Optional, Dict, Union
-from enum import Enum
 from dataclasses import dataclass, field
+from enum import Enum
+from typing import Dict, List, Optional, Union
 
-from pymultiwfn.core.data import Wavefunction
+import numpy as np
+
 from pymultiwfn.core.constants import AU_TO_EV
+from pymultiwfn.core.data import Wavefunction
 
 
 class BroadeningFunction(Enum):

@@ -5,8 +5,9 @@ This module provides helper functions and utilities for surface analysis,
 including mathematical operations, data processing, and visualization helpers.
 """
 
+from typing import Dict, List, Optional, Tuple
+
 import numpy as np
-from typing import Tuple, List, Optional, Dict
 from scipy.spatial import cKDTree
 
 from .surface_analysis import SurfaceData
