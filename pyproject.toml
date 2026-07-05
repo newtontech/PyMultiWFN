@@ -43,7 +43,7 @@ dev = [
     "pytest-mock>=3.12",
     "pytest-xdist>=3.0",
     "pytest-timeout>=2.0",
-    "pytest-rerunfailures>=13.0",
+    "pytest-rerunfailures>=16.4",
 ]
 visualization = [
     "matplotlib>=3.5",
@@ -98,7 +98,7 @@ dev = [
     "pytest-mock>=3.12",
     "pytest-xdist>=3.0",  # Parallel testing
     "pytest-timeout>=2.0",  # Test timeout
-    "pytest-rerunfailures>=13.0",  # Rerun flaky tests
+    "pytest-rerunfailures>=16.4",  # Rerun flaky tests
 ]
 
 [tool.pytest.ini_options]
